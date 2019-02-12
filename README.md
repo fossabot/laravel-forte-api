@@ -6,27 +6,8 @@
 
 ### Server Architecture
 - AWS EC2
-- AWS S3
-- AWS CodePipeline
 
-### Code Rules
-
-#### Code Concept
-- PSR(PHP Standards Recommendation) 을 따른다.
-
-#### Model
-
-#### View
-
-#### Controller
-
-#### Database Migration
-
-...
-
-### URL Rules
-- RESTFUL API 규칙을 지킨다.
-- URL에는 복수형 단어를 사용한다.
+### Plan
 
 ### Installation
 - Ubuntu 기준
