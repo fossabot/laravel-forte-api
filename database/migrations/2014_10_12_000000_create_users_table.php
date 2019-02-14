@@ -15,7 +15,9 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('public_id')->comment('username');
+            $table->string('name')->comment('username');
+            $table->string('email')->unique();
+            $table->string('password');
             $table->bigInteger('points')->default(0)->comment('virtual currency balance');
             $table->timestamps();
         });
