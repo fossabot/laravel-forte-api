@@ -12,6 +12,6 @@ class Discord extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'discord_id', 'expiration_time', 'purchase_limit',
+        'user_id', 'discord_id',
     ];
 }

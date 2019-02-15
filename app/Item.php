@@ -12,6 +12,6 @@ class Item extends Model
      * @var array
      */
     protected $fillable = [
-        'client_id', 'sku', 'name', 'image_url', 'price', 'enabled', 'consumable',
+        'client_id', 'sku', 'name', 'image_url', 'price', 'enabled', 'consumable', 'expiration_time', 'purchase_limit',
     ];
 }
