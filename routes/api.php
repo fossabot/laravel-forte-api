@@ -16,7 +16,7 @@ use Illuminate\Http\Request;
 Route::prefix('v1/')->middleware(['api.headers'])->group(function () {
     Route::resource('users', 'UserController');
 
-    Route::post('users/{user_id}/discord', 'UserController@linkDiscord');
+    Route::post('users/{user_id}/discord', 'DiscordController@store');
     Route::get('discords', 'DiscordController@index');
     Route::get('discords/{discord_id}', 'DiscordController@show');
 
