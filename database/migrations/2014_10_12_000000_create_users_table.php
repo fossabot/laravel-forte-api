@@ -19,6 +19,7 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->bigInteger('points')->default(0)->comment('virtual currency balance');
+            $table->date('withdraw_at')->nullable();
             $table->timestamps();
         });
     }
