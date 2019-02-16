@@ -1,13 +1,15 @@
 CREATE TABLE `users` (
     `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `public_id` VARCHAR(255) NOT NULL UNIQUE COMMENT 'username',
+    `name` VARCHAR(255) NOT NULL COMMENT 'username',
+    `email` VARCHAR(255) NOT NULL UNIQUE,
+    `password` VARCHAR(255) NOT NULL,
     `points` BIGINT NOT NULL DEFAULT 0 COMMENT 'virtual currency balance'
 );
 
 CREATE TABLE `discords` (
     `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `user_id` INT NOT NULL UNIQUE,
-    `discord_id` CHAR(18) NOT NULL UNIQUE COMMENT 'id of discord user account',
+    `discord_id` CHAR(18) NOT NULL COMMENT 'id of discord user account',
     FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 );
 
