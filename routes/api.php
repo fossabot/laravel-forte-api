@@ -13,8 +13,13 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::prefix('v1/')->group(function () {
+Route::prefix('v1/')->middleware(['api.headers'])->group(function () {
     Route::resource('users', 'UserController');
+
+    Route::post('users/{user_id}/discord', 'UserController@linkDiscord');
+    Route::get('discords', 'DiscordController@index');
+    Route::get('discords/{discord_id}', 'DiscordController@show');
+
     Route::get('users/{user_id}/items', 'ItemController@index');
     Route::get('users/{user_id}/items/{item_id}', 'ItemController@show');
     Route::post('users/{user_id}/items', 'ItemController@store');
