@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "68ee0aed297357a8e697457cbab100b8",
+    "content-hash": "5bc0e301672d062659b245dfa9d6d16c",
     "packages": [
         {
             "name": "darkaonline/l5-swagger",
@@ -3635,6 +3635,54 @@
                 "environment"
             ],
             "time": "2019-01-29T11:11:52+00:00"
+        },
+        {
+            "name": "xsolla/xsolla-sdk-php",
+            "version": "v4.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/xsolla/xsolla-sdk-php.git",
+                "reference": "3b6ec623bd3548d9e152d93a12f35c754bf34fa9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/xsolla/xsolla-sdk-php/zipball/3b6ec623bd3548d9e152d93a12f35c754bf34fa9",
+                "reference": "3b6ec623bd3548d9e152d93a12f35c754bf34fa9",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "guzzlehttp/guzzle": "~6.0",
+                "php": ">=7.1.3 <7.3",
+                "symfony/http-foundation": "~2.3 || ~3.0 || ~4.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "~2.13",
+                "mtdowling/burgomaster": "^0.0.3",
+                "phpunit/phpunit": "~7.3",
+                "symfony/process": "~4.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Xsolla\\SDK\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Xsolla SDK for PHP. Xsolla is the authorized reseller and merchant providing e-commerce services for online games.",
+            "homepage": "http://xsolla.com",
+            "keywords": [
+                "api",
+                "games",
+                "payment",
+                "sdk",
+                "xsolla"
+            ],
+            "time": "2018-12-04T11:42:48+00:00"
         },
         {
             "name": "zendframework/zend-diactoros",

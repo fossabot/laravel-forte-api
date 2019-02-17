@@ -15,6 +15,7 @@
         "laravel/framework": "5.7.*",
         "laravel/tinker": "^1.0",
         "tymon/jwt-auth": "^0.5.12",
+        "xsolla/xsolla-sdk-php": "^4.0",
         "zircote/swagger-php": "2.*"
     },
     "require-dev": {
