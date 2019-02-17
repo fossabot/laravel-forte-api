@@ -21,7 +21,7 @@ class Discord extends Model
      * @return mixed
      */
     static public function scopeAllDiscordAccounts() {
-        return self::whereNull('withdraw_at')->get();
+        return self::get();
     }
 
     /**
@@ -61,9 +61,7 @@ class Discord extends Model
      * @return array
      */
     static public function scopeDestoryDiscordAccount(int $id) {
-        self::where('user_id', $id)->update([
-            'withdraw_at' => date('Y-m-d')
-        ]);
+        self::where('user_id', $id)->delete();
 
         return ['message' => 'success'];
     }

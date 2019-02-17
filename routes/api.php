@@ -18,6 +18,7 @@ Route::prefix('v1/')->middleware(['api.headers'])->group(function () {
 
     Route::post('users/{user_id}/discord', 'DiscordController@store');
     Route::put('users/{user_id}/discord', 'DiscordController@update');
+    Route::delete('users/{user_id}/discord', 'DiscordController@destroy');
     Route::get('discords', 'DiscordController@index');
     Route::get('discords/{discord_id}', 'DiscordController@show');
 

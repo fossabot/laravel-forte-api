@@ -105,26 +105,26 @@ class DiscordController extends Controller
      * )
      */
     public function store(Request $request, int $id) {
-        $discordId = $request->only('discord_id');
-
         if (! User::scopeGetUser($id)) {
             return response([
                 'message' => 'Not found User Id',
             ], 404);
         }
 
-        if (Discord::scopeSelfDiscordAccount($discordId)) {
-            return response([
-                'message' => 'Duplicated Discord Account',
-            ], 400);
+        if (isset($request->discord_id)) {
+            if (Discord::scopeSelfDiscordAccount($request->discord_id)) {
+                return response([
+                    'message' => 'Duplicated Discord Account',
+                ], 400);
+            }
         }
 
         Discord::create([
             'user_id' => $id,
-            'discord_id' => $discordId,
+            'discord_id' => $request->discord_id,
         ]);
 
-        return ['discord_id' => $discordId];
+        return ['discord_id' => $request->discord_id];
     }
 
     /**

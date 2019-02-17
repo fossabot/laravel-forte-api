@@ -17,7 +17,6 @@ class CreateDiscordsTable extends Migration
             $table->increments('id');
             $table->integer('user_id')->unique();
             $table->text('discord_id')->comment('id of discord user account');
-            $table->date('withdraw_at');
             $table->timestamps();
         });
     }
