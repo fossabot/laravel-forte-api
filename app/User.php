@@ -58,6 +58,9 @@ class User extends Authenticatable
             DB::beginTransaction();
 
             foreach ($datas as $key => $data) {
+                if (User::where($key, $data)->first()) {
+                    continue;
+                }
                 $user->$key = $data;
             }
             $user->save();
