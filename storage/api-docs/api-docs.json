@@ -1,0 +1,297 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Team Crescendo Central API",
+        "contact": {
+            "name": "Mingeun Kim (Kevin)",
+            "url": "https://mingeun.com"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8000",
+    "basePath": "/api/v1",
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "paths": {
+        "/discords": {
+            "get": {
+                "tags": [
+                    "Discord"
+                ],
+                "description": "List Discord Account Users",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Discord Account User Lists"
+                    }
+                }
+            }
+        },
+        "/discords/{discordId}": {
+            "get": {
+                "tags": [
+                    "Discord"
+                ],
+                "description": "Show Discord Account User Information",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "discordId",
+                        "in": "path",
+                        "description": "Discord Id",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Discord User Account Information"
+                    }
+                }
+            }
+        },
+        "/users/{userId}/discord": {
+            "put": {
+                "tags": [
+                    "User"
+                ],
+                "description": "Update User Discord Account Information",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "User Id",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "discord_id",
+                        "in": "query",
+                        "description": "User Discord Id",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful User Discord Account Information Update"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Discord"
+                ],
+                "description": "Store(save) the User Discord Account Information",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "User Id",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "discord_id",
+                        "in": "query",
+                        "description": "User Discord Id",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Successful Create User Discord Account Information"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Discord"
+                ],
+                "summary": "Remove the specified resource from storage.",
+                "description": "Destroy User Discord Account",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "User Id",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Destroy User Discord Account"
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Display a listing of the resource.",
+                "description": "List Users",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User Lists"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Store a newly created resource in storage.",
+                "description": "Store(save) the User Information",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "User Name",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "email",
+                        "in": "query",
+                        "description": "User Email",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "password",
+                        "in": "query",
+                        "description": "User Password",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Successful Create User Information"
+                    }
+                }
+            }
+        },
+        "/users/{userId}": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Display the specified resource.",
+                "description": "Show User Information",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "User Id",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful User Information"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update the specified resource in storage.",
+                "description": "Update User Information",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "User Id",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "User Name",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "email",
+                        "in": "query",
+                        "description": "User Email",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "password",
+                        "in": "query",
+                        "description": "User Password",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful User Information Update"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Remove the specified resource from storage.",
+                "description": "Destroy User",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "User Id",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Destroy User"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {}
+}
