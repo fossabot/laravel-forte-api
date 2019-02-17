@@ -115,7 +115,7 @@ class DiscordController extends Controller
      *     path="/users/{userId}/discord",
      *     description="Update User Discord Account Information",
      *     produces={"application/json"},
-     *     tags={"User"},
+     *     tags={"Discord"},
      *      @SWG\Parameter(
      *          name="userId",
      *          in="path",
