@@ -22,11 +22,14 @@ Route::prefix('v1/')->middleware(['api.headers'])->group(function () {
     Route::get('discords', 'DiscordController@index');
     Route::get('discords/{discord_id}', 'DiscordController@show');
 
-    Route::get('users/{user_id}/items', 'ItemController@index');
-    Route::get('users/{user_id}/items/{item_id}', 'ItemController@show');
-    Route::post('users/{user_id}/items', 'ItemController@store');
-    Route::put('users/{user_id}/items/{item_id}', 'ItemController@update');
-    Route::delete('users/{user_id}/items/{item_id}', 'ItemController@destroy');
+    Route::get('items', 'ItemController@index');
+    Route::get('items/{item_id}', 'ItemController@show');
+
+    Route::get('users/{user_id}/items', 'UserItemController@index');
+    Route::get('users/{user_id}/items/{user_item_id}', 'UserItemController@show');
+    Route::post('users/{user_id}/items', 'UserItemController@store');
+    Route::put('users/{user_id}/items/{item_id}', 'UserItemController@update');
+    Route::delete('users/{user_id}/items/{item_id}', 'UserItemController@destroy');
     Route::post('users/{user_id}/points', 'PointController@store');
     Route::get('users/{user_id}/receipts', 'ReceiptController@index');
     Route::get('users/{user_id}/receipts/{receipt_id}', 'ReceiptController@show');

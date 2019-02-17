@@ -14,4 +14,20 @@ class Item extends Model
     protected $fillable = [
         'client_id', 'sku', 'name', 'image_url', 'price', 'enabled', 'consumable', 'expiration_time', 'purchase_limit',
     ];
+
+    /**
+     * @return mixed
+     */
+    static public function scopeAllItemLists() {
+        return self::get();
+    }
+
+    /**
+     * @param int $id
+     * @return mixed
+     */
+    static public function scopeItemDetail(int $id) {
+        return self::where('id', $id)->first();
+    }
+
 }
