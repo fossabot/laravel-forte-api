@@ -14,4 +14,8 @@ class Client extends Model
     protected $fillable = [
         'name', 'token',
     ];
+
+    static public function bringNameByToken(string $token) {
+        return self::where('token', $token)->first();
+    }
 }
