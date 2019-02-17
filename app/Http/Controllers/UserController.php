@@ -16,6 +16,13 @@ class UserController extends Controller {
      *     description="List Users",
      *     produces={"application/json"},
      *     tags={"User"},
+     *     @SWG\Parameter(
+     *         name="Authorization",
+     *         in="header",
+     *         description="Authorization Token",
+     *         required=true,
+     *         type="string"
+     *     ),
      *     @SWG\Response(
      *         response=200,
      *         description="User Lists"
@@ -37,6 +44,13 @@ class UserController extends Controller {
      *     description="Store(save) the User Information",
      *     produces={"application/json"},
      *     tags={"User"},
+     *      @SWG\Parameter(
+     *          name="Authorization",
+     *          in="header",
+     *          description="Authorization Token",
+     *          required=true,
+     *          type="string"
+     *      ),
      *      @SWG\Parameter(
      *          name="name",
      *          in="query",
@@ -95,6 +109,13 @@ class UserController extends Controller {
      *     produces={"application/json"},
      *     tags={"User"},
      *     @SWG\Parameter(
+     *         name="Authorization",
+     *         in="header",
+     *         description="Authorization Token",
+     *         required=true,
+     *         type="string"
+     *     ),
+     *     @SWG\Parameter(
      *         name="userId",
      *         in="path",
      *         description="User Id",
@@ -123,38 +144,45 @@ class UserController extends Controller {
      *     description="Update User Information",
      *     produces={"application/json"},
      *     tags={"User"},
-     *      @SWG\Parameter(
-     *          name="userId",
-     *          in="path",
-     *          description="User Id",
-     *          required=true,
-     *          type="integer"
-     *      ),
-     *      @SWG\Parameter(
-     *          name="name",
-     *          in="query",
-     *          description="User Name",
-     *          required=false,
-     *          type="string"
-     *      ),
-     *      @SWG\Parameter(
-     *          name="email",
-     *          in="query",
-     *          description="User Email",
-     *          required=false,
-     *          type="string"
-     *      ),
-     *      @SWG\Parameter(
-     *          name="password",
-     *          in="query",
-     *          description="User Password",
-     *          required=false,
-     *          type="string"
-     *      ),
-     *      @SWG\Response(
-     *          response=200,
-     *          description="Successful User Information Update"
-     *      ),
+     *     @SWG\Parameter(
+     *         name="Authorization",
+     *         in="header",
+     *         description="Authorization Token",
+     *         required=true,
+     *         type="string"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="userId",
+     *         in="path",
+     *         description="User Id",
+     *         required=true,
+     *         type="integer"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="name",
+     *         in="query",
+     *         description="User Name",
+     *         required=false,
+     *         type="string"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="email",
+     *         in="query",
+     *         description="User Email",
+     *         required=false,
+     *         type="string"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="password",
+     *         in="query",
+     *         description="User Password",
+     *         required=false,
+     *         type="string"
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Successful User Information Update"
+     *     ),
      * )
      */
     public function update(Request $request, int $id) {
@@ -172,6 +200,13 @@ class UserController extends Controller {
      *     description="Destroy User",
      *     produces={"application/json"},
      *     tags={"User"},
+     *     @SWG\Parameter(
+     *         name="Authorization",
+     *         in="header",
+     *         description="Authorization Token",
+     *         required=true,
+     *         type="string"
+     *     ),
      *     @SWG\Parameter(
      *         name="userId",
      *         in="path",

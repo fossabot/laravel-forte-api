@@ -17,6 +17,13 @@ class DiscordController extends Controller
      *     description="List Discord Account Users",
      *     produces={"application/json"},
      *     tags={"Discord"},
+     *     @SWG\Parameter(
+     *         name="Authorization",
+     *         in="header",
+     *         description="Authorization Token",
+     *         required=true,
+     *         type="string"
+     *     ),
      *     @SWG\Response(
      *         response=200,
      *         description="Discord Account User Lists"
@@ -36,6 +43,13 @@ class DiscordController extends Controller
      *     description="Show Discord Account User Information",
      *     produces={"application/json"},
      *     tags={"Discord"},
+     *     @SWG\Parameter(
+     *         name="Authorization",
+     *         in="header",
+     *         description="Authorization Token",
+     *         required=true,
+     *         type="string"
+     *     ),
      *     @SWG\Parameter(
      *         name="discordId",
      *         in="path",
@@ -63,24 +77,31 @@ class DiscordController extends Controller
      *     description="Store(save) the User Discord Account Information",
      *     produces={"application/json"},
      *     tags={"Discord"},
-     *      @SWG\Parameter(
-     *          name="userId",
-     *          in="path",
-     *          description="User Id",
-     *          required=true,
-     *          type="integer"
-     *      ),
-     *      @SWG\Parameter(
-     *          name="discord_id",
-     *          in="query",
-     *          description="User Discord Id",
-     *          required=true,
-     *          type="string"
-     *      ),
-     *     @SWG\Response(
-     *         response=201,
-     *         description="Successful Create User Discord Account Information"
+     *     @SWG\Parameter(
+     *         name="Authorization",
+     *         in="header",
+     *         description="Authorization Token",
+     *         required=true,
+     *         type="string"
      *     ),
+     *     @SWG\Parameter(
+     *         name="userId",
+     *         in="path",
+     *         description="User Id",
+     *         required=true,
+     *         type="integer"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="discord_id",
+     *         in="query",
+     *         description="User Discord Id",
+     *         required=true,
+     *         type="string"
+     *     ),
+     *    @SWG\Response(
+     *        response=201,
+     *        description="Successful Create User Discord Account Information"
+     *    ),
      * )
      */
     public function store(Request $request, int $id) {
@@ -116,24 +137,31 @@ class DiscordController extends Controller
      *     description="Update User Discord Account Information",
      *     produces={"application/json"},
      *     tags={"Discord"},
-     *      @SWG\Parameter(
-     *          name="userId",
-     *          in="path",
-     *          description="User Id",
-     *          required=true,
-     *          type="integer"
-     *      ),
-     *      @SWG\Parameter(
-     *          name="discord_id",
-     *          in="query",
-     *          description="User Discord Id",
-     *          required=false,
-     *          type="string"
-     *      ),
-     *      @SWG\Response(
-     *          response=200,
-     *          description="Successful User Discord Account Information Update"
-     *      ),
+     *     @SWG\Parameter(
+     *         name="Authorization",
+     *         in="header",
+     *         description="Authorization Token",
+     *         required=true,
+     *         type="string"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="userId",
+     *         in="path",
+     *         description="User Id",
+     *         required=true,
+     *         type="integer"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="discord_id",
+     *         in="query",
+     *         description="User Discord Id",
+     *         required=false,
+     *         type="string"
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Successful User Discord Account Information Update"
+     *     ),
      * )
      */
     public function update(Request $request, int $id) {
@@ -165,6 +193,13 @@ class DiscordController extends Controller
      *     description="Destroy User Discord Account",
      *     produces={"application/json"},
      *     tags={"Discord"},
+     *     @SWG\Parameter(
+     *         name="Authorization",
+     *         in="header",
+     *         description="Authorization Token",
+     *         required=true,
+     *         type="string"
+     *     ),
      *     @SWG\Parameter(
      *         name="userId",
      *         in="path",

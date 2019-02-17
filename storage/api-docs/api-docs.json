@@ -59,7 +59,7 @@
         "/users/{userId}/discord": {
             "put": {
                 "tags": [
-                    "User"
+                    "Discord"
                 ],
                 "description": "Update User Discord Account Information",
                 "produces": [
@@ -152,6 +152,15 @@
                 "produces": [
                     "application/json"
                 ],
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Authorization Token",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "User Lists"
@@ -168,6 +177,13 @@
                     "application/json"
                 ],
                 "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Authorization Token",
+                        "required": true,
+                        "type": "string"
+                    },
                     {
                         "name": "name",
                         "in": "query",
