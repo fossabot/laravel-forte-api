@@ -38,7 +38,7 @@ class Discord extends Model
      * @return array
      */
     static public function scopeUpdateDiscordAccount(int $id, array $datas = []) {
-        $discord = self::where('user_id', $id);
+        $discord = self::where('user_id', $id)->first();
         try {
             DB::beginTransaction();
 

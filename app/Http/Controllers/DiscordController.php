@@ -165,18 +165,22 @@ class DiscordController extends Controller
      * )
      */
     public function update(Request $request, int $id) {
-        $discordId = $request->only('discord_id');
-
         if (! User::scopeGetUser($id)) {
             return response([
                 'message' => 'Not found User Id',
             ], 404);
         }
 
-        if (Discord::scopeSelfDiscordAccount($discordId)) {
+        if (isset($request->discord_id)) {
+            if (Discord::scopeSelfDiscordAccount($request->discord_id)) {
+                return response([
+                    'message' => 'Duplicated Discord Account',
+                ], 400);
+            }
+        } else {
             return response([
-                'message' => 'Duplicated Discord Account',
-            ], 400);
+                'message' => 'Not found User discord_id',
+            ], 404);
         }
 
         return response()->json(Discord::scopeUpdateDiscordAccount($id, $request->all()));
