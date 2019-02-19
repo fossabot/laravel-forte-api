@@ -32,6 +32,10 @@ class Discord extends Model
         return self::where('discord_id', $id)->first();
     }
 
+    static public function scopeSelfDiscordSelectFieldAccount($field, $id) {
+        return self::where($field, $id)->first();
+    }
+
     /**
      * @param int $id
      * @param array $datas

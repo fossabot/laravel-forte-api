@@ -112,6 +112,18 @@ class DiscordController extends Controller
         }
 
         if (isset($request->discord_id)) {
+            if (! empty(User::scopeGetUser($id)->withdraw_at)) {
+                return response([
+                    'message' => 'Withdraw User Account',
+                ], 400);
+            }
+
+            if (Discord::scopeSelfDiscordSelectFieldAccount('user_id', $id)) {
+                return response([
+                    'message' => 'Duplicated User Id or Discord Account',
+                ], 400);
+            }
+
             if (Discord::scopeSelfDiscordAccount($request->discord_id)) {
                 return response([
                     'message' => 'Duplicated Discord Account',
