@@ -20,8 +20,8 @@ class CreateReceiptsTable extends Migration
             $table->integer('user_item_id');
             $table->boolean('about_cash')->default(true)->comment('whether the payment/refund is relate to real cash (not points)');
             $table->boolean('refund')->default(true)->comment('whether the process is refund (not payment)');
-            $table->integer('points_old');
-            $table->integer('points_new');
+            $table->bigInteger('points_old');
+            $table->bigInteger('points_new');
             $table->timestamps();
         });
     }
