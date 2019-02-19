@@ -17,7 +17,7 @@ class CreateReceiptsTable extends Migration
             $table->increments('id');
             $table->integer('user_id');
             $table->integer('client_id')->comment('where the payment/refund is completed (xsolla)');
-            $table->integer('user_item_id');
+            $table->integer('user_item_id')->nullable();
             $table->boolean('about_cash')->default(true)->comment('whether the payment/refund is relate to real cash (not points)');
             $table->boolean('refund')->default(true)->comment('whether the process is refund (not payment)');
             $table->bigInteger('points_old');
