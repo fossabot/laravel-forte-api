@@ -36,10 +36,11 @@ class UserItem extends Model
 
     /**
      * @param int $id
+     * @param int $itemId
      * @return mixed
      */
-    static public function scopeCountUserPurchase(int $id) {
-        return self::where('user_id', $id)->count();
+    static public function scopeCountUserPurchaseDuplicateItem(int $id, int $itemId) {
+        return self::where('user_id', $id)->where('item_id', $itemId)->whereNull('deleted_at')->count();
     }
 
     /**
@@ -59,7 +60,9 @@ class UserItem extends Model
             return response()->json([
                 'message' => 'Item is disable'
             ], 400);
-        } elseif (self::scopeCountUserPurchase($id) >= ($item->purchase_limit == NULL ? 9999 : $item->purchase_limit)) {
+        }
+
+        if (self::scopeCountUserPurchaseDuplicateItem($id, $itemId) < Item::scopeItemDetail($itemId)->purchase_limit) {
             return response()->json([
                 'message' => 'over user purchase limit !'
             ], 400);
@@ -140,7 +143,7 @@ class UserItem extends Model
 
             foreach ($datas as $key => $data) {
                 if ($key == 'sync') {
-                    $userItem->$key = Client::bringNameByToken($token) ? 1 : 0;
+                    $userItem->$key = in_array(Client::bringNameByToken($token)->name, Client::BOT_CLIENT) ? 1 : 0;
                     continue;
                 }
                 $userItem->$key = $data;

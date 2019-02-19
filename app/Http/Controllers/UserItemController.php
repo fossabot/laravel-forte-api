@@ -164,7 +164,7 @@ class UserItemController extends Controller {
      *         name="userItemId",
      *         in="path",
      *         description="User Item Id",
-     *         required=false,
+     *         required=true,
      *         type="integer"
      *     ),
      *     @SWG\Parameter(
