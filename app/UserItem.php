@@ -21,7 +21,7 @@ class UserItem extends Model
      * @return mixed
      */
     static public function scopeUserItemLists(int $id) {
-        return self::join('items', 'items.id', '=', 'user_items.item_id')->where('user_items.user_id', $id)->get();
+        return self::selectRaw('items.*, user_items.*, user_items.item_id as user_item_id')->join('items', 'items.id', '=', 'user_items.item_id')->where('user_items.user_id', $id)->get();
     }
 
     /**
