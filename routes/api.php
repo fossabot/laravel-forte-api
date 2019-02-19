@@ -34,3 +34,5 @@ Route::prefix('v1/')->middleware(['api.headers'])->group(function () {
     Route::get('users/{user_id}/receipts', 'ReceiptController@index');
     Route::get('users/{user_id}/receipts/{receipt_id}', 'ReceiptController@show');
 });
+
+Route::get('v1/xsolla', 'XsollaWebhookController@index');
