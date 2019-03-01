@@ -129,6 +129,7 @@ class UserItem extends Model
      * @param int $itemId
      * @param array $datas
      * @return array
+     * @throws \Exception
      */
     static public function scopeUpdateUserItem(int $id, int $itemId, array $datas = [], string $token) {
         if (Item::scopeItemDetail($itemId)->consumable == 0 && $datas['consumed']) {

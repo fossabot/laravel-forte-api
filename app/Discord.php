@@ -40,6 +40,7 @@ class Discord extends Model
      * @param int $id
      * @param array $datas
      * @return array
+     * @throws \Exception
      */
     static public function scopeUpdateDiscordAccount(int $id, array $datas = []) {
         $discord = self::where('user_id', $id)->first();
