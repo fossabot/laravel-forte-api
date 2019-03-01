@@ -48,6 +48,7 @@ class UserItem extends Model
      * @param int $itemId
      * @param string $token
      * @return mixed
+     * @throws \Exception
      */
     static public function scopePurchaseUserItem(int $id, int $itemId, string $token) {
         $user = User::scopeGetUser($id);
@@ -101,14 +102,14 @@ class UserItem extends Model
      * @return int
      */
     static private function createUserReceipt(int $id, int $itemId, int $userItemId, string $token) {
-        $client = Client::bringNameByToken($token);
+        $client = $token == 'xsolla' ?: Client::bringNameByToken($token);
         $user = User::scopeGetUser($id);
         $item = Item::scopeItemDetail($itemId);
         $currentPoints = $user->points - $item->price;
 
         $receiptId = Receipt::insertGetId([
             'user_id' => $id,
-            'client_id' => $client->id,
+            'client_id' => $token == 'xsolla' ? 1 : $client->id,
             'user_item_id' => $userItemId,
             'about_cash' => 1,
             'refund' => 0,
