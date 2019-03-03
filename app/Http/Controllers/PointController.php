@@ -51,12 +51,19 @@ class PointController extends Controller
      * )
      */
     public function store(Request $request, int $id) {
-        $user = User::where('id', $id)->first();
+        $user = User::scopeGetUser($id);
         if (! empty($user->withdraw_at)) {
             return response([
                 'message' => 'Withdraw User Account',
             ], 400);
         }
+
+        if (! $user) {
+            return response([
+                'message' => 'User does not exist',
+            ], 404);
+        }
+
         $oldPoints = $user->points;
         $user->points += $request->points;
         $user->save();
