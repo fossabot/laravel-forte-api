@@ -14,6 +14,7 @@
         "getsolaris/laravel-make-service": "^0.1.0",
         "laravel/framework": "5.7.*",
         "laravel/tinker": "^1.0",
+        "sentry/sentry-laravel": "1.0.0",
         "tymon/jwt-auth": "^0.5.12",
         "zircote/swagger-php": "2.*"
     },
