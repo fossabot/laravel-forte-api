@@ -2,13 +2,13 @@
 
 namespace App\Services;
 
-use DB;
+use App\Item;
+use App\User;
 use App\Client;
 use App\Discord;
-use App\Item;
 use App\Receipt;
-use App\User;
 use App\UserItem;
+use Illuminate\Support\Facades\DB;
 
 /**
  * RESPONSE CODE
@@ -24,9 +24,6 @@ const HTTP_FORBIDDEN = 403;
 const HTTP_NOT_FOUND = 404;
 const HTTP_INTERNAL_SERVER_ERROR = 500;
 const HTTP_NOT_IMPLEMENTED = 501;
-
-const TYPE_USER_VALIDATION = 'user_validation';
-const TYPE_PAYMENT = 'payment';
 
 /**
  * Class XsollaWebhookService
@@ -53,10 +50,10 @@ class XsollaWebhookService
     protected $apiKey;
 
     public function __construct() {
-        $this->merchantId = env('XSOLLA_MERCHANT_ID', '');
-        $this->projectId = env('XSOLLA_PROJECT_ID', '');
-        $this->projectKey = env('XSOLLA_PROJECT_KEY', '');
-        $this->apiKey = env('XSOLLA_API_KEY', '');
+        $this->merchantId = config('xsolla.merchantId');
+        $this->projectId = config('xsolla.projectId');
+        $this->projectKey = config('xsolla.projectKey');
+        $this->apiKey = config('xsolla.apiKey');
     }
 
     /**
@@ -139,9 +136,10 @@ class XsollaWebhookService
      * sends when payment is cancelled for unknown reason.
      *
      * @param $data
+     * @return mixed
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_refund
      */
     public function refund($data) {
-
+        return $data;
     }
 }
