@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use App\Client;
-use Illuminate\Support\Facades\Response;
 
 class CheckApiHeader
 {
@@ -17,15 +16,21 @@ class CheckApiHeader
      */
     public function handle($request, Closure $next) {
         if (! isset($_SERVER['HTTP_AUTHORIZATION'])) {
-            return Response::json([
-                'error' => 'Please set Authorization header'
-            ]);
+            return response([
+                'error' => [
+                    'code' => 'INVALID_AUTHORIZATION',
+                    'message' => 'Please set Authorization Header',
+                ],
+            ], 404);
         }
 
         if (! Client::where('token', $_SERVER['HTTP_AUTHORIZATION'])->first()) {
-            return Response::json([
-                'error' => 'Wrong Authorization header'
-            ]);
+            return response([
+                'error' => [
+                    'code' => 'INVALID_AUTHORIZATION',
+                    'message' => 'The Authorization Header is invalid',
+                ],
+            ], 401);
         }
         return $next($request);
     }
