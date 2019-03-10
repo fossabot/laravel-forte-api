@@ -105,8 +105,7 @@ class XsollaWebhookService
 
         try {
             DB::beginTransaction();
-
-            $user = User::scopeGetUser(NULL, $userData['email']);
+            $user = User::scopeGetUserById($userData['id']);
 
             if (isset($purchaseData['virtual_items'])) {
                 foreach ($purchaseData['virtual_items']['items'] as $item) {

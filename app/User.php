@@ -41,11 +41,18 @@ class User extends Authenticatable
      * see a user who been withdraw
      *
      * @param int $id
-     * @param string|null $email
      * @return mixed
      */
-    static public function scopeGetUser(int $id = null, string $email = null) {
-        return self::where('id', $id)->orWhere('email', $email)->first();
+    static public function scopeGetUser(int $id) {
+        return self::where('id', $id)->first();
+    }
+
+    /**
+     * @param string $id
+     * @return User|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|object|null
+     */
+    static public function scopeGetUserById(string $id) {
+        return self::where('name', $id)->orWhere('email', $id)->first();
     }
 
     /**
