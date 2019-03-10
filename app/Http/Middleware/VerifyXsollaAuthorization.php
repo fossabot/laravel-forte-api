@@ -14,6 +14,7 @@ class VerifyXsollaAuthorization
      * @return mixed
      */
     public function handle($request, Closure $next) {
+        ini_set( 'serialize_precision', -1 );
         $body = json_encode($request->json()->all()) . config('xsolla.projectKey');// . env('XSOLLA_PROJECT_KEY', 0)
         $hash = sha1($body);
 
