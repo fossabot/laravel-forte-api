@@ -65,7 +65,12 @@ class XsollaWebhookService
      */
     public function userValidation($data) {
         if (User::where('email', $data['user']['id'])->orWhere('name', $data['user']['id'])->first()) {
-            return response(HTTP_OK);
+            return response([
+                'success' => [
+                    'code' => 'VALID_USER',
+                    'message' => 'The user is valid',
+                ],
+            ], HTTP_OK);
         } else {
             return response([
                 'error' => [
