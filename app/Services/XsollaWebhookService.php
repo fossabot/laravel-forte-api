@@ -113,7 +113,7 @@ class XsollaWebhookService
                     UserItem::scopePurchaseUserItem($user->id, $purchaseItem->id, 'xsolla');
                 }
             } else {
-                $user->points += (round($purchaseData['virtual_currency']['amount']) * $purchaseData['virtual_currency']['quantity']);
+                $user->points += $purchaseData['virtual_currency']['quantity'];
             }
 
             $user->save();
@@ -122,7 +122,7 @@ class XsollaWebhookService
             return response([
                 'success' => [
                     'code' => 'SUCCESS_PAYMENT',
-                    'message' => 'The payment has been successfully completed successfully.',
+                    'message' => 'The payment has been completed successfully.',
                 ],
             ], HTTP_OK);
         } catch (\Exception $e) {
