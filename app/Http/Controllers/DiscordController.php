@@ -143,6 +143,7 @@ class DiscordController extends Controller
      * @param Request $request
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      *
      * @SWG\Put(
      *     path="/users/{userId}/discord",
