@@ -42,6 +42,9 @@ return [
 
     'discord' => [
         'token' => env('DISCORD_BOT_TOKEN', ''),
+        'channel' => [
+            'log' => env('DISCORD_CENTRAL_API_LOGGING_CHANNEL', ''),
+        ]
     ]
 
 ];
