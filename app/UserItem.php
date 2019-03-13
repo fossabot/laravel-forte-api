@@ -105,7 +105,12 @@ class UserItem extends Model
         $client = $token == 'xsolla' ?: Client::bringNameByToken($token);
         $user = User::scopeGetUser($id);
         $item = Item::scopeItemDetail($itemId);
-        $currentPoints = $user->points - $item->price;
+
+        if ($token != 'xsolla') {
+            $currentPoints = $user->points - $item->price;
+        } else {
+            $currentPoints = $user->points;
+        }
 
         $receiptId = Receipt::insertGetId([
             'user_id' => $id,
