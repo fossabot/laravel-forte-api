@@ -40,4 +40,8 @@ return [
         ],
     ],
 
+    'discord' => [
+        'token' => env('DISCORD_BOT_TOKEN', ''),
+    ]
+
 ];

@@ -12,6 +12,7 @@
         "darkaonline/l5-swagger": "5.7.*",
         "fideloper/proxy": "^4.0",
         "getsolaris/laravel-make-service": "^0.1.0",
+        "laravel-notification-channels/discord": "^1.0",
         "laravel/framework": "5.7.*",
         "laravel/tinker": "^1.0",
         "sentry/sentry-laravel": "1.0.0",
