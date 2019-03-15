@@ -113,7 +113,18 @@ class XsollaWebhookService
                     UserItem::scopePurchaseUserItem($user->id, $purchaseItem->id, 'xsolla');
                 }
             } else {
+                $receipt = new Receipt;
+                $receipt->user_id = $user->id;
+                $receipt->client_id = 1;
+                $receipt->user_item_id = NULL;
+                $receipt->about_cash = 1;
+                $receipt->refund = 0;
+                $receipt->points_old = $user->points;
+
                 $user->points += $purchaseData['virtual_currency']['quantity'];
+
+                $receipt->points_new = $user->points;
+                $receipt->save();
             }
 
             $user->save();
