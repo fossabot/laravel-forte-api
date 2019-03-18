@@ -1,11 +1,26 @@
 <?php
 namespace App\Http\Controllers;
-use Illuminate\Http\Request;
-use App\Http\Requests\RegisterFormRequest;
 
 use App\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Services\XsollaAPIService;
+use App\Http\Requests\RegisterFormRequest;
 
 class UserController extends Controller {
+    /**
+     * @var XsollaAPIService
+     */
+    protected $xsollaAPI;
+
+    /**
+     * UserController constructor.
+     * @param XsollaAPIService $xsollaAPI
+     */
+    public function __construct(XsollaAPIService $xsollaAPI) {
+        $this->xsollaAPI = $xsollaAPI;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -38,6 +53,7 @@ class UserController extends Controller {
      *
      * @param RegisterFormRequest $request
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     * @throws \Exception
      *
      * @SWG\Post(
      *     path="/users",
@@ -78,21 +94,32 @@ class UserController extends Controller {
      *     ),
      * )
      */
-    public function store(RegisterFormRequest $request) {
-        $user = new User;
-        $user->email = $request->email;
-        $user->name = $request->name;
-        $user->password = bcrypt($request->password);
-        $user->save();
+    public function store(Request $request) {
+        DB::beginTransaction();
+        try {
+            $user = new User;
+            $user->email = $request->email;
+            $user->name = $request->name;
+            $user->password = bcrypt($request->password);
+            $user->save();
 
-        if ($user) {
+            $datas = [
+                'user_id' => $user->id,
+                'user_name' => $user->name,
+                'email' => $user->email
+            ];
+
+            $this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users', $datas);
+
             return response()->json([
                 'status' => 'success',
                 'data' => $user
             ], 201);
-        } else {
+        } catch (\Exception $e) {
+            DB::rollBack();
+            (new \App\Http\Controllers\DiscordNotificationController)->exception($e, $request->all());
             return response()->json([
-                'error' => 'test'
+                'error' => $e
             ], 400);
         }
     }
@@ -138,6 +165,7 @@ class UserController extends Controller {
      * @param  \Illuminate\Http\Request $request
      * @param  int $id
      * @return \Illuminate\Http\Response
+     * @throws \Exception
      *
      * @SWG\Put(
      *     path="/users/{userId}",
