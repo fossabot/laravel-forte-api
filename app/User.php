@@ -2,11 +2,10 @@
 
 namespace App;
 
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-
 use Illuminate\Support\Facades\DB;
+use App\Services\XsollaAPIService;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
@@ -62,6 +61,7 @@ class User extends Authenticatable
      * @throws \Exception
      */
     static public function scopeUpdateUser(int $id, array $datas = []) {
+        $xsollaAPI = \App::make('App\Services\XsollaAPIService');
         $user = self::find($id);
         try {
             DB::beginTransaction();
@@ -74,9 +74,18 @@ class User extends Authenticatable
             }
             $user->save();
 
+            $datas = [
+                'enabled' => true,
+                'user_name' => $user->name,
+                'email' => $user->email,
+            ];
+
+            $xsollaAPI->requestAPI('PUT', 'projects/:projectId/users/' . $id, $datas);
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
+            (new \App\Http\Controllers\DiscordNotificationController)->exception($e, $datas);
             return ['error' => $e->getMessage()];
         }
 
