@@ -111,6 +111,8 @@ class UserController extends Controller {
 
             $this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users', $datas);
 
+            DB::commit();
+            
             return response()->json([
                 'status' => 'success',
                 'data' => $user
