@@ -97,9 +97,17 @@ class User extends Authenticatable
      * @return array
      */
     static public function scopeDestoryUser(int $id) {
+        $xsollaAPI = \App::make('App\Services\XsollaAPIService');
+
         self::where('id', $id)->update([
             'withdraw_at' => date('Y-m-d')
         ]);
+
+        $datas = [
+            'enabled' => false,
+        ];
+
+        $xsollaAPI->requestAPI('PUT', 'projects/:projectId/users/' . $id, $datas);
 
         return ['message' => 'success'];
     }
