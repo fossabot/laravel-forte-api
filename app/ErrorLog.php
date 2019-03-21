@@ -7,6 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class ErrorLog extends Model
 {
     protected $fillable = [
-        'envrionment', 'title', 'message', 'parameters'
+        'environment', 'title', 'message', 'parameters'
     ];
 }
