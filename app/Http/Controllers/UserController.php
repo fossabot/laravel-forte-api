@@ -283,7 +283,11 @@ class UserController extends Controller {
                 ],
             ];
 
-            return $datas;
+            $request = json_decode($this->xsollaAPI->requestAPI('POST', 'merchants/:merchantId/token', $datas), true);
+
+            return response()->json([
+                'url' => $url . $request['token']
+            ], 200);
         } catch (\Exception $e) {
             (new \App\Http\Controllers\DiscordNotificationController)->exception($e, $datas);
             return $e->getMessage();
