@@ -26,7 +26,7 @@
 
 
 ### Server Architecture
-- AWS EC2
+- AWS EC2 (Ubuntu 18.06)
 
 ### Links
 - URL
@@ -34,6 +34,68 @@
     - xsolla endpoint: [https://crescendo.mingeun.com/api/xsolla](https://crescendo.mingeun.com/api/xsolla)
 - Docs
     - API Document: [https://crescendo.mingeun.com/api/documentation](https://crescendo.mingeun.com/api/documentation)
+    
+### Directory Structure
+중앙API 구조 (자세한 라라벨 관련 구조는 [여기](https://laravel.com/docs/5.8/structure)를 참고해주세요.)
+
+- app
+    - Http
+        - Controllers (컨트롤러가 모여있습니다.)
+            - Auth (컨트롤러 구조 안에 인증이 있으나 사용하지 않습니다.)
+        - Middleware (사용자의 요청을 필터링합니다. 중앙API 토큰, Xsolla 인증 로직이 있습니다.)
+        - Requests (해당 요청의 유효성을 판단합니다. 유저 회원가입 유효성 로직이 있습니다.)
+    - Services (서비스 관련된 로직이 구현되어있습니다.)
+- config (설정 파일이 모여있습니다. l5-swagger, sentry, xsolla)
+- database
+    - migrations (마이그레이션 파일이 모여있습니다.)
+    - sql (DB 백업 파일이 있습니다.)
+- routes (라우팅 관련된 파일이 모여있으며 오직 `api.php` 만 수정합니다.)
+
+### Error Tracking
+에러트래킹은 `Sentry`를 사용합니다. 그외 디스코드 중앙API - 로깅 채널에서 확인 가능합니다.
+
+### Architecture Concept
+#### Http Request
+- 요청의 유효성을 판단합니다.
+
+#### Middleware
+- 사용자의 요청을 필터링/검증 합니다.
+
+#### Controller
+- 직접적으로 서비스 로직을 포함하지 않습니다.
+    - 관련 로직은 서비스에서 작성합니다.
+    
+#### Model
+- 모델은 생각보다 무거운 존재가 됩니다.
+- 가장 기본이 되는 객체
+- 해당 객체가 가져야하는 역할 및 속성을 작성합니다.
+
+#### Services
+- 컨트롤러에서 요청받은 로직을 서비스단에서 수행합니다.
+- 데이터관련된 로직은 모델을 호출 후 처리합니다.
+
+### Working Process
+- 워킹 프로세스는 깃허브를 기반으로 진행합니다.
+- 깃허브의 `Projects` 를 이용(Todo 기반 협업툴)하여 할일을 정리합니다.
+- 할일은 프로젝트와 이슈를 생성합니다.
+
+### Issue Information 
+- 이슈 라벨
+    - hotfix: 버그 발생 시 이슈 생성 후 해당 라벨을 추가합니다.
+    - database: 데이터베이스 관련된 추가/오류는 해당 라벨을 추가합니다.
+    - develop: 개발을 포함한 이슈에는 해당 라벨을 추가합니다.
+    - doc: 문서를 수정할때 요청하는 라벨입니다.
+    - feature: 신규 개발 시 해당 라벨을 추가합니다.
+    - help: 다른 개발자에게 해당 이슈의 도움을 받고싶을 때 해당 라벨을 추가합니다.
+    - question: 봇 개발자가 중앙API 개발자에게 질문 할때 해당 라벨을 추가합니다.
+    - Test: 테스팅 작업시 해당 라벨을 추가합니다
+    - xsolla: 엑솔라 관련 작업 시 해당 라벨을 추가합니다.
+    
+### Issue Tracking
+이슈 트래킹은 `feature`(Feature) 와 `hotfix`(Fix) 라벨이 존재할 경우에만 적용됩니다.
+<br>
+- 사용 예) feature #2 - Issue Title
+자세한 내용은 아래 `Commit Rules` 에서 계속됩니다.
 
 ### Commit Rules
 default commit
