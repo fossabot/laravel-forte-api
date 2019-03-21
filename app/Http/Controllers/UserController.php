@@ -253,4 +253,40 @@ class UserController extends Controller {
     public function destroy(int $id) {
         return response()->json(User::scopeDestoryUser($id));
     }
+
+    /**
+     * @param int $id
+     * @return mixed|\Psr\Http\Message\ResponseInterface
+     */
+    public function xsollaToken(int $id) {
+        try {
+            if (env('APP_ENV') == 'production') {
+                $mode = '';
+            } else {
+                $mode = 'sandbox-';
+            }
+
+            $url = 'https://' . $mode . 'secure.xsolla.com/paystation2/?access_token=';
+
+            $datas = [
+                'user' => [
+                    'id' => [
+                        'value' => (string) $id,
+                    ],
+                ],
+                'settings' => [
+                    'project_id' => (int) config('xsolla.projectId'),
+                    'mode' => isset($mode) ? 'sandbox' : '',
+                    'ui' => [
+                        'theme' => 'default_dark'
+                    ],
+                ],
+            ];
+
+            return $datas;
+        } catch (\Exception $e) {
+            (new \App\Http\Controllers\DiscordNotificationController)->exception($e, $datas);
+            return $e->getMessage();
+        }
+    }
 }
