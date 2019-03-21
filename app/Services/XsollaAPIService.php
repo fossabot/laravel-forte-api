@@ -64,7 +64,7 @@ class XsollaAPIService
         }
 
         try {
-            return $this->client->request($method, $this->endpoint . $uri, [
+            $response = $this->client->request($method, $this->endpoint . $uri, [
                 'body' => json_encode($datas),
                 'headers' => [
                     'Authorization' => 'Basic ' . $this->authKey,
@@ -72,6 +72,8 @@ class XsollaAPIService
                     'Content-Type' => 'application/json; charset=utf-8',
                 ],
             ]);
+
+            return $response->getBody();
         } catch (GuzzleException $e) {
             (new \App\Http\Controllers\DiscordNotificationController)->exception($e, $datas);
             return $e->getMessage();
