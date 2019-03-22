@@ -257,6 +257,31 @@ class UserController extends Controller {
     /**
      * @param int $id
      * @return mixed|\Psr\Http\Message\ResponseInterface
+     *
+     * @SWG\GET(
+     *     path="/users/{userId}/xsolla/token",
+     *     description="Xsolla Shop Token",
+     *     produces={"application/json"},
+     *     tags={"Xsolla"},
+     *     @SWG\Parameter(
+     *         name="Authorization",
+     *         in="header",
+     *         description="Authorization Token",
+     *         required=true,
+     *         type="string"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="userId",
+     *         in="path",
+     *         description="User Id",
+     *         required=true,
+     *         type="integer"
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Successful Xsolla Shop Token"
+     *     ),
+     * )
      */
     public function xsollaToken(int $id) {
         try {
