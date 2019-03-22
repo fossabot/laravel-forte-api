@@ -2,15 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-
 use App\User;
 use App\Receipt;
 use App\Client;
+use Illuminate\Http\Request;
+use App\Services\XsollaAPIService;
 
 class PointController extends Controller
 {
+    /**
+     * @var XsollaAPIService
+     */
+    protected $xsollaAPI;
+
+    /**
+     * UserController constructor.
+     * @param XsollaAPIService $xsollaAPI
+     */
+    public function __construct(XsollaAPIService $xsollaAPI) {
+        $this->xsollaAPI = $xsollaAPI;
+    }
     /**
      * Store a newly created resource in storage.
      *
@@ -51,6 +62,8 @@ class PointController extends Controller
      * )
      */
     public function store(Request $request, int $id) {
+        $repetition = false;
+        $needPoint = 0;
         $user = User::scopeGetUser($id);
 
         if (! $user) {
@@ -78,6 +91,30 @@ class PointController extends Controller
         $receipt->points_old = $oldPoints;
         $receipt->points_new = $user->points;
         $receipt->save();
+
+        /**
+         * @brief sync Xsolla DB from Crescendo API \n
+         * 응답이 우리 DB와 일치하는 지 확인하고 \n
+         * 일치하지 않는다면 이를 갱신하기 위해 API를 다시 호출 \n
+         * (엑솔라 DB가 우리 DB의 데이터를 따르도록.. 만약 우리 DB는 500인데 엑솔라 DB 응답이 300이었다면 +200 요청을 다시 보내주는 식)
+         * @author GBS-Skile
+         */
+        while(true) {
+            $datas = [
+                'amount' => $repetition ? $needPoint : $request->points,
+                'comment' => 'Updated User Point => ' . Client::bringNameByToken($request->header('Authorization'))->name,
+            ];
+
+            $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/' . $receipt->user_id . '/recharge', $datas), true);
+
+            if ($user->points !== $response['amount']) {
+                $repetition = true;
+                $needPoint = $user->points > $response['amount'] ? $user->points - $response['amount'] : $response['amount'] - $user->points;
+                continue;
+            } else {
+                break;
+            }
+        }
 
         return ['receipt_id' => $receipt->id];
     }
