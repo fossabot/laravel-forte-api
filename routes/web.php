@@ -14,3 +14,12 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::prefix('dashboard/')->group(function () {
+    Route::any('/signin', 'DashboardController@signin')->name('login');
+    Route::middleware('auth')->group(function () {
+        Route::get('/', 'DashboardController@index')->name('dashboard.index');
+
+        Route::post('logout', 'DashboardController@logout')->name('dashboard.logout');
+    });
+});
