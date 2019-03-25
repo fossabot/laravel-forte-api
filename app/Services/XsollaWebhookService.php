@@ -9,6 +9,7 @@ use App\Discord;
 use App\Receipt;
 use App\UserItem;
 use Illuminate\Support\Facades\DB;
+use App\Services\XsollaAPIService;
 
 /**
  * RESPONSE CODE
@@ -48,8 +49,13 @@ class XsollaWebhookService
      * @var $apiKey
      */
     protected $apiKey;
+    /**
+     * @var XsollaAPIService
+     */
+    protected $xsollaAPI;
 
-    public function __construct() {
+    public function __construct(XsollaAPIService $xsollaAPI) {
+        $this->xsollaAPI = $xsollaAPI;
         $this->merchantId = config('xsolla.merchantId');
         $this->projectId = config('xsolla.projectId');
         $this->projectKey = config('xsolla.projectKey');
@@ -59,11 +65,11 @@ class XsollaWebhookService
     /**
      * it identifies the presence of users in the game system.
      *
-     * @param $data
+     * @param array $data
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_validation
      */
-    public function userValidation($data) {
+    public function userValidation(array $data) {
         if (User::where('email', $data['user']['id'])->orWhere('name', $data['user']['id'])->first()) {
             return response([
                 'success' => [
@@ -83,7 +89,7 @@ class XsollaWebhookService
 
     /**
      * this method is buying the outside xsolla game store.
-     *
+     * @deprecated xsolla webhooks userSearch method is no use
      * @return string
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_search
      */
@@ -94,12 +100,12 @@ class XsollaWebhookService
     /**
      * sends when the user has completed the payment process.
      *
-     * @param $data
+     * @param array $data
      * @return mixed
      * @throws \Exception
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_payment
      */
-    public function payment($data) {
+    public function payment(array $data) {
         $userData = $data['user'];
         $purchaseData = $data['purchase'];
 
@@ -149,12 +155,146 @@ class XsollaWebhookService
 
     /**
      * sends when payment is cancelled for unknown reason.
-     *
-     * @param $data
+     * @deprecated xsolla webhooks refund method is no use
+     * @param array $data
      * @return mixed
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_refund
      */
-    public function refund($data) {
+    public function refund(array $data) {
         return $data;
+    }
+
+    /**
+     * @param array $data
+     * @return mixed
+     * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_payment
+     * @throws \Exception
+     */
+    public function userBalanceOperation(array $data) {
+        $operationType = $data['operation_type'];
+
+        switch ($operationType) {
+            case 'payment':
+                $this->operationPayment($data);
+                break;
+            case 'inGamePurchase':
+                $this->operationPurchase($data);
+                break;
+            case 'coupon':
+                $this->operationCoupon($data);
+                break;
+            case 'internal':
+                $this->operationInternal($data);
+                break;
+            case 'refund':
+                $this->operationRefund($data);
+                break;
+        }
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_payment
+     */
+    private function operationPayment(array $data) {
+        return $this->operationPointRelevant($data);
+    }
+
+    /**
+     * @param array $data
+     * @return string
+     * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_purchase
+     * @throws \Exception
+     */
+    private function operationPurchase(array $data) {
+        $userData = $data['user'];
+        $items = $data['items_operation_type']['items'];
+
+        try {
+            foreach ($items as $item) {
+                UserItem::scopePurchaseUserItem($userData['id'], Item::scopeSkuParseId($item->sku), 'xsolla');
+            }
+        } catch (\Exception $e) {
+            (new \App\Http\Controllers\DiscordNotificationController)->exception($e, $data);
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_redeem_coupon
+     */
+    private function operationCoupon(array $data) {
+        return $this->operationPointRelevant($data);
+    }
+
+    /**
+     * @deprecated
+     * @param array $data
+     * @return array
+     * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_manual_update
+     */
+    private function operationInternal(array $data) {
+        return $this->operationPointRelevant($data);
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_refund
+     */
+    private function operationRefund(array $data) {
+        return $this->operationPointRelevant($data);
+    }
+
+    /**
+     * User Balance Operation Central Point Processing Function
+     * @param array $data
+     * @return array
+     */
+    private function operationPointRelevant(array $data) {
+        // TODO: sync xsolla with crescendo API if points are different
+
+        $repetition = false;
+        $needPoint = 0;
+
+        $userData = $data['user'];
+        $virtualCurrencyBalance = $data['virtual_currency_balance'];
+        $user = User::scopeGetUser($userData['id']);
+
+        $oldPoints = $user->points;
+        $user->points += $virtualCurrencyBalance['new_value'];
+        $user->save();
+
+        $receipt = new Receipt;
+        $receipt->user_id = $user->id;
+        $receipt->client_id = 1;
+        $receipt->user_item_id = NULL;
+        $receipt->about_cash = 0;
+        $receipt->refund = 0;
+        $receipt->points_old = $oldPoints;
+        $receipt->points_new = $user->points;
+        $receipt->save();
+
+        while(true) {
+            $datas = [
+                'amount' => $repetition ? $needPoint : $virtualCurrencyBalance['new_value'],
+                'comment' => 'Updated User Point => xsolla',
+            ];
+
+            $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/' . $receipt->user_id . '/recharge', $datas), true);
+
+            if ($user->points !== $response['amount']) {
+                $repetition = true;
+                $needPoint = $user->points > $response['amount'] ? $user->points - $response['amount'] : $response['amount'] - $user->points;
+                continue;
+            } else {
+                break;
+            }
+        }
+
+        return ['receipt_id' => $receipt->id];
     }
 }

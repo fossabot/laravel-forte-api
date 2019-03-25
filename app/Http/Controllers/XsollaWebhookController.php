@@ -51,6 +51,8 @@ class XsollaWebhookController extends Controller {
                 return $this->xws->payment($request->all());
             case TYPE_REFUND:
                 return $this->xws->refund($request->all());
+            case TYPE_USER_BALANCE_OPERATION:
+                return $this->xws->userBalanceOperation($request->all());
         }
     }
 
