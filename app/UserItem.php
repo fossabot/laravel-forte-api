@@ -70,6 +70,8 @@ class UserItem extends Model
         }
 
         try {
+            DB::beginTransaction();
+
             $userItemId = self::insertGetId([
                 'user_id' => $id,
                 'item_id' => $itemId,
