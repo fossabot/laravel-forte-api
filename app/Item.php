@@ -30,4 +30,12 @@ class Item extends Model
         return self::where('id', $id)->first();
     }
 
+    /**
+     * @param string $sku
+     * @return mixed
+     */
+    static public function scopeSkuParseId(string $sku) {
+        return self::where('sku', $sku)->first()->id;
+    }
+
 }
