@@ -54,8 +54,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="./examples/profile.html">
+                    <a class="nav-link" href="{{ route('dashboard.users') }}">
                         <i class="ni ni-single-02 text-yellow"></i> Users
+                    </a>
+                </li><li class="nav-item">
+                    <a class="nav-link" href="{{ route('dashboard.errors') }}">
+                        <i class="ni ni-bell-55 text-red"></i> Errors
                     </a>
                 </li>
             </ul>
