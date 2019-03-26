@@ -285,6 +285,13 @@ class UserController extends Controller {
      */
     public function xsollaToken(int $id) {
         try {
+            $user = User::scopeGetUser($id);
+            if (!$user) {
+                return response()->json([
+                    'message' => 'User ' . $id . ' not found.',
+                ], 404);
+            }
+
             if (env('APP_ENV') == 'production') {
                 $mode = '';
             } else {
@@ -297,6 +304,9 @@ class UserController extends Controller {
                 'user' => [
                     'id' => [
                         'value' => (string) $id,
+                    ],
+                    'name' => [
+                        'value' => $user->name,
                     ],
                 ],
                 'settings' => [
