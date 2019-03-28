@@ -43,7 +43,11 @@ class User extends Authenticatable
      * @return mixed
      */
     static public function scopeGetUser(int $id) {
-        return self::where('id', $id)->first();
+        try {
+            return self::findOrFail($id)->first();
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
     /**
