@@ -17,11 +17,19 @@ class UserItem extends Model
     ];
 
     /**
+     * @brief 1:n relationship
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function item() {
+        return $this->belongsTo(Item::class);
+    }
+
+    /**
      * @param int $id
      * @return mixed
      */
     static public function scopeUserItemLists(int $id) {
-        return self::selectRaw('items.*, user_items.*, user_items.item_id as user_item_id')->join('items', 'items.id', '=', 'user_items.item_id')->where('user_items.user_id', $id)->get();
+        return self::with('item')->where('user_id', $id)->get();
     }
 
     /**

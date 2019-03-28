@@ -16,6 +16,14 @@ class Item extends Model
     ];
 
     /**
+     * @brief 1:n relationship
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function userItems() {
+        return $this->hasMany(UserItem::class);
+    }
+
+    /**
      * @return mixed
      */
     static public function scopeAllItemLists() {
