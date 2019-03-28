@@ -30,6 +30,14 @@ class User extends Authenticatable
     ];
 
     /**
+     * @brief 1:1 relationship
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function discord() {
+        return $this->hasOne(Discord::class, 'id', 'user_id');
+    }
+
+    /**
      * @return mixed
      */
     static public function scopeAllUsers() {

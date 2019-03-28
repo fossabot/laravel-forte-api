@@ -18,10 +18,18 @@ class Discord extends Model
     ];
 
     /**
+     * @brief 1:1 relationship
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user() {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    /**
      * @return mixed
      */
     static public function scopeAllDiscordAccounts() {
-        return self::get();
+        return self::with('user')->get();
     }
 
     /**
