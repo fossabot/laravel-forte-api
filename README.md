@@ -53,6 +53,9 @@
     - sql (DB 백업 파일이 있습니다.)
 - routes (라우팅 관련된 파일이 모여있으며 오직 `api.php` 만 수정합니다.)
 
+### Synchronization
+Xsolla 와 Forte(중앙 API)의 아이템 동기화는 매일 02시에 진행됩니다. `app/Console/Kernal.php` (라라벨 스케쥴러) 참고해주세요.
+
 ### Error Tracking
 에러트래킹은 `Sentry`를 사용합니다. 그외 디스코드 중앙API - 로깅 채널에서 확인 가능합니다.
 
@@ -179,4 +182,10 @@ $ chmod -R 775 storage bootstrap/cache storage/framework storage/logs
 $ sudo chown -R $USER:www-data storage
 $ sudo chown -R $USER:www-data bootstrap/cache
 $ cp .env.example .env
+```
+
+8. Laravel Scheduler
+```bash
+# cron
+* * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
 ```
