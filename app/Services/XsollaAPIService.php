@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Item;
+use App\Discord;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 use GuzzleHttp\Exception\GuzzleException;
@@ -98,17 +99,20 @@ class XsollaAPIService
     public function syncItems() {
         $this->print('== Xsolla Sync from Forte Items Start ==');
 
+        $count = 0;
         $xsollaItemsSku = [];
         $xsollaItemIds = [];
+        $xsollaDuplicateItemsSku = [];
 
         try {
             $xsollaItems = json_decode($this->requestAPI('GET', 'projects/:projectId/virtual_items/items', []), true);
 
             foreach ($xsollaItems as $item) {
-                if (Item::where('sku', $item['sku'])->first()) {
-                    array_push($xsollaItemsSku, $item['sku']);
-                    array_push($xsollaItemIds, $item['id']);
+                if (! Item::where('sku', $item['sku'])->first()) {
+                    array_push($xsollaDuplicateItemsSku, $item['sku']);
                 }
+                array_push($xsollaItemsSku, $item['sku']);
+                array_push($xsollaItemIds, $item['id']);
             }
 
             Item::whereNotIn('sku', $xsollaItemsSku)->delete();
@@ -119,19 +123,20 @@ class XsollaAPIService
 
                 // Forte DB 에 아이템이 없을 경우 생성
                 if (! Item::where('sku', $xsollaDetailItem['sku'])->first()) {
+                    $count++;
                     $skuParse = explode('_', $xsollaDetailItem['sku']);
                     $convertSku = array_search($skuParse[0], SKU_PREFIX);
 
                     Item::create([
-                        'client_id' => \Client::where('name', $convertSku)->value('id'),
+                        'client_id' => \App\Client::where('name', $convertSku)->value('id'),
                         'sku' => $xsollaDetailItem['sku'],
-                        'name' => empty(! $xsollaDetailItem['name']['ko']) ?: $xsollaDetailItem['name']['en'],
+                        'name' => (! empty($xsollaDetailItem['name']['ko'])) ? $xsollaDetailItem['name']['ko'] : $xsollaDetailItem['name']['en'],
                         'image_url' => $xsollaDetailItem['image_url'],
-                        'price' => is_null($xsollaDetailItem['virtual_currency_price']) ? 0 : $xsollaDetailItem['virtual_currency_price'],
+                        'price' => empty($xsollaDetailItem['virtual_currency_price']) ? 0 : $xsollaDetailItem['virtual_currency_price'],
                         'enabled' => $xsollaDetailItem['enabled'] == true ? 1 : 0,
                         'consumable' => $xsollaDetailItem['permanent'] == true ? 0 : 1,
-                        'expiration_time' => is_null($xsollaDetailItem['expiration']) ?: $xsollaDetailItem['expiration'],
-                        'purchase_limit' => is_null($xsollaDetailItem['purchase_limit']) ?: $xsollaDetailItem['purchase_limit'],
+                        'expiration_time' => empty($xsollaDetailItem['expiration']) ?: $xsollaDetailItem['expiration'],
+                        'purchase_limit' => empty($xsollaDetailItem['purchase_limit']) ?: $xsollaDetailItem['purchase_limit'],
                     ]);
                 }
             }
@@ -140,6 +145,7 @@ class XsollaAPIService
             return $e->getMessage();
         }
 
+        (new \App\Http\Controllers\DiscordNotificationController)->sync($count, $xsollaDuplicateItemsSku);
         $this->print('== End Xsolla Sync from Forte Items ==');
     }
 
