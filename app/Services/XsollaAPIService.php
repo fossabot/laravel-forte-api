@@ -120,10 +120,10 @@ class XsollaAPIService
             // 각 아이템 고유 ID에 대해 세부 페이지에 접속해서 동기화시킨다.
             foreach ($xsollaItemIds as $xsollaItemId) {
                 $xsollaDetailItem = json_decode($this->requestAPI('GET', 'projects/:projectId/virtual_items/items/' . $xsollaItemId, []), true);
+                $count++;
 
                 // Forte DB 에 아이템이 없을 경우 생성
                 if (! Item::where('sku', $xsollaDetailItem['sku'])->first()) {
-                    $count++;
                     $skuParse = explode('_', $xsollaDetailItem['sku']);
                     $convertSku = array_search($skuParse[0], SKU_PREFIX);
 
@@ -135,8 +135,18 @@ class XsollaAPIService
                         'price' => empty($xsollaDetailItem['virtual_currency_price']) ? 0 : $xsollaDetailItem['virtual_currency_price'],
                         'enabled' => $xsollaDetailItem['enabled'] == true ? 1 : 0,
                         'consumable' => $xsollaDetailItem['permanent'] == true ? 0 : 1,
-                        'expiration_time' => empty($xsollaDetailItem['expiration']) ?: $xsollaDetailItem['expiration'],
-                        'purchase_limit' => empty($xsollaDetailItem['purchase_limit']) ?: $xsollaDetailItem['purchase_limit'],
+                        'expiration_time' => empty($xsollaDetailItem['expiration']) ? NULL : $xsollaDetailItem['expiration'],
+                        'purchase_limit' => empty($xsollaDetailItem['purchase_limit']) ? NULL : $xsollaDetailItem['purchase_limit'],
+                    ]);
+                } else {
+                    Item::where('sku', $xsollaDetailItem['sku'])->update([
+                        'name' => (! empty($xsollaDetailItem['name']['ko'])) ? $xsollaDetailItem['name']['ko'] : $xsollaDetailItem['name']['en'],
+                        'image_url' => $xsollaDetailItem['image_url'],
+                        'price' => empty($xsollaDetailItem['virtual_currency_price']) ? 0 : $xsollaDetailItem['virtual_currency_price'],
+                        'enabled' => $xsollaDetailItem['enabled'] == true ? 1 : 0,
+                        'consumable' => $xsollaDetailItem['permanent'] == true ? 0 : 1,
+                        'expiration_time' => empty($xsollaDetailItem['expiration']) ? NULL: $xsollaDetailItem['expiration'],
+                        'purchase_limit' => empty($xsollaDetailItem['purchase_limit']) ? NULL : $xsollaDetailItem['purchase_limit'],
                     ]);
                 }
             }
