@@ -2,8 +2,16 @@
 
 namespace App\Services;
 
+use App\Item;
 use GuzzleHttp\Client;
+use Illuminate\Console\Command;
 use GuzzleHttp\Exception\GuzzleException;
+
+const SKU_PREFIX = [
+    'baechubotv2' => 'cabv2',
+    'sangchuv2' => 'letv2',
+    'skilebot' => 'skb',
+];
 
 class XsollaAPIService
 {
@@ -35,6 +43,10 @@ class XsollaAPIService
      * @var $endpoint
      */
     protected $endpoint;
+    /**
+     * @var $command
+     */
+    protected $command;
 
     /**
      * XsollaAPIService constructor.
@@ -77,6 +89,68 @@ class XsollaAPIService
         } catch (GuzzleException $e) {
             (new \App\Http\Controllers\DiscordNotificationController)->exception($e, $datas);
             return $e->getMessage();
+        }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function syncItems() {
+        $this->print('== Xsolla Sync from Forte Items Start ==');
+
+        $xsollaItemsSku = [];
+        $xsollaItemIds = [];
+
+        try {
+            $xsollaItems = json_decode($this->requestAPI('GET', 'projects/:projectId/virtual_items/items', []), true);
+
+            foreach ($xsollaItems as $item) {
+                if (Item::where('sku', $item['sku'])->first()) {
+                    array_push($xsollaItemsSku, $item['sku']);
+                    array_push($xsollaItemIds, $item['id']);
+                }
+            }
+
+            Item::whereNotIn('sku', $xsollaItemsSku)->delete();
+
+            // 각 아이템 고유 ID에 대해 세부 페이지에 접속해서 동기화시킨다.
+            foreach ($xsollaItemIds as $xsollaItemId) {
+                $xsollaDetailItem = json_decode($this->requestAPI('GET', 'projects/:projectId/virtual_items/items/' . $xsollaItemId, []), true);
+
+                // Forte DB 에 아이템이 없을 경우 생성
+                if (! Item::where('sku', $xsollaDetailItem['sku'])->first()) {
+                    $skuParse = explode('_', $xsollaDetailItem['sku']);
+                    $convertSku = array_search($skuParse[0], SKU_PREFIX);
+
+                    Item::create([
+                        'client_id' => \Client::where('name', $convertSku)->value('id'),
+                        'sku' => $xsollaDetailItem['sku'],
+                        'name' => empty(! $xsollaDetailItem['name']['ko']) ?: $xsollaDetailItem['name']['en'],
+                        'image_url' => $xsollaDetailItem['image_url'],
+                        'price' => is_null($xsollaDetailItem['virtual_currency_price']) ? 0 : $xsollaDetailItem['virtual_currency_price'],
+                        'enabled' => $xsollaDetailItem['enabled'] == true ? 1 : 0,
+                        'consumable' => $xsollaDetailItem['permanent'] == true ? 0 : 1,
+                        'expiration_time' => is_null($xsollaDetailItem['expiration']) ?: $xsollaDetailItem['expiration'],
+                        'purchase_limit' => is_null($xsollaDetailItem['purchase_limit']) ?: $xsollaDetailItem['purchase_limit'],
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            (new \App\Http\Controllers\DiscordNotificationController)->exception($e, $xsollaItemsSku);
+            return $e->getMessage();
+        }
+
+        $this->print('== End Xsolla Sync from Forte Items ==');
+    }
+
+    /**
+     * @param string $message
+     */
+    private function print(string $message) {
+        if ($this->command) {
+            $this->command->info($message);
+        } else {
+            dump($message);
         }
     }
 }
