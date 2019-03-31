@@ -52,7 +52,7 @@ class User extends Authenticatable
      */
     static public function scopeGetUser(int $id) {
         try {
-            return self::findOrFail($id)->first();
+            return self::findOrFail($id);
         } catch (\Exception $e) {
             return $e->getMessage();
         }
