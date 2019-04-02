@@ -18,7 +18,9 @@
         "laravel/framework": "5.7.*",
         "laravel/tinker": "^1.0",
         "sentry/sentry-laravel": "1.0.0",
+        "symfony/options-resolver": "^3.0",
         "symfony/psr-http-message-bridge": "^1.2",
+        "team-reflex/discord-php": "^4.0",
         "tymon/jwt-auth": "^0.5.12",
         "zircote/swagger-php": "2.*"
     },
