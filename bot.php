@@ -29,9 +29,11 @@ $discord->registerCommand('xsolla:sync', function () {
 $forte = $discord->registerCommand('forte', function ($discord) {
     $commands = [
         'forte users',
+        'forte users <id>',
+        'forte users ban <id>',
+        'forte users unban <id>',
         'forte items',
-        'forte users <email>',
-        'forte items <email>',
+        'forte items <id>',
     ];
 
     $string = '';
@@ -57,7 +59,7 @@ $forte->registerSubCommand('users', function ($discord) {
 
     foreach ($users as $index => $user) {
         ++$index;
-        $string .= $index . '. ' . $user->name . ' (' . $user->email . ')' . PHP_EOL;
+        $string .= $index . '. ' . $user->name . ' (ID: ' . $user->id . ' | EMAIL: ' .$user->email . ')' . PHP_EOL;
     }
 
     return $discord->reply('```' . $string . '```');
@@ -77,7 +79,7 @@ $forte->registerSubCommand('items', function ($discord) {
 
     foreach ($items as $index => $item) {
         ++$index;
-        $string .= $index . '. ' . $item->name . ' (' . number_format($item->price) . ' 원)' . PHP_EOL;
+        $string .= $index . '. ' . $item->name . ' (ID: ' . $item->id . ' | ' . number_format($item->price) . ' 원)' . PHP_EOL;
     }
 
     return $discord->reply('```' . $string . '```');

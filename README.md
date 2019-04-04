@@ -121,11 +121,11 @@ Lara 는 포르테 프로젝트를 도와주는 봇입니다.
 - `@Lara uptime` (서버 구동 시간)
 - `@Lara xsolla:sync` (엑솔라와 포르테 아이템 동기화)
 - `@Lara forte users` (포르테 유저 목록)
-- `@Lara forte users <email>` (포르테 유저 검색)
+- `@Lara forte users <id>` (포르테 유저 검색)
 - `@Lara forte items` (포르테 아이템 목록)
-- `@Lara forte items <email>` (포르테 유저 보유중인 아이템 검색)
-- `@Lara forte users ban <email>` (포르테 유저 정지)
-- `@Lara forte users unban <email>` (포르테 유저 정지 해제)
+- `@Lara forte items <id>` (포르테 유저 보유중인 아이템 검색)
+- `@Lara forte users ban <id>` (포르테 유저 정지)
+- `@Lara forte users unban <id>` (포르테 유저 정지 해제)
 
 ## Installation
 - Ubuntu 기준
