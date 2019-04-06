@@ -199,7 +199,15 @@ $ cp .env.example .env
 $ php artisan key:generate
 ```
 
-8. Apache2 Setting
+8. MySQL Setting
+```bash
+$ sudo mysql -uroot -p
+mysql> create user 'sqluser'@'%' identified by 'password';
+mysql> grant all privileges on *.* to sqluser@'%' identified by 'password' with grant option;
+mysql> FLUSH PRIVILEGES;
+```
+
+9. Apache2 Setting
 ```bash
 # /etc/apache2/apache2.conf
 <Directory /var/www/>
@@ -210,7 +218,7 @@ $ php artisan key:generate
 DocumentRoot /var/www/project/public
 ```
 
-9. Laravel Scheduler
+10. Laravel Scheduler
 ```bash
 # cron
 $ crontab -e
@@ -218,7 +226,7 @@ $ crontab -e
 * * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
 ```
 
-10. Forte Bot
+11. Forte Bot
 ```bash
 $ nohup php bot.php &
 ```
