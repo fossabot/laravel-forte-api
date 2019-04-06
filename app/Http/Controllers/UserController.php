@@ -5,7 +5,8 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Services\XsollaAPIService;
-use App\Http\Requests\RegisterFormRequest;
+use App\Http\Requests\UserUpdateFormRequest;
+use App\Http\Requests\UserRegisterFormRequest;
 
 class UserController extends Controller {
     /**
@@ -51,7 +52,7 @@ class UserController extends Controller {
     /**
      * Store a newly created resource in storage.
      *
-     * @param RegisterFormRequest $request
+     * @param UserRegisterFormRequest $request
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      * @throws \Exception
      *
@@ -94,7 +95,7 @@ class UserController extends Controller {
      *     ),
      * )
      */
-    public function store(Request $request) {
+    public function store(UserRegisterFormRequest $request) {
         DB::beginTransaction();
         try {
             $user = new User;
@@ -215,7 +216,7 @@ class UserController extends Controller {
      *     ),
      * )
      */
-    public function update(Request $request, int $id) {
+    public function update(UserUpdateFormRequest $request, int $id) {
         return response()->json(User::scopeUpdateUser($id, $request->all()));
     }
 
