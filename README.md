@@ -149,7 +149,7 @@ $ source ~/.profile
 ```bash
 $ sudo add-apt-repository ppa:ondrej/php 
 $ sudo apt-get update
-$ sudo apt-get install php7.1 php7.1-mcrypt php7.1-xml php7.1-gd php7.1-opcache php7.1-mbstring php7.1-curl
+$ sudo apt-get install php7.1 php7.1-mcrypt php7.1-xml php7.1-gd php7.1-opcache php7.1-mbstring php7.1-curl php7.1-zip
 ```
 
 3. Apache Install (Apache 와 PHP를 연결하기 위해 libapache2-mod-php7.1 패키지를 설치해야함)
@@ -192,20 +192,33 @@ $ service apache2 restart
 $ git clone https://github.com/Team-Crescendo/laravel-central-api
 $ composer global require "laravel/installer"
 $ composer install
-$ php artisan key:generate
 $ chmod -R 775 storage bootstrap/cache storage/framework storage/logs
 $ sudo chown -R $USER:www-data storage
 $ sudo chown -R $USER:www-data bootstrap/cache
 $ cp .env.example .env
+$ php artisan key:generate
 ```
 
-8. Laravel Scheduler
+8. Apache2 Setting
+```bash
+# /etc/apache2/apache2.conf
+<Directory /var/www/>
+    AllowOverride All
+</Directory>
+
+# /etc/apache2/sites-enabled
+DocumentRoot /var/www/project/public
+```
+
+9. Laravel Scheduler
 ```bash
 # cron
+$ crontab -e
+
 * * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
 ```
 
-9. Forte Bot
+10. Forte Bot
 ```bash
 $ nohup php bot.php &
 ```
