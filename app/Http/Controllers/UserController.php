@@ -165,11 +165,10 @@ class UserController extends Controller {
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param UserUpdateFormRequest $request
      * @param  int $id
      * @return \Illuminate\Http\Response
      * @throws \Exception
-     *
      * @SWG\Put(
      *     path="/users/{userId}",
      *     description="Update User Information",
