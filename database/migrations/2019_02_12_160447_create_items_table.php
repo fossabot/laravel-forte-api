@@ -22,8 +22,8 @@ class CreateItemsTable extends Migration
             $table->integer('price')->comment('item price in points');
             $table->boolean('enabled')->default(true)->comment('whether the item is on sale');
             $table->boolean('consumable')->default(true);
-            $table->integer('expiration_time')->comment('expiration time in seconds (NULL means permanent)');
-            $table->integer('purchase_limit')->comment('max purchase count per user (NULL means infinity)');
+            $table->integer('expiration_time')->nullable()->comment('expiration time in seconds (NULL means permanent)');
+            $table->integer('purchase_limit')->nullable()->comment('max purchase count per user (NULL means infinity)');
             $table->timestamps();
         });
     }
