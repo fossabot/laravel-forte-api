@@ -29,6 +29,8 @@
 
 ## Server Architecture
 - AWS EC2 (Ubuntu 18.06)
+- AWS Elastic Beanstalk
+- Docker
 
 ## Links
 - URL
@@ -229,4 +231,26 @@ $ crontab -e
 11. Forte Bot
 ```bash
 $ nohup php bot.php &
+```
+
+12. Redis
+```bash
+$ sudo apt-get install build-essential tcl
+$ sudo apt-get install redis-server
+$ sudo systemctl enable redis-server.service
+$ redis-server --version
+$ vmstat -s
+$ sudo vi /etc/redis/redis.conf
+
+# redis.conf
+maxmemory 1g
+maxmemory-policy allkeys-lru
+
+$ sudo systemctl restart redis-server.service
+$ sudo apt-get install php-redis
+
+$ redis-cli
+127.0.0.1:6379> ping
+PONG
+127.0.0.1:6379>
 ```
