@@ -162,6 +162,9 @@ $ apt install php7.3-bcmath php7.3-bz2 php7.3-curl php7.3-gd php7.3-intl php7.3-
 $ sudo apt install php7.3-fpm
 $ sudo apt install libapache2-mod-php7.3
 
+# enable PHP 7.3 and restart Apache2
+$ sudo a2enmod php7.3
+
 # If old PHP Version
 $ sudo apt purge php7.1 php7.1-common
 ```
