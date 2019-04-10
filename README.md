@@ -147,16 +147,23 @@ TZ='Asia/Seoul'; export TZ
 $ source ~/.profile
 ```
 
-2. PHP 7.1 Install
+2. PHP 7.3 Install
 ```bash
 $ sudo add-apt-repository ppa:ondrej/php 
 $ sudo apt-get update
-$ sudo apt-get install php7.1 php7.1-mcrypt php7.1-xml php7.1-gd php7.1-opcache php7.1-mbstring php7.1-curl php7.1-zip
+# $ sudo apt-get install php7.1 php7.1-mcrypt php7.1-xml php7.1-gd php7.1-opcache php7.1-mbstring php7.1-curl php7.1-zip
+$ sudo apt install php7.3 php7.3-common php7.3-cli
+$ apt install php7.3-bcmath php7.3-bz2 php7.3-curl php7.3-gd php7.3-intl php7.3-json php7.3-mbstring php7.3-readline php7.3-xml php7.3-zip
 ```
 
 3. Apache Install (Apache 와 PHP를 연결하기 위해 libapache2-mod-php7.1 패키지를 설치해야함)
 ```bash
-$ sudo apt-get install apache2 libapache2-mod-php7.1
+# $ sudo apt-get install apache2 libapache2-mod-php7.1
+$ sudo apt install php7.3-fpm
+$ sudo apt install libapache2-mod-php7.3
+
+# If old PHP Version
+$ sudo apt purge php7.1 php7.1-common
 ```
 
 4. Laravel Install
@@ -179,7 +186,7 @@ $ sudo service apache2 restart
 
 6. MySQL & PHPMyAdmin Install
 ```bash
-$ sudo apt-get install mysql-server php7.1-mysql
+$ sudo apt-get install mysql-server php7.3-mysql
 $ service mysql restart
 $ service apache2 restart
 $ sudo apt-get install phpmyadmin php-mbstring php-gettext
