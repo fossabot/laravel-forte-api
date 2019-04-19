@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 Route::prefix('v1/')->middleware(['api.headers'])->group(function () {
     Route::resource('users', 'UserController');
     Route::get('users/{user_id}/xsolla/token', 'UserController@xsollaToken');
+    Route::post('users/{user_id}/signin', 'UserController@authentication');
 
     Route::post('users/{user_id}/discord', 'DiscordController@store');
     Route::put('users/{user_id}/discord', 'DiscordController@update');

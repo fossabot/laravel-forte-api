@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\User;
 use Illuminate\Http\Request;
+use App\Services\UserService;
 use Illuminate\Support\Facades\DB;
 use App\Services\XsollaAPIService;
 use App\Http\Requests\UserUpdateFormRequest;
@@ -13,13 +14,19 @@ class UserController extends Controller {
      * @var XsollaAPIService
      */
     protected $xsollaAPI;
+    /**
+     * @var UserService $us
+     */
+    protected $us;
 
     /**
      * UserController constructor.
      * @param XsollaAPIService $xsollaAPI
+     * @param UserService $us
      */
-    public function __construct(XsollaAPIService $xsollaAPI) {
+    public function __construct(XsollaAPIService $xsollaAPI, UserService $us) {
         $this->xsollaAPI = $xsollaAPI;
+        $this->us = $us;
     }
 
     /**
@@ -327,5 +334,52 @@ class UserController extends Controller {
             (new \App\Http\Controllers\DiscordNotificationController)->exception($e, $datas);
             return $e->getMessage();
         }
+    }
+
+    /**
+     * @param Request $request
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     *
+     * @SWG\POST(
+     *     path="/users/{userId}/signin",
+     *     description="User 2FA",
+     *     produces={"application/json"},
+     *     tags={"User"},
+     *     @SWG\Parameter(
+     *         name="Authorization",
+     *         in="header",
+     *         description="Authorization Token",
+     *         required=true,
+     *         type="string"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="userId",
+     *         in="path",
+     *         description="User Id",
+     *         required=true,
+     *         type="integer"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="password",
+     *         in="query",
+     *         description="User Password",
+     *         required=true,
+     *         type="string"
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Successful User 2FA Auth"
+     *     ),
+     * )
+     */
+    public function authentication(Request $request, int $id) {
+        if (empty($id) || empty($request->password)) {
+            return response()->json([
+               'message' => 'Notfound'
+            ], 404);
+        }
+
+        return $this->us->authentication($id, $request->password);
     }
 }
