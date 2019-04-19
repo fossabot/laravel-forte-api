@@ -313,7 +313,8 @@ class UserController extends Controller {
                     'project_id' => (int) config('xsolla.projectId'),
                     'mode' => isset($mode) ? 'sandbox' : '',
                     'ui' => [
-                        'theme' => 'default_dark'
+                        'theme' => 'default_dark',
+                        'size' => 'large',
                     ],
                 ],
             ];
