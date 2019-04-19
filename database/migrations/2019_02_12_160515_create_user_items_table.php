@@ -22,6 +22,11 @@ class CreateUserItemsTable extends Migration
             $table->boolean('sync')->default(false)->comment('whether bot(items.client_id) is notified of the change in this item');
             $table->date('deleted_at')->nullable();
             $table->timestamps();
+
+            $table->foreign('item_id')->references('id')->on('items');
+            $table->foreign('user_id')
+                ->references('id')->on('users')
+                ->onDelete('cascade');
         });
     }
 

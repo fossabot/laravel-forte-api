@@ -23,6 +23,12 @@ class CreateReceiptsTable extends Migration
             $table->bigInteger('points_old');
             $table->bigInteger('points_new');
             $table->timestamps();
+
+            $table->foreign('client_id')->references('id')->on('clients');
+            $table->foreign('user_item_id')->references('id')->on('user_items');
+            $table->foreign('user_id')
+                ->references('id')->on('users')
+                ->onDelete('cascade');
         });
     }
 

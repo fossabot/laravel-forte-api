@@ -18,6 +18,10 @@ class CreateDiscordsTable extends Migration
             $table->integer('user_id')->unique();
             $table->text('discord_id')->comment('id of discord user account');
             $table->timestamps();
+
+            $table->foreign('user_id')
+                ->references('id')->on('users')
+                ->onDelete('cascade');
         });
     }
 

@@ -25,6 +25,8 @@ class CreateItemsTable extends Migration
             $table->integer('expiration_time')->nullable()->comment('expiration time in seconds (NULL means permanent)');
             $table->integer('purchase_limit')->nullable()->comment('max purchase count per user (NULL means infinity)');
             $table->timestamps();
+
+            $table->foreign('client_id')->references('id')->on('clients');
         });
     }
 
