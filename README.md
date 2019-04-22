@@ -34,10 +34,10 @@
 
 ## Links
 - URL
-    - api endpoint: [https://crescendo.mingeun.com/api/v1](https://crescendo.mingeun.com/api/v1)
-    - xsolla endpoint: [https://crescendo.mingeun.com/api/xsolla](https://crescendo.mingeun.com/api/xsolla)
+    - api endpoint: [https://forte.team-crescendo.me/api/v1](https://forte.team-crescendo.me/api/v1)
+    - xsolla endpoint: [https://forte.team-crescendo.me/api/xsolla](https://forte.team-crescendo.me/api/xsolla)
 - Docs
-    - API Document: [https://crescendo.mingeun.com/api/documentation](https://crescendo.mingeun.com/api/documentation)
+    - API Document: [https://forte.team-crescendo.me/api/documentation](https://forte.team-crescendo.me/api/documentation)
     
 ## Directory Structure
 중앙API 구조 (자세한 라라벨 관련 구조는 [여기](https://laravel.com/docs/5.8/structure)를 참고해주세요.)
