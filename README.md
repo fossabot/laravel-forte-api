@@ -2,7 +2,7 @@
 
 `팀 크레센도` 중앙 API 서버(이하 “API 서버”)는 팀 크레센도 홈페이지(이하 “홈페이지”), 결제 대행사(“엑솔라”), 디스코드 봇(이하 “봇”) 사이에서 통용되는 데이터를 통합해서 관리하는 API 서버입니다.
 
-[![Build Status](https://travis-ci.com/team-crescendo/laravel-forte-api.svg?branch=master)](https://travis-ci.com/team-crescendo/laravel-forte-api)
+[![Build Status](https://travis-ci.com/team-crescendo/laravel-forte.svg?branch=master)](https://travis-ci.com/team-crescendo/laravel-forte)
 
 ## Developers
 - 김민근 ([@getsolaris](https://github.com/getsolaris)) kevin@mingeun.com
@@ -34,10 +34,10 @@
 
 ## Links
 - URL
-    - api endpoint: [https://crescendo.mingeun.com/api/v1](https://crescendo.mingeun.com/api/v1)
-    - xsolla endpoint: [https://crescendo.mingeun.com/api/xsolla](https://crescendo.mingeun.com/api/xsolla)
+    - api endpoint: [https://forte.team-crescendo.me/api/v1](https://forte.team-crescendo.me/api/v1)
+    - xsolla endpoint: [https://forte.team-crescendo.me/api/xsolla](https://forte.team-crescendo.me/api/xsolla)
 - Docs
-    - API Document: [https://crescendo.mingeun.com/api/documentation](https://crescendo.mingeun.com/api/documentation)
+    - API Document: [https://forte.team-crescendo.me/api/documentation](https://forte.team-crescendo.me/api/documentation)
     
 ## Directory Structure
 중앙API 구조 (자세한 라라벨 관련 구조는 [여기](https://laravel.com/docs/5.8/structure)를 참고해주세요.)
