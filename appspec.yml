@@ -2,4 +2,13 @@ version: 0.0
 os: linux
 files:
   - source: ./
-    destination: /var/www/laravel-central-api
+    destination: /var/www/release/
+permissions:
+  - object: /var/www/laravel-central-api/
+    owner: www-data
+    group: www-data
+hooks:
+  BeforeInstall:
+    - location: scripts/beforeInstall.bash
+  AfterInstall:
+    - location: scripts/afterInstall.bash
