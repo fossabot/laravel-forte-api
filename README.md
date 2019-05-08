@@ -264,3 +264,11 @@ $ redis-cli
 PONG
 127.0.0.1:6379>
 ```
+
+13. AWS CodeDeploy
+```bash
+# ruby install
+sudo apt-get install ruby
+
+ruby --version
+```
