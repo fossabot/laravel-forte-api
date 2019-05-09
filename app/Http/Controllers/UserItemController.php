@@ -7,7 +7,7 @@ use App\UserItem;
 
 class UserItemController extends Controller {
     /**
-     * Display the specified resource.
+     * 이용자의 보유한 아이템 목록을 조회합니다.
      *
      * @param int $id
      * @return \Illuminate\Http\Response
@@ -42,11 +42,12 @@ class UserItemController extends Controller {
     }
 
     /**
-     * Store a newly created resource in storage.
+     * 아이템을 구매합니다.
      *
      * @param  \Illuminate\Http\Request $request
      * @param int $id
      * @return mixed
+     * @throws \Exception
      *
      * @SWG\Post(
      *     path="/users/{userId}/items",
@@ -91,7 +92,7 @@ class UserItemController extends Controller {
     }
 
     /**
-     * Display the specified resource.
+     * 이용자가 보유중인 아이템 상세 정보를 조회합니다.
      *
      * @param  int $id
      * @param int $itemId
@@ -134,12 +135,13 @@ class UserItemController extends Controller {
     }
 
     /**
-     * Update the specified resource in storage.
+     * 이용자의 아이템 정보를 갱신합니다.
      *
      * @param  \Illuminate\Http\Request $request
      * @param  int $id
      * @param int $itemId
      * @return \Illuminate\Http\Response
+     * @throws \Exception
      *
      * @SWG\Put(
      *     path="/users/{userId}/items/{userItemId}",
@@ -199,7 +201,7 @@ class UserItemController extends Controller {
     }
 
     /**
-     * Remove the specified resource from storage.
+     * 이용자의 아이템을 제거합니다.
      *
      * @param  int $id
      * @param int $itemId

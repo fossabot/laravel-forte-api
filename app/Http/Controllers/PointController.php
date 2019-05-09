@@ -22,8 +22,9 @@ class PointController extends Controller
     public function __construct(XsollaAPIService $xsollaAPI) {
         $this->xsollaAPI = $xsollaAPI;
     }
+
     /**
-     * Store a newly created resource in storage.
+     * 이용자에게 포인트를 지급합니다.
      *
      * @param Request $request
      * @param int $id

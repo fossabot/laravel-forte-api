@@ -9,7 +9,7 @@ use App\Item;
 class ItemController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * 전체 아이템을 조회합니다.
      *
      * @return \Illuminate\Http\Response
      *
@@ -36,7 +36,7 @@ class ItemController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * 아이템을 상세 조회합니다.
      *
      * @param  int $id
      * @return \Illuminate\Http\Response

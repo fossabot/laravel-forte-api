@@ -30,7 +30,7 @@ class UserController extends Controller {
     }
 
     /**
-     * Display a listing of the resource.
+     * 전체 이용자를 조회합니다.
      *
      * @return \Illuminate\Http\Response
      *
@@ -57,7 +57,7 @@ class UserController extends Controller {
     }
 
     /**
-     * Store a newly created resource in storage.
+     * 이용자를 추가(회원가입) 합니다.
      *
      * @param UserRegisterFormRequest $request
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
@@ -135,7 +135,7 @@ class UserController extends Controller {
     }
 
     /**
-     * Display the specified resource.
+     * 이용자의 정보를 조회합니다.
      *
      * @param  int $id
      * @return \Illuminate\Http\Response
@@ -170,7 +170,7 @@ class UserController extends Controller {
     }
 
     /**
-     * Update the specified resource in storage.
+     * 이용자의 정보를 갱신합니다.
      *
      * @param UserUpdateFormRequest $request
      * @param  int $id
@@ -227,7 +227,7 @@ class UserController extends Controller {
     }
 
     /**
-     * Remove the specified resource from storage.
+     * 이용자를 탈퇴처리합니다.
      *
      * @param  int $id
      * @return \Illuminate\Http\Response
@@ -262,6 +262,8 @@ class UserController extends Controller {
     }
 
     /**
+     * 이용자의 엑솔라 상점 URL 을 발급받습니다.
+     *
      * @param int $id
      * @return mixed|\Psr\Http\Message\ResponseInterface
      *
@@ -338,6 +340,8 @@ class UserController extends Controller {
     }
 
     /**
+     * 2FA 용 이용자 회원가입
+     *
      * @param Request $request
      * @param int $id
      * @return \Illuminate\Http\JsonResponse

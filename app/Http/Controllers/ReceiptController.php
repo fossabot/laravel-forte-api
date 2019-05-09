@@ -9,6 +9,8 @@ use App\Receipt;
 class ReceiptController extends Controller
 {
     /**
+     * 이용자의 모든 레시피 정보를 조회합니다.
+     *
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
      *
@@ -42,6 +44,8 @@ class ReceiptController extends Controller
     }
 
     /**
+     * 이용자의 상세 레시피 정보를 조회합니다.
+     *
      * @param int $id
      * @param int $receiptId
      * @return \Illuminate\Http\JsonResponse

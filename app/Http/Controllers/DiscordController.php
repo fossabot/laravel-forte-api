@@ -10,6 +10,8 @@ use App\Discord;
 class DiscordController extends Controller
 {
     /**
+     * 모든 디스코드 계정을 조회합니다.
+     *
      * @return \Illuminate\Http\JsonResponse
      *
      * @SWG\Get(
@@ -35,6 +37,8 @@ class DiscordController extends Controller
     }
 
     /**
+     * 디스코드 아이디로 조회합니다.
+     *
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
      *
@@ -68,6 +72,8 @@ class DiscordController extends Controller
     }
 
     /**
+     * 이용자의 디스코드 계정을 연동합니다.
+     *
      * @param Request $request
      * @param int $id
      * @return array|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
@@ -136,10 +142,14 @@ class DiscordController extends Controller
             'discord_id' => $request->discord_id,
         ]);
 
-        return ['discord_id' => $request->discord_id];
+        return response()->json([
+            'discord_id' => $request->discord_id
+        ], 201);
     }
 
     /**
+     * 이용자의 디스코드 계정 정보를 갱신합니다.
+     *
      * @param Request $request
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
@@ -200,7 +210,7 @@ class DiscordController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * 이용자에게 연동된 디스코드 계정 정보를 제거합니다.
      *
      * @param  int $id
      * @return \Illuminate\Http\Response
