@@ -6,4 +6,5 @@
 if [ -d /var/www/release ]; then
     sudo rm -rf /var/www/release
 fi
+sudo php artisan aws:codedeploy starting
 sudo mkdir -vp /var/www/release

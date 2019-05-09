@@ -49,4 +49,29 @@ class DiscordNotificationController extends Controller
             ]
         ]);
     }
+
+    /**
+     * @param string $status
+     * @return array
+     */
+    public function deploy(string $status) {
+        $time = now();
+
+        if ($status == 'starting') {
+            $status = '배포를 시작했습니다.';
+        } elseif ($status == 'finish') {
+            $status = '배포가 종료되었습니다.';
+        } else {
+            $status = '에러가 발생했습니다.';
+        }
+
+        return app(Discord::class)->send('576091937811988482', [
+            'content' => 'AWS Auto Deploy Notification',
+            'tts' => false,
+            'embed' => [
+                'title' => 'Deploy Information',
+                'description' => "`TIME` \n {$time} \n `STATUS` \n {$status}"
+            ]
+        ]);
+    }
 }
