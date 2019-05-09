@@ -11,6 +11,8 @@ sudo php artisan config:cache
 sudo chmod -R 775 storage bootstrap/cache storage/framework storage/logs
 sudo chown -R $USER:www-data storage
 sudo chown -R $USER:www-data bootstrap/cache
+sudo pkill -9 -ef bot.php
+nohup php bot.php &
 
 if [ -d /var/www/release ]; then
     sudo rm -rf /var/www/release
