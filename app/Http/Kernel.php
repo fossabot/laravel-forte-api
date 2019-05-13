@@ -40,6 +40,7 @@ class Kernel extends HttpKernel
         'api' => [
             'throttle:60,1',
             'bindings',
+            'log.request'
         ],
     ];
 
@@ -64,6 +65,7 @@ class Kernel extends HttpKernel
         'api.xsolla' => \App\Http\Middleware\VerifyXsollaAuthorization::class,
         'jwt.auth' => \Tymon\JWTAuth\Middleware\GetUserFromToken::class,
         'jwt.refresh' => \Tymon\JWTAuth\Middleware\RefreshToken::class,
+        'log.request' => \App\Http\Middleware\APIRequestLog::class,
     ];
 
     /**
