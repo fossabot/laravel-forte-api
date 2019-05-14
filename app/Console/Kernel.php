@@ -4,6 +4,7 @@ namespace App\Console;
 
 use App\Console\Commands\SyncXsollaItems;
 use Illuminate\Console\Scheduling\Schedule;
+use App\Console\Commands\RenewalClientToken;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
@@ -14,6 +15,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
+        RenewalClientToken::class,
         SyncXsollaItems::class,
     ];
 
@@ -25,6 +27,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+         $schedule->command(RenewalClientToken::class)->hourly();
          $schedule->command(SyncXsollaItems::class)->dailyAt('02:00');
     }
 

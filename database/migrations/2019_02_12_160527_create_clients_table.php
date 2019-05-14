@@ -16,7 +16,8 @@ class CreateClientsTable extends Migration
         Schema::create('clients', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->unique()->comment('skilebot and xsolla');
-            $table->string('token')->comment('authentication token');
+            $table->text('token')->comment('authentication token');
+            $table->text('prev_token');
             $table->timestamps();
         });
     }

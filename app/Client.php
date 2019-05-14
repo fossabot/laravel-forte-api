@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Client extends Model
 {
     const BOT_CLIENT = ['skilebot', 'baechubotv2'];
+    const BOT_TOKEN_RENEWAL_EXCEPTION = ['lara'];
 
     /**
      * The attributes that are mass assignable.
@@ -14,7 +15,7 @@ class Client extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'token',
+        'name', 'token', 'prev_token'
     ];
 
     /**

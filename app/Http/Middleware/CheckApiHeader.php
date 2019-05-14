@@ -4,9 +4,23 @@ namespace App\Http\Middleware;
 
 use Closure;
 use App\Client;
+use App\Http\Controllers\ClientController;
 
 class CheckApiHeader
 {
+    /**
+     * @var ClientController
+     */
+    protected $cc;
+
+    /**
+     * CheckApiHeader constructor.
+     * @param ClientController $cc
+     */
+    public function __construct(ClientController $cc) {
+        $this->cc = $cc;
+    }
+
     /**
      * Handle an incoming request.
      *
@@ -24,6 +38,10 @@ class CheckApiHeader
             ], 404);
         }
 
+        if (Client::where('prev_token', $_SERVER['HTTP_AUTHORIZATION'])->first()) {
+            return $this->cc->issue();
+        }
+
         if (! Client::where('token', $_SERVER['HTTP_AUTHORIZATION'])->first()) {
             return response([
                 'error' => [
@@ -32,6 +50,7 @@ class CheckApiHeader
                 ],
             ], 401);
         }
+
         return $next($request);
     }
 }

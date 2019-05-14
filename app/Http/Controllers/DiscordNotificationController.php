@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Client;
 use App\ErrorLog;
 use NotificationChannels\Discord\Discord;
 
@@ -71,6 +72,30 @@ class DiscordNotificationController extends Controller
             'embed' => [
                 'title' => 'Deploy Information',
                 'description' => "`TIME` \n {$time} \n `STATUS` \n {$status}"
+            ]
+        ]);
+    }
+
+    /**
+     * @return array
+     */
+    public function clientToken() {
+        $name = [];
+
+        foreach (Client::get() as $client) {
+            if (! in_array($client->name,Client::BOT_TOKEN_RENEWAL_EXCEPTION)) {
+                array_push($name, $client->name);
+            }
+        }
+
+        $name = implode(', ', $name);
+
+        return app(Discord::class)->send('561429015433445376', [
+            'content' => now() . '] Client Token Issue (' . date('H') . '/24)',
+            'tts' => false,
+            'embed' => [
+                'title' => 'Client Information',
+                'description' => "`Clients` \n {$name}"
             ]
         ]);
     }

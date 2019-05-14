@@ -35,6 +35,8 @@ Route::prefix('v1/')->middleware(['api.headers'])->group(function () {
     Route::post('users/{user_id}/points', 'PointController@store');
     Route::get('users/{user_id}/receipts', 'ReceiptController@index');
     Route::get('users/{user_id}/receipts/{receipt_id}', 'ReceiptController@show');
+
+    Route::get('clients/token', 'ClientController@issue');
 });
 
 Route::post('v1/xsolla', 'XsollaWebhookController@index')->middleware('api.xsolla');
