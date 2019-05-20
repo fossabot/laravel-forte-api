@@ -143,12 +143,13 @@ class UserItem extends Model
     /**
      * @param int $id
      * @param int $itemId
-     * @param array $datas
+     * @param array $data
+     * @param string $token
      * @return array
      * @throws \Exception
      */
-    static public function scopeUpdateUserItem(int $id, int $itemId, array $datas = [], string $token) {
-        if (Item::scopeItemDetail($itemId)->consumable == 0 && $datas['consumed']) {
+    static public function scopeUpdateUserItem(int $id, int $itemId, array $data = [], string $token) {
+        if (Item::scopeItemDetail($itemId)->consumable == 0 && $data['consumed']) {
             return response()->json([
                 'message' => 'Bad Request Consumed value is true'
             ], 400);
@@ -158,12 +159,12 @@ class UserItem extends Model
         try {
             DB::beginTransaction();
 
-            foreach ($datas as $key => $data) {
+            foreach ($data as $key => $item) {
                 if ($key == 'sync') {
                     $userItem->$key = in_array(Client::bringNameByToken($token)->name, Client::BOT_CLIENT) ? 1 : 0;
                     continue;
                 }
-                $userItem->$key = $data;
+                $userItem->$key = $item;
             }
             $userItem->save();
 
