@@ -48,7 +48,8 @@ class ClientController extends Controller
      * )
      */
     public function issue() {
-        if ($client = Client::where('prev_token', $_SERVER['HTTP_AUTHORIZATION'])->first()) {
+        $client = Client::where('prev_token', $_SERVER['HTTP_AUTHORIZATION'])->first() ?: NULL;
+        if (! empty($client)) {
             return response()->json([
                'token' => $client->token,
                'updated_at' => $client->updated_at
