@@ -93,9 +93,9 @@ class UserItem extends Model
             $createUserReceipt = self::createUserReceipt($id, $itemId, $userItemId, $token);
 
             DB::commit();
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             DB::rollback();
-            return ['error' => $e->getMessage()];
+            return ['error' => $exception->getMessage()];
         }
 
         return response()->json([
@@ -168,9 +168,9 @@ class UserItem extends Model
             $userItem->save();
 
             DB::commit();
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             DB::rollback();
-            return ['error' => $e->getMessage()];
+            return ['error' => $exception->getMessage()];
         }
 
         return $userItem;
