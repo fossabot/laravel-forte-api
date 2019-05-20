@@ -272,3 +272,11 @@ sudo apt-get install ruby
 
 ruby --version
 ```
+
+13. PHP Insight
+```bash
+$ composer require nunomaduro/phpinsights --dev
+$ php artisan vendor:publish --provider="NunoMaduro\PhpInsights\Application\Adapters\Laravel\InsightsServiceProvider"
+
+$ php artisan insights
+```
