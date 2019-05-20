@@ -61,9 +61,9 @@ class Discord extends Model
             $discord->save();
 
             DB::commit();
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             DB::rollback();
-            return ['error' => $e->getMessage()];
+            return ['error' => $exception->getMessage()];
         }
 
         return $discord;

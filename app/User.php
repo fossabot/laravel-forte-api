@@ -53,8 +53,8 @@ class User extends Authenticatable
     static public function scopeGetUser(int $id) {
         try {
             return self::findOrFail($id);
-        } catch (\Exception $e) {
-            return $e->getMessage();
+        } catch (\Exception $exception) {
+            return $exception->getMessage();
         }
     }
 
@@ -95,10 +95,10 @@ class User extends Authenticatable
             $xsollaAPI->requestAPI('PUT', 'projects/:projectId/users/' . $id, $datas);
 
             DB::commit();
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             DB::rollback();
-            (new \App\Http\Controllers\DiscordNotificationController)->exception($e, $datas);
-            return ['error' => $e->getMessage()];
+            (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $datas);
+            return ['error' => $exception->getMessage()];
         }
 
         return $user;

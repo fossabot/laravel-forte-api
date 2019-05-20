@@ -142,7 +142,7 @@ class XsollaWebhookService
                     'message' => 'The payment has been completed successfully.',
                 ],
             ], HTTP_OK);
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             DB::rollback();
             return response([
                 'error' => [
@@ -215,9 +215,9 @@ class XsollaWebhookService
             foreach ($items as $item) {
                 UserItem::scopePurchaseUserItem($userData['id'], Item::scopeSkuParseId($item->sku), 'xsolla');
             }
-        } catch (\Exception $e) {
-            (new \App\Http\Controllers\DiscordNotificationController)->exception($e, $data);
-            return $e->getMessage();
+        } catch (\Exception $exception) {
+            (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $data);
+            return $exception->getMessage();
         }
     }
 

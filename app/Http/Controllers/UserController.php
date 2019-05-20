@@ -125,11 +125,11 @@ class UserController extends Controller {
                 'status' => 'success',
                 'data' => $user
             ], 201);
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             DB::rollBack();
-            (new \App\Http\Controllers\DiscordNotificationController)->exception($e, $request->all());
+            (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $request->all());
             return response()->json([
-                'error' => $e
+                'error' => $exception
             ], 400);
         }
     }
@@ -333,9 +333,9 @@ class UserController extends Controller {
             return response()->json([
                 'url' => $url . $request['token']
             ], 200);
-        } catch (\Exception $e) {
-            (new \App\Http\Controllers\DiscordNotificationController)->exception($e, $datas);
-            return $e->getMessage();
+        } catch (\Exception $exception) {
+            (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $datas);
+            return $exception->getMessage();
         }
     }
 

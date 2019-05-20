@@ -9,17 +9,17 @@ use NotificationChannels\Discord\Discord;
 class DiscordNotificationController extends Controller
 {
     /**
-     * @param \Exception $e
+     * @param \Exception $exception
      * @param array $data
      * @return array
      */
-    public function exception(\Exception $e, array $data = []) {
+    public function exception(\Exception $exception, array $data = []) {
         $params = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
 
         ErrorLog::create([
             'environment' => config('app.env'),
-            'title' => $e->getFile() . '(' . $e->getLine() . ')',
-            'message' => $e->getMessage(),
+            'title' => $exception->getFile() . '(' . $exception->getLine() . ')',
+            'message' => $exception->getMessage(),
             'parameters' => $params,
         ]);
 
@@ -27,7 +27,7 @@ class DiscordNotificationController extends Controller
             'content' => '[' . config('app.env') . '> ' . now() . '] API ERROR',
             'tts' => false,
             'embed' => [
-                'title' => $e->getFile() . '(' . $e->getLine() . ')',
+                'title' => $exception->getFile() . '(' . $e->getLine() . ')',
                 'description' => "`ERROR` \n {$e->getMessage()} \n `PARAMS` \n ``` {$params} ```"
             ]
         ]);

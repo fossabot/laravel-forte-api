@@ -87,9 +87,9 @@ class XsollaAPIService
             ]);
 
             return $response->getBody();
-        } catch (GuzzleException $e) {
-            (new \App\Http\Controllers\DiscordNotificationController)->exception($e, $datas);
-            return $e->getMessage();
+        } catch (GuzzleException $exception) {
+            (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $datas);
+            return $exception->getMessage();
         }
     }
 
@@ -150,9 +150,9 @@ class XsollaAPIService
                     ]);
                 }
             }
-        } catch (\Exception $e) {
-            (new \App\Http\Controllers\DiscordNotificationController)->exception($e, $xsollaItemsSku);
-            return $e->getMessage();
+        } catch (\Exception $exception) {
+            (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $xsollaItemsSku);
+            return $exception->getMessage();
         }
 
         (new \App\Http\Controllers\DiscordNotificationController)->sync($count, $xsollaDuplicateItemsSku);
