@@ -48,7 +48,7 @@ $forte = $discord->registerCommand('forte', function ($discord) {
 ]);
 
 $forte->registerSubCommand('users', function ($discord) {
-    if (getenv('APP_ENV') == 'local') {
+    if (getenv('APP_ENV') === 'local') {
         $users = exec('curl -X GET "http://localhost:8000/api/v1/users" -H "accept: application/json" -H "Authorization: '. getenv('DISCORD_LARA_TOKEN') .'" -H "X-CSRF-TOKEN: "', $system);
     } else {
         $users = exec('curl -X GET "https://forte.team-crescendo.me/api/v1/users" -H "accept: application/json" -H "Authorization: '. getenv('DISCORD_LARA_TOKEN') .'" -H "X-CSRF-TOKEN: "', $system);
@@ -68,7 +68,7 @@ $forte->registerSubCommand('users', function ($discord) {
 ]);
 
 $forte->registerSubCommand('items', function ($discord) {
-    if (getenv('APP_ENV') == 'local') {
+    if (getenv('APP_ENV') === 'local') {
         $items = exec('curl -X GET "http://localhost:8000/api/v1/items" -H "accept: application/json" -H "Authorization: '. getenv('DISCORD_LARA_TOKEN') .'" -H "X-CSRF-TOKEN: "', $system);
     } else {
         $items = exec('curl -X GET "https://forte.team-crescendo.me/api/v1/items" -H "accept: application/json" -H "Authorization: '. getenv('DISCORD_LARA_TOKEN') .'" -H "X-CSRF-TOKEN: "', $system);

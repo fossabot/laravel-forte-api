@@ -160,7 +160,7 @@ class UserItem extends Model
             DB::beginTransaction();
 
             foreach ($data as $key => $item) {
-                if ($key == 'sync') {
+                if ($key === 'sync') {
                     $userItem->$key = in_array(Client::bringNameByToken($token)->name, Client::BOT_CLIENT) ? 1 : 0;
                     continue;
                 }
