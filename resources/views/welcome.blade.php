@@ -67,12 +67,12 @@
         <div class="flex-center position-ref full-height">
             <div class="content">
                 <div class="title m-b-md">
-                    Crescendo API
+                    Forte API
                 </div>
 
                 <div class="links">
-                    <a href="https://cafe.naver.com/teamcrescendocafe">Cafe</a>
-                    <a href="https://github.com/team-crescendo/laravel-central-api">GitHub</a>
+                    <a href="https://github.com/team-crescendo/laravel-forte">GitHub</a>
+                    <a href="https://forte.team-crescendo.me/api/documentation">API Documentation</a>
                 </div>
             </div>
         </div>
