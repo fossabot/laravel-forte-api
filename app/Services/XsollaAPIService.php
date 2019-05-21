@@ -135,8 +135,8 @@ class XsollaAPIService
                         'price' => empty($xsollaDetailItem['virtual_currency_price']) ? 0 : $xsollaDetailItem['virtual_currency_price'],
                         'enabled' => $xsollaDetailItem['enabled'] == true ? 1 : 0,
                         'consumable' => $xsollaDetailItem['permanent'] == true ? 0 : 1,
-                        'expiration_time' => empty($xsollaDetailItem['expiration']) ? NULL : $xsollaDetailItem['expiration'],
-                        'purchase_limit' => empty($xsollaDetailItem['purchase_limit']) ? NULL : $xsollaDetailItem['purchase_limit'],
+                        'expiration_time' => empty($xsollaDetailItem['expiration']) ? null : $xsollaDetailItem['expiration'],
+                        'purchase_limit' => empty($xsollaDetailItem['purchase_limit']) ? null : $xsollaDetailItem['purchase_limit'],
                     ]);
                 } else {
                     Item::where('sku', $xsollaDetailItem['sku'])->update([
@@ -145,8 +145,8 @@ class XsollaAPIService
                         'price' => empty($xsollaDetailItem['virtual_currency_price']) ? 0 : $xsollaDetailItem['virtual_currency_price'],
                         'enabled' => $xsollaDetailItem['enabled'] == true ? 1 : 0,
                         'consumable' => $xsollaDetailItem['permanent'] == true ? 0 : 1,
-                        'expiration_time' => empty($xsollaDetailItem['expiration']) ? NULL: $xsollaDetailItem['expiration'],
-                        'purchase_limit' => empty($xsollaDetailItem['purchase_limit']) ? NULL : $xsollaDetailItem['purchase_limit'],
+                        'expiration_time' => empty($xsollaDetailItem['expiration']) ? null : $xsollaDetailItem['expiration'],
+                        'purchase_limit' => empty($xsollaDetailItem['purchase_limit']) ? null : $xsollaDetailItem['purchase_limit'],
                     ]);
                 }
             }
