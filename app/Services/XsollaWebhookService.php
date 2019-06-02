@@ -162,8 +162,7 @@ class XsollaWebhookService
      * @return mixed
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_refund
      */
-    public function refund(array $data)
-    {
+    public function refund(array $data) {
         return $data;
     }
 

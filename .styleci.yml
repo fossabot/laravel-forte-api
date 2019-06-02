@@ -1,1 +1,4 @@
 preset: laravel
+disabled:
+  - newline_after_open_tag
+  - braces
