@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\User;
-use App\Receipt;
 use App\Client;
+use App\Receipt;
 use Illuminate\Http\Request;
 use App\Services\XsollaAPIService;
 
@@ -19,7 +19,8 @@ class PointController extends Controller
      * UserController constructor.
      * @param XsollaAPIService $xsollaAPI
      */
-    public function __construct(XsollaAPIService $xsollaAPI) {
+    public function __construct(XsollaAPIService $xsollaAPI)
+    {
         $this->xsollaAPI = $xsollaAPI;
     }
 
@@ -62,7 +63,8 @@ class PointController extends Controller
      *     ),
      * )
      */
-    public function store(Request $request, int $id) {
+    public function store(Request $request, int $id)
+    {
         $repetition = false;
         $needPoint = 0;
         $user = User::scopeGetUser($id);
@@ -86,27 +88,27 @@ class PointController extends Controller
         $receipt = new Receipt;
         $receipt->user_id = $id;
         $receipt->client_id = Client::bringNameByToken($request->header('Authorization'))->id;
-        $receipt->user_item_id = NULL;
+        $receipt->user_item_id = null;
         $receipt->about_cash = 0;
         $receipt->refund = 0;
         $receipt->points_old = $oldPoints;
         $receipt->points_new = $user->points;
         $receipt->save();
 
-        /**
+        /*
          * @brief sync Xsolla DB from Crescendo API \n
          * 응답이 우리 DB와 일치하는 지 확인하고 \n
          * 일치하지 않는다면 이를 갱신하기 위해 API를 다시 호출 \n
          * (엑솔라 DB가 우리 DB의 데이터를 따르도록.. 만약 우리 DB는 500인데 엑솔라 DB 응답이 300이었다면 +200 요청을 다시 보내주는 식)
          * @author GBS-Skile
          */
-        while(true) {
+        while (true) {
             $datas = [
                 'amount' => $repetition ? $needPoint : $request->points,
-                'comment' => 'Updated User Point => ' . Client::bringNameByToken($request->header('Authorization'))->name,
+                'comment' => 'Updated User Point => '.Client::bringNameByToken($request->header('Authorization'))->name,
             ];
 
-            $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/' . $receipt->user_id . '/recharge', $datas), true);
+            $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->user_id.'/recharge', $datas), true);
 
             if ($user->points !== $response['amount']) {
                 $repetition = true;

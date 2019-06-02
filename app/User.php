@@ -3,7 +3,6 @@
 namespace App;
 
 use Illuminate\Support\Facades\DB;
-use App\Services\XsollaAPIService;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -33,24 +32,27 @@ class User extends Authenticatable
      * @brief 1:1 relationship
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function discord() {
+    public function discord()
+    {
         return $this->hasOne(Discord::class, 'id', 'user_id');
     }
 
     /**
      * @return mixed
      */
-    static public function scopeAllUsers() {
+    public static function scopeAllUsers()
+    {
         return self::whereNull('withdraw_at')->get();
     }
 
     /**
-     * see a user who been withdraw
+     * see a user who been withdraw.
      *
      * @param int $id
      * @return mixed
      */
-    static public function scopeGetUser(int $id) {
+    public static function scopeGetUser(int $id)
+    {
         try {
             return self::findOrFail($id);
         } catch (\Exception $exception) {
@@ -62,7 +64,8 @@ class User extends Authenticatable
      * @param string $id
      * @return User|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|object|null
      */
-    static public function scopeGetUserById(string $id) {
+    public static function scopeGetUserById(string $id)
+    {
         return self::where('name', $id)->orWhere('email', $id)->first();
     }
 
@@ -72,14 +75,15 @@ class User extends Authenticatable
      * @return array
      * @throws \Exception
      */
-    static public function scopeUpdateUser(int $id, array $datas = []) {
+    public static function scopeUpdateUser(int $id, array $datas = [])
+    {
         $xsollaAPI = \App::make('App\Services\XsollaAPIService');
         $user = self::find($id);
         try {
             DB::beginTransaction();
 
             foreach ($datas as $key => $data) {
-                if (User::where($key, $data)->first()) {
+                if (self::where($key, $data)->first()) {
                     continue;
                 }
                 $user->$key = $data;
@@ -92,12 +96,13 @@ class User extends Authenticatable
                 'email' => $user->email,
             ];
 
-            $xsollaAPI->requestAPI('PUT', 'projects/:projectId/users/' . $id, $datas);
+            $xsollaAPI->requestAPI('PUT', 'projects/:projectId/users/'.$id, $datas);
 
             DB::commit();
         } catch (\Exception $exception) {
             DB::rollback();
             (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $datas);
+
             return ['error' => $exception->getMessage()];
         }
 
@@ -108,18 +113,19 @@ class User extends Authenticatable
      * @param int $id
      * @return array
      */
-    static public function scopeDestoryUser(int $id) {
+    public static function scopeDestoryUser(int $id)
+    {
         $xsollaAPI = \App::make('App\Services\XsollaAPIService');
 
         self::where('id', $id)->update([
-            'withdraw_at' => date('Y-m-d')
+            'withdraw_at' => date('Y-m-d'),
         ]);
 
         $datas = [
             'enabled' => false,
         ];
 
-        $xsollaAPI->requestAPI('PUT', 'projects/:projectId/users/' . $id, $datas);
+        $xsollaAPI->requestAPI('PUT', 'projects/:projectId/users/'.$id, $datas);
 
         return ['message' => 'success'];
     }

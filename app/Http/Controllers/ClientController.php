@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Client;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class ClientController extends Controller
@@ -11,11 +10,12 @@ class ClientController extends Controller
     /**
      * @return array
      */
-    public function renewal() {
+    public function renewal()
+    {
         foreach (Client::get() as $client) {
-            if (! in_array($client->name,Client::BOT_TOKEN_RENEWAL_EXCEPTION)) {
+            if (! in_array($client->name, Client::BOT_TOKEN_RENEWAL_EXCEPTION)) {
                 Client::find($client->id)->update([
-                    'token' => 'forte-' . Hash::make(date('Y-m-d h:m:s')),
+                    'token' => 'forte-'.Hash::make(date('Y-m-d h:m:s')),
                     'prev_token' => $client->token,
                 ]);
             }
@@ -47,12 +47,13 @@ class ClientController extends Controller
      *     ),
      * )
      */
-    public function issue() {
-        $client = Client::where('prev_token', $_SERVER['HTTP_AUTHORIZATION'])->first() ?: NULL;
+    public function issue()
+    {
+        $client = Client::where('prev_token', $_SERVER['HTTP_AUTHORIZATION'])->first() ?: null;
         if (! empty($client)) {
             return response()->json([
                'token' => $client->token,
-               'updated_at' => $client->updated_at
+               'updated_at' => $client->updated_at,
             ]);
         }
     }

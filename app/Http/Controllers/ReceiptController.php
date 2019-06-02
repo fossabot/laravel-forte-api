@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 use App\Receipt;
 
 class ReceiptController extends Controller
@@ -39,7 +37,8 @@ class ReceiptController extends Controller
      *     ),
      * )
      */
-    public function index(int $id) {
+    public function index(int $id)
+    {
         return response()->json(Receipt::scopeUserReceiptLists($id));
     }
 
@@ -82,7 +81,8 @@ class ReceiptController extends Controller
      *     ),
      * )
      */
-    public function show(int $id, int $receiptId) {
+    public function show(int $id, int $receiptId)
+    {
         return response()->json(Receipt::scopeUserReceiptDetail($id, $receiptId));
     }
 }

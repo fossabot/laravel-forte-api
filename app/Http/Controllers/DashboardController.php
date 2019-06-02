@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\ErrorLog;
 use App\User;
+use App\ErrorLog;
 use App\UserItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-
     /**
      * @param Request $request
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
      */
-    public function signin(Request $request) {
+    public function signin(Request $request)
+    {
         if ($request->isMethod('get')) {
             return view('dashboard.signin');
         }
@@ -33,8 +33,10 @@ class DashboardController extends Controller
         }
     }
 
-    public function logout() {
+    public function logout()
+    {
         Auth::logout();
+
         return redirect()->route('login');
     }
 
@@ -43,35 +45,41 @@ class DashboardController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index() {
+    public function index()
+    {
         $result = [
             'users' => User::count(),
             'items' => UserItem::count(),
             'points' => User::sum('points'),
         ];
+
         return view('dashboard.index', compact('result'));
     }
 
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function users() {
+    public function users()
+    {
         $result = [
             'counts' => User::count(),
             'users' => User::scopeAllUsers(),
         ];
+
         return view('dashboard.users', compact('result'));
     }
 
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function errors() {
+    public function errors()
+    {
         $result = [
             'counts' => ErrorLog::count(),
             'today_counts' => ErrorLog::whereDate('created_at', date('Y-m-d'))->count(),
             'errors' => ErrorLog::get(),
         ];
+
         return view('dashboard.errors', compact('result'));
     }
 }

@@ -13,9 +13,10 @@ class VerifyXsollaAuthorization
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next) {
-        ini_set( 'serialize_precision', -1 );
-        $body = json_encode($request->json()->all()) . config('xsolla.projectKey');// . env('XSOLLA_PROJECT_KEY', 0)
+    public function handle($request, Closure $next)
+    {
+        ini_set('serialize_precision', -1);
+        $body = json_encode($request->json()->all()).config('xsolla.projectKey'); // . env('XSOLLA_PROJECT_KEY', 0)
         $hash = sha1($body);
 
         if (! isset($_SERVER['HTTP_AUTHORIZATION'])) {
@@ -27,7 +28,7 @@ class VerifyXsollaAuthorization
             ], 404);
         }
 
-        if ($_SERVER['HTTP_AUTHORIZATION'] != 'Signature ' . $hash) {
+        if ($_SERVER['HTTP_AUTHORIZATION'] != 'Signature '.$hash) {
             return response([
                 'error' => [
                     'code' => 'INVALID_SIGNATURE',
@@ -35,6 +36,7 @@ class VerifyXsollaAuthorization
                 ],
             ], 401);
         }
+
         return $next($request);
     }
 }

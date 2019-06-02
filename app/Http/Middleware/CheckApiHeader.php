@@ -17,7 +17,8 @@ class CheckApiHeader
      * CheckApiHeader constructor.
      * @param ClientController $cc
      */
-    public function __construct(ClientController $cc) {
+    public function __construct(ClientController $cc)
+    {
         $this->cc = $cc;
     }
 
@@ -28,7 +29,8 @@ class CheckApiHeader
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next) {
+    public function handle($request, Closure $next)
+    {
         if (! isset($_SERVER['HTTP_AUTHORIZATION'])) {
             return response([
                 'error' => [

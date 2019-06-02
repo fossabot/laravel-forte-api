@@ -15,6 +15,6 @@ class RequestLog extends Model
     //            $table->text('response');
 
     protected $fillable = [
-        'duration', 'url', 'method', 'ip', 'request', 'response'
+        'duration', 'url', 'method', 'ip', 'request', 'response',
     ];
 }

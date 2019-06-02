@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
 use App\Services\XsollaWebhookService;
 
 const TYPE_USER_VALIDATION = 'user_validation';
@@ -21,9 +20,10 @@ const TYPE_INVENTORY_GET = 'inventory_get';
 const TYPE_INVENTORY_PULL = 'inventory_pull';
 const TYPE_INVENTORY_PUSH = 'inventory_push';
 
-class XsollaWebhookController extends Controller {
+class XsollaWebhookController extends Controller
+{
     /**
-     * @var XsollaWebhookService $xws
+     * @var XsollaWebhookService
      */
     protected $xws;
 
@@ -31,7 +31,8 @@ class XsollaWebhookController extends Controller {
      * XsollaWebhookController constructor.
      * @param XsollaWebhookService $xws
      */
-    public function __construct(XsollaWebhookService $xws) {
+    public function __construct(XsollaWebhookService $xws)
+    {
         $this->xws = $xws;
     }
 
@@ -41,7 +42,8 @@ class XsollaWebhookController extends Controller {
      * @throws \Exception
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_webhooks_list
      */
-    public function index(Request $request) {
+    public function index(Request $request)
+    {
         switch ($request['notification_type']) {
             case TYPE_USER_VALIDATION:
                 return $this->xws->userValidation($request->all());
@@ -55,5 +57,4 @@ class XsollaWebhookController extends Controller {
                 return $this->xws->userBalanceOperation($request->all());
         }
     }
-
 }

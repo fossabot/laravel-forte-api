@@ -1,21 +1,23 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\User;
 use Illuminate\Http\Request;
 use App\Services\UserService;
-use Illuminate\Support\Facades\DB;
 use App\Services\XsollaAPIService;
+use Illuminate\Support\Facades\DB;
 use App\Http\Requests\UserUpdateFormRequest;
 use App\Http\Requests\UserRegisterFormRequest;
 
-class UserController extends Controller {
+class UserController extends Controller
+{
     /**
      * @var XsollaAPIService
      */
     protected $xsollaAPI;
     /**
-     * @var UserService $us
+     * @var UserService
      */
     protected $us;
 
@@ -24,7 +26,8 @@ class UserController extends Controller {
      * @param XsollaAPIService $xsollaAPI
      * @param UserService $us
      */
-    public function __construct(XsollaAPIService $xsollaAPI, UserService $us) {
+    public function __construct(XsollaAPIService $xsollaAPI, UserService $us)
+    {
         $this->xsollaAPI = $xsollaAPI;
         $this->us = $us;
     }
@@ -52,7 +55,8 @@ class UserController extends Controller {
      *     ),
      * )
      */
-    public function index() {
+    public function index()
+    {
         return response()->json(User::scopeAllUsers());
     }
 
@@ -102,7 +106,8 @@ class UserController extends Controller {
      *     ),
      * )
      */
-    public function store(UserRegisterFormRequest $request) {
+    public function store(UserRegisterFormRequest $request)
+    {
         DB::beginTransaction();
         try {
             $user = new User;
@@ -114,22 +119,23 @@ class UserController extends Controller {
             $datas = [
                 'user_id' => $user->id,
                 'user_name' => $user->name,
-                'email' => $user->email
+                'email' => $user->email,
             ];
 
             $this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users', $datas);
 
             DB::commit();
-            
+
             return response()->json([
                 'status' => 'success',
-                'data' => $user
+                'data' => $user,
             ], 201);
         } catch (\Exception $exception) {
             DB::rollBack();
             (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $request->all());
+
             return response()->json([
-                'error' => $exception
+                'error' => $exception,
             ], 400);
         }
     }
@@ -165,7 +171,8 @@ class UserController extends Controller {
      *     ),
      * )
      */
-    public function show(int $id) {
+    public function show(int $id)
+    {
         return response()->json(User::scopeGetUser($id));
     }
 
@@ -222,7 +229,8 @@ class UserController extends Controller {
      *     ),
      * )
      */
-    public function update(UserUpdateFormRequest $request, int $id) {
+    public function update(UserUpdateFormRequest $request, int $id)
+    {
         return response()->json(User::scopeUpdateUser($id, $request->all()));
     }
 
@@ -257,7 +265,8 @@ class UserController extends Controller {
      *     ),
      * )
      */
-    public function destroy(int $id) {
+    public function destroy(int $id)
+    {
         return response()->json(User::scopeDestoryUser($id));
     }
 
@@ -292,12 +301,13 @@ class UserController extends Controller {
      *     ),
      * )
      */
-    public function xsollaToken(int $id) {
+    public function xsollaToken(int $id)
+    {
         try {
             $user = User::scopeGetUser($id);
-            if (!$user) {
+            if (! $user) {
                 return response()->json([
-                    'message' => 'User ' . $id . ' not found.',
+                    'message' => 'User '.$id.' not found.',
                 ], 404);
             }
 
@@ -307,7 +317,7 @@ class UserController extends Controller {
                 $mode = 'sandbox-';
             }
 
-            $url = 'https://' . $mode . 'secure.xsolla.com/paystation2/?access_token=';
+            $url = 'https://'.$mode.'secure.xsolla.com/paystation2/?access_token=';
 
             $datas = [
                 'user' => [
@@ -331,16 +341,17 @@ class UserController extends Controller {
             $request = json_decode($this->xsollaAPI->requestAPI('POST', 'merchants/:merchantId/token', $datas), true);
 
             return response()->json([
-                'url' => $url . $request['token']
+                'url' => $url.$request['token'],
             ], 200);
         } catch (\Exception $exception) {
             (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $datas);
+
             return $exception->getMessage();
         }
     }
 
     /**
-     * 2FA 용 이용자 회원가입
+     * 2FA 용 이용자 회원가입.
      *
      * @param Request $request
      * @param int $id
@@ -378,10 +389,11 @@ class UserController extends Controller {
      *     ),
      * )
      */
-    public function authentication(Request $request, int $id) {
+    public function authentication(Request $request, int $id)
+    {
         if (empty($id) || empty($request->password)) {
             return response()->json([
-               'message' => 'Notfound'
+               'message' => 'Notfound',
             ], 404);
         }
 
