@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 use App\Item;
 
 class ItemController extends Controller
@@ -31,7 +29,8 @@ class ItemController extends Controller
      *     ),
      * )
      */
-    public function index() {
+    public function index()
+    {
         return response()->json(Item::scopeAllItemLists());
     }
 
@@ -66,7 +65,8 @@ class ItemController extends Controller
      *     ),
      * )
      */
-    public function show(int $id) {
+    public function show(int $id)
+    {
         return response()->json(Item::scopeItemDetail($id));
     }
 }

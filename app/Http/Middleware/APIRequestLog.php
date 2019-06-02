@@ -21,12 +21,14 @@ class APIRequestLog
         return $next($request);
     }
 
-    public function terminate($request, $response) {
+    public function terminate($request, $response)
+    {
         $request->end = microtime(true);
-        $this->log($request,$response);
+        $this->log($request, $response);
     }
 
-    protected function log($request, $response) {
+    protected function log($request, $response)
+    {
         RequestLog::create([
            'duration' => $request->end - $request->start,
            'url' => $request->fullUrl(),

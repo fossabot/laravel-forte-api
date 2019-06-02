@@ -2,8 +2,8 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Model;
 
 class UserItem extends Model
 {
@@ -20,7 +20,8 @@ class UserItem extends Model
      * @brief 1:n relationship
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function item() {
+    public function item()
+    {
         return $this->belongsTo(Item::class);
     }
 
@@ -28,7 +29,8 @@ class UserItem extends Model
      * @param int $id
      * @return mixed
      */
-    static public function scopeUserItemLists(int $id) {
+    public static function scopeUserItemLists(int $id)
+    {
         return self::with('item')->where('user_id', $id)->get();
     }
 
@@ -37,7 +39,8 @@ class UserItem extends Model
      * @param int $itemId
      * @return mixed
      */
-    static public function scopeUserItemDetail(int $id, int $itemId) {
+    public static function scopeUserItemDetail(int $id, int $itemId)
+    {
         return self::join('items', 'items.id', '=', 'user_items.item_id')->where('user_items.user_id', $id)
             ->where('user_items.id', $itemId)->first();
     }
@@ -47,7 +50,8 @@ class UserItem extends Model
      * @param int $itemId
      * @return mixed
      */
-    static public function scopeCountUserPurchaseDuplicateItem(int $id, int $itemId) {
+    public static function scopeCountUserPurchaseDuplicateItem(int $id, int $itemId)
+    {
         return self::where('user_id', $id)->where('item_id', $itemId)->whereNull('deleted_at')->count();
     }
 
@@ -58,22 +62,23 @@ class UserItem extends Model
      * @return mixed
      * @throws \Exception
      */
-    static public function scopePurchaseUserItem(int $id, int $itemId, string $token) {
+    public static function scopePurchaseUserItem(int $id, int $itemId, string $token)
+    {
         $user = User::scopeGetUser($id);
         $item = Item::scopeItemDetail($itemId);
         if ($user->points < $item->price) {
             return response()->json([
-                'message' => 'Insufficient points'
+                'message' => 'Insufficient points',
             ], 400);
         } elseif ($item->enabled == false) {
             return response()->json([
-                'message' => 'Item is disable'
+                'message' => 'Item is disable',
             ], 400);
         }
 
         if (self::scopeCountUserPurchaseDuplicateItem($id, $itemId) < Item::scopeItemDetail($itemId)->purchase_limit) {
             return response()->json([
-                'message' => 'over user purchase limit !'
+                'message' => 'over user purchase limit !',
             ], 400);
         }
 
@@ -95,6 +100,7 @@ class UserItem extends Model
             DB::commit();
         } catch (\Exception $exception) {
             DB::rollback();
+
             return ['error' => $exception->getMessage()];
         }
 
@@ -111,7 +117,8 @@ class UserItem extends Model
      * @param string $token
      * @return int
      */
-    static private function createUserReceipt(int $id, int $itemId, int $userItemId, string $token) {
+    private static function createUserReceipt(int $id, int $itemId, int $userItemId, string $token)
+    {
         $client = $token == 'xsolla' ?: Client::bringNameByToken($token);
         $user = User::scopeGetUser($id);
         $item = Item::scopeItemDetail($itemId);
@@ -148,10 +155,11 @@ class UserItem extends Model
      * @return array
      * @throws \Exception
      */
-    static public function scopeUpdateUserItem(int $id, int $itemId, array $data = [], string $token) {
+    public static function scopeUpdateUserItem(int $id, int $itemId, array $data, string $token)
+    {
         if (Item::scopeItemDetail($itemId)->consumable == 0 && $data['consumed']) {
             return response()->json([
-                'message' => 'Bad Request Consumed value is true'
+                'message' => 'Bad Request Consumed value is true',
             ], 400);
         }
 
@@ -171,6 +179,7 @@ class UserItem extends Model
             DB::commit();
         } catch (\Exception $exception) {
             DB::rollback();
+
             return ['error' => $exception->getMessage()];
         }
 
@@ -182,7 +191,8 @@ class UserItem extends Model
      * @param int $itemId
      * @return array
      */
-    static public function scopeDestroyUserItem(int $id, int $itemId) {
+    public static function scopeDestroyUserItem(int $id, int $itemId)
+    {
         self::where('user_id', $id)->where('item_id', $itemId)->update([
             'deleted_at' => date('Y-m-d H:m:s'),
         ]);

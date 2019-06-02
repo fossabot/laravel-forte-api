@@ -27,8 +27,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-         $schedule->command(RenewalClientToken::class)->hourly();
-         $schedule->command(SyncXsollaItems::class)->dailyAt('02:00');
+        $schedule->command(RenewalClientToken::class)->hourly();
+        $schedule->command(SyncXsollaItems::class)->dailyAt('02:00');
     }
 
     /**

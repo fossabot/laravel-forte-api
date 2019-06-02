@@ -19,7 +19,8 @@ class Receipt extends Model
      * @param int $id
      * @return mixed
      */
-    static public function scopeUserReceiptLists(int $id) {
+    public static function scopeUserReceiptLists(int $id)
+    {
         return self::where('user_id', $id)->get();
     }
 
@@ -28,7 +29,8 @@ class Receipt extends Model
      * @param int $receiptId
      * @return mixed
      */
-    static public function scopeUserReceiptDetail(int $id, int $receiptId) {
+    public static function scopeUserReceiptDetail(int $id, int $receiptId)
+    {
         return self::where('user_id', $id)->where('id', $receiptId)->get();
     }
 }

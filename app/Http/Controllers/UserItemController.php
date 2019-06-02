@@ -1,11 +1,13 @@
 <?php
+
 namespace App\Http\Controllers;
-use Illuminate\Http\Request;
 
 use App\User;
 use App\UserItem;
+use Illuminate\Http\Request;
 
-class UserItemController extends Controller {
+class UserItemController extends Controller
+{
     /**
      * 이용자의 보유한 아이템 목록을 조회합니다.
      *
@@ -37,7 +39,8 @@ class UserItemController extends Controller {
      *     ),
      * )
      */
-    public function index(int $id) {
+    public function index(int $id)
+    {
         return response()->json(UserItem::scopeUserItemLists($id));
     }
 
@@ -81,7 +84,8 @@ class UserItemController extends Controller {
      *     ),
      * )
      */
-    public function store(Request $request, int $id) {
+    public function store(Request $request, int $id)
+    {
         if (isset($request->item_id) && User::scopeGetUser($id)) {
             return response()->json(UserItem::scopePurchaseUserItem($id, $request->item_id, $request->header('Authorization')));
         } else {
@@ -130,7 +134,8 @@ class UserItemController extends Controller {
      *     ),
      * )
      */
-    public function show(int $id, int $itemId) {
+    public function show(int $id, int $itemId)
+    {
         return response()->json(UserItem::scopeUserItemDetail($id, $itemId));
     }
 
@@ -196,7 +201,8 @@ class UserItemController extends Controller {
      *     ),
      * )
      */
-    public function update(Request $request, int $id, int $itemId) {
+    public function update(Request $request, int $id, int $itemId)
+    {
         return response()->json(UserItem::scopeUpdateUserItem($id, $itemId, $request->all(), $request->header('Authorization')));
     }
 
@@ -239,7 +245,8 @@ class UserItemController extends Controller {
      *     ),
      * )
      */
-    public function destroy(int $id, int $itemId) {
+    public function destroy(int $id, int $itemId)
+    {
         return response()->json(UserItem::scopeDestroyUserItem($id, $itemId));
     }
 }

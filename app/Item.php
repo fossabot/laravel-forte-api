@@ -19,14 +19,16 @@ class Item extends Model
      * @brief 1:n relationship
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function userItems() {
+    public function userItems()
+    {
         return $this->hasMany(UserItem::class);
     }
 
     /**
      * @return mixed
      */
-    static public function scopeAllItemLists() {
+    public static function scopeAllItemLists()
+    {
         return self::get();
     }
 
@@ -34,7 +36,8 @@ class Item extends Model
      * @param int $id
      * @return mixed
      */
-    static public function scopeItemDetail(int $id) {
+    public static function scopeItemDetail(int $id)
+    {
         return self::where('id', $id)->first();
     }
 
@@ -42,8 +45,8 @@ class Item extends Model
      * @param string $sku
      * @return mixed
      */
-    static public function scopeSkuParseId(string $sku) {
+    public static function scopeSkuParseId(string $sku)
+    {
         return self::where('sku', $sku)->first()->id;
     }
-
 }

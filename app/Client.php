@@ -15,14 +15,15 @@ class Client extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'token', 'prev_token'
+        'name', 'token', 'prev_token',
     ];
 
     /**
      * @param string $token
      * @return mixed
      */
-    static public function bringNameByToken(string $token) {
+    public static function bringNameByToken(string $token)
+    {
         return self::where('token', $token)->first();
     }
 }

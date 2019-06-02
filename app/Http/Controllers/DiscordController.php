@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 use App\User;
 use App\Discord;
+use Illuminate\Http\Request;
 
 class DiscordController extends Controller
 {
@@ -32,7 +31,8 @@ class DiscordController extends Controller
      *     ),
      * )
      */
-    public function index() {
+    public function index()
+    {
         return response()->json(Discord::scopeAllDiscordAccounts());
     }
 
@@ -67,7 +67,8 @@ class DiscordController extends Controller
      *     ),
      * )
      */
-    public function show(int $id) {
+    public function show(int $id)
+    {
         return response()->json(Discord::scopeSelfDiscordAccount($id));
     }
 
@@ -110,7 +111,8 @@ class DiscordController extends Controller
      *    ),
      * )
      */
-    public function store(Request $request, int $id) {
+    public function store(Request $request, int $id)
+    {
         if (! User::scopeGetUser($id)) {
             return response([
                 'message' => 'Not found User Id',
@@ -143,7 +145,7 @@ class DiscordController extends Controller
         ]);
 
         return response()->json([
-            'discord_id' => $request->discord_id
+            'discord_id' => $request->discord_id,
         ], 201);
     }
 
@@ -187,7 +189,8 @@ class DiscordController extends Controller
      *     ),
      * )
      */
-    public function update(Request $request, int $id) {
+    public function update(Request $request, int $id)
+    {
         if (! User::scopeGetUser($id)) {
             return response([
                 'message' => 'Not found User Id',
@@ -240,7 +243,8 @@ class DiscordController extends Controller
      *     ),
      * )
      */
-    public function destroy(int $id) {
+    public function destroy(int $id)
+    {
         return response()->json(Discord::scopeDestoryDiscordAccount($id));
     }
 }
