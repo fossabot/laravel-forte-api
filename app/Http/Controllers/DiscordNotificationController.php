@@ -28,8 +28,8 @@ class DiscordNotificationController extends Controller
             'content' => '['.config('app.env').'> '.now().'] API ERROR',
             'tts' => false,
             'embed' => [
-                'title' => $exception->getFile().'('.$e->getLine().')',
-                'description' => "`ERROR` \n {$e->getMessage()} \n `PARAMS` \n ``` {$params} ```",
+                'title' => $exception->getFile().'('.$exception->getLine().')',
+                'description' => "`ERROR` \n {$exception->getMessage()} \n `PARAMS` \n ``` {$params} ```",
             ],
         ]);
     }
