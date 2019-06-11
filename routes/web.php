@@ -15,6 +15,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('shops/{token}', 'UserController@shortXsollaURL')->name('xsolla.short');
+
 Route::prefix('dashboard/')->group(function () {
     Route::any('/signin', 'DashboardController@signin')->name('login');
     Route::middleware('auth')->group(function () {

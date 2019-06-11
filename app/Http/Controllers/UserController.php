@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use App\XsollaUrl;
 use Illuminate\Http\Request;
 use App\Services\UserService;
 use App\Services\XsollaAPIService;
@@ -340,8 +341,14 @@ class UserController extends Controller
 
             $request = json_decode($this->xsollaAPI->requestAPI('POST', 'merchants/:merchantId/token', $datas), true);
 
+            XsollaUrl::create([
+                'token' => $request['token'],
+                'redirect_url' => $url.$request['token'],
+                'hit' => 0,
+            ]);
+
             return response()->json([
-                'url' => $url.$request['token'],
+                'url' => route('xsolla.short', $request['token']),
             ], 200);
         } catch (\Exception $exception) {
             (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $datas);
@@ -398,5 +405,11 @@ class UserController extends Controller
         }
 
         return $this->us->authentication($id, $request->password);
+    }
+
+    public function shortXsollaURL(string $token) {
+        $url = XsollaUrl::where('token', $token)->first();
+
+        return view('xsolla.short', ['token' => $url->token, 'redirect_url' => $url->redirect_url]);
     }
 }
