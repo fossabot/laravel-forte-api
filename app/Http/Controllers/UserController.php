@@ -348,7 +348,8 @@ class UserController extends Controller
             ]);
 
             return response()->json([
-                'url' => route('xsolla.short', $request['token']),
+                'url' => $url.$request['token'],
+                'test_url' => route('xsolla.short', $request['token']),
             ], 200);
         } catch (\Exception $exception) {
             (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $datas);
