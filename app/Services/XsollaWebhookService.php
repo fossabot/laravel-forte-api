@@ -187,7 +187,7 @@ class XsollaWebhookService
                 $this->operationCoupon($data);
                 break;
             case 'internal':
-                $this->operationInternal($data);
+//                $this->operationInternal($data);
                 break;
             case 'refund':
                 $this->operationRefund($data);
