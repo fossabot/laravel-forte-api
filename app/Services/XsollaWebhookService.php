@@ -275,7 +275,7 @@ class XsollaWebhookService
         $user = User::scopeGetUser($userData['id']);
 
         $oldPoints = $user->points;
-        $user->points += $virtualCurrencyBalance['new_value'];
+        $user->points += $virtualCurrencyBalance['new_value'] - $virtualCurrencyBalance['old_value'];
         $user->save();
 
         $receipt = new Receipt;
@@ -298,7 +298,7 @@ class XsollaWebhookService
 
             if ($user->points !== $response['amount']) {
                 $repetition = true;
-                $needPoint = $user->points > $response['amount'] ? $user->points - $response['amount'] : $response['amount'] - $user->points;
+                $needPoint = $user->points - $response['amount'];
                 continue;
             } else {
                 break;
