@@ -41,4 +41,3 @@ Route::post('v1/xsolla', 'XsollaWebhookController@index')->middleware('api.xsoll
 
 // Xsolla Test Case
 Route::post('v1/test/xsolla', 'XsollaTestCaseController@index');
-

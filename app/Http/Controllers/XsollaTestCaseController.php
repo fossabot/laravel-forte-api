@@ -3,17 +3,15 @@
  * Created by PhpStorm.
  * User: solaris
  * Date: 2019-06-28
- * Time: 17:09
+ * Time: 17:09.
  */
 
 namespace App\Http\Controllers;
 
 use App\Item;
 use App\User;
-use App\Receipt;
 use App\UserItem;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class XsollaTestCaseController
 {
