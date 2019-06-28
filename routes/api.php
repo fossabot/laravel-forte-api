@@ -38,3 +38,7 @@ Route::prefix('v1/')->middleware(['api.headers'])->group(function () {
 });
 
 Route::post('v1/xsolla', 'XsollaWebhookController@index')->middleware('api.xsolla');
+
+// Xsolla Test Case
+Route::post('v1/test/xsolla', 'XsollaTestCaseController@index');
+

@@ -219,7 +219,7 @@ class XsollaWebhookService
         try {
             if ($data['items_operation_type'] == 'add') {
                 foreach ($items as $item) {
-                    UserItem::scopePurchaseUserItem((int) $userData['id'], Item::scopeSkuParseId($item->sku), 'xsolla');
+                    UserItem::scopePurchaseUserItem((int) $userData['id'], Item::scopeSkuParseId($item['sku']), 'xsolla');
                 }
             }
         } catch (\Exception $exception) {
@@ -227,6 +227,10 @@ class XsollaWebhookService
 
             return $exception->getMessage();
         }
+
+        return response()->json([
+            'message' => 'Success',
+        ], 200);
     }
 
     /**
