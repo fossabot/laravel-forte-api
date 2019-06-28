@@ -214,11 +214,13 @@ class XsollaWebhookService
     private function operationPurchase(array $data)
     {
         $userData = $data['user'];
-        $items = $data['items_operation_type']['items'];
+        $items = $data['items'];
 
         try {
-            foreach ($items as $item) {
-                UserItem::scopePurchaseUserItem($userData['id'], Item::scopeSkuParseId($item->sku), 'xsolla');
+            if ($data['items_operation_type'] == 'add') {
+                foreach ($items as $item) {
+                    UserItem::scopePurchaseUserItem((int) $userData['id'], Item::scopeSkuParseId($item->sku), 'xsolla');
+                }
             }
         } catch (\Exception $exception) {
             (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $data);
