@@ -127,10 +127,17 @@ class XsollaWebhookService
                 $receipt->refund = 0;
                 $receipt->points_old = $user->points;
 
-                $user->points += $purchaseData['virtual_currency']['quantity'];
+                $quantity = $purchaseData['virtual_currency']['quantity'];
+                $user->points += $quantity;
 
                 $receipt->points_new = $user->points;
                 $receipt->save();
+
+                $datas = [
+                    'amount' => $quantity,
+                    'comment' => 'Purchase '.$quantity.' points',
+                ];
+                $this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->user_id.'/recharge', $datas);
             }
 
             $user->save();
@@ -214,15 +221,24 @@ class XsollaWebhookService
     private function operationPurchase(array $data)
     {
         $userData = $data['user'];
+        $userId = (int) $userData['id'];
+        $user = User::scopeGetUser($userId);
+        
         $items = $data['items'];
 
         try {
+            DB::beginTransaction();
             if ($data['items_operation_type'] == 'add') {
                 foreach ($items as $item) {
-                    UserItem::scopePurchaseUserItem((int) $userData['id'], Item::scopeSkuParseId($item['sku']), 'xsolla');
+                    UserItem::scopePurchaseUserItem($userId, Item::scopeSkuParseId($item['sku']), 'xsolla');
                 }
             }
+
+            $user->points = $data['virtual_currency_balance']['new_value'];
+            $user->save();
+            DB::commit();
         } catch (\Exception $exception) {
+            DB::rollback();
             (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $data);
 
             return $exception->getMessage();
