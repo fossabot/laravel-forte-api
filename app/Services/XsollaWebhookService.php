@@ -223,7 +223,7 @@ class XsollaWebhookService
         $userData = $data['user'];
         $userId = (int) $userData['id'];
         $user = User::scopeGetUser($userId);
-        
+
         $items = $data['items'];
 
         try {
