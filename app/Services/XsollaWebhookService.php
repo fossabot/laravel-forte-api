@@ -127,10 +127,17 @@ class XsollaWebhookService
                 $receipt->refund = 0;
                 $receipt->points_old = $user->points;
 
-                $user->points += $purchaseData['virtual_currency']['quantity'];
+                $quantity = $purchaseData['virtual_currency']['quantity'];
+                $user->points += $quantity;
 
                 $receipt->points_new = $user->points;
                 $receipt->save();
+
+                $datas = [
+                    'amount' => $quantity,
+                    'comment' => 'Purchase '.$quantity.' points',
+                ];
+                $this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->user_id.'/recharge', $datas);
             }
 
             $user->save();
