@@ -176,6 +176,8 @@ class UserItem extends Model
             }
             $userItem->save();
 
+            (new \App\Http\Controllers\DiscordNotificationController)->xsollaUserAction('User Item Update', $userItem);
+
             DB::commit();
         } catch (\Exception $exception) {
             DB::rollback();

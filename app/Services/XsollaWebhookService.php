@@ -131,6 +131,13 @@ class XsollaWebhookService
 
                 $receipt->points_new = $user->points;
                 $receipt->save();
+
+                $userAction = [
+                    'name' => $userData,
+                    'purchase' => $purchaseData,
+                ];
+
+                (new \App\Http\Controllers\DiscordNotificationController)->xsollaUserAction('Payment', $userAction);
             }
 
             $user->save();
@@ -227,6 +234,15 @@ class XsollaWebhookService
 
             return $exception->getMessage();
         }
+
+        $userAction = [
+            'name' => $userData['name'],
+            'email' => $userData['email'],
+            'items' => $items,
+            'balance' => $data['virtual_currency_balance'],
+        ];
+
+        (new \App\Http\Controllers\DiscordNotificationController)->xsollaUserAction('Item Purchase', $userAction);
 
         return response()->json([
             'message' => 'Success',

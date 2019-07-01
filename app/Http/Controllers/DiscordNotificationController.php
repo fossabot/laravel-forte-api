@@ -103,4 +103,17 @@ class DiscordNotificationController extends Controller
             ],
         ]);
     }
+
+    public function xsollaUserAction(string $action, array $data = []) {
+        $params = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
+
+        return app(Discord::class)->send('595192089457983490', [
+            'content' => now().'] Xsolla User Log',
+            'tts' => false,
+            'embed' => [
+                'title' => $action,
+                'description' => "``` {$params} ```",
+            ],
+        ]);
+    }
 }
