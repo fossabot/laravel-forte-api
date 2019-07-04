@@ -16,6 +16,7 @@ class CreateReceiptsTable extends Migration
         Schema::create('receipts', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('user_id');
+            $table->unsignedInteger('transaction_id')->default(null)->comment('xsolla payment duplicate observe transaction id');
             $table->unsignedInteger('client_id')->comment('where the payment/refund is completed (xsolla)');
             $table->unsignedInteger('user_item_id')->nullable();
             $table->boolean('about_cash')->default(true)->comment('whether the payment/refund is relate to real cash (not points)');

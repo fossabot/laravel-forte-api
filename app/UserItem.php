@@ -157,6 +157,7 @@ class UserItem extends Model
      */
     public static function scopeUpdateUserItem(int $id, int $itemId, array $data, string $token)
     {
+        $items = [];
         $userItem = self::where('user_id', $id)->find($itemId);
 
         if (Item::scopeItemDetail($userItem->item_id)->consumable == 0 && $data['consumed']) {
@@ -174,10 +175,12 @@ class UserItem extends Model
                     continue;
                 }
                 $userItem->$key = $item;
+
+                array_push($items, $item);
             }
             $userItem->save();
 
-            (new \App\Http\Controllers\DiscordNotificationController)->xsollaUserAction('User Item Update', $userItem);
+            (new \App\Http\Controllers\DiscordNotificationController)->xsollaUserAction('User Item Update', $items);
 
             DB::commit();
         } catch (\Exception $exception) {
