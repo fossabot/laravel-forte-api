@@ -157,13 +157,14 @@ class UserItem extends Model
      */
     public static function scopeUpdateUserItem(int $id, int $itemId, array $data, string $token)
     {
-        if (Item::scopeItemDetail($itemId)->consumable == 0 && $data['consumed']) {
+        $userItem = self::where('user_id', $id)->find($itemId);
+
+        if (Item::scopeItemDetail($userItem->item_id)->consumable == 0 && $data['consumed']) {
             return response()->json([
                 'message' => 'Bad Request Consumed value is true',
             ], 400);
         }
 
-        $userItem = self::where('user_id', $id)->find($itemId);
         try {
             DB::beginTransaction();
 
