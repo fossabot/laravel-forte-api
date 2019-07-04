@@ -2,15 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\RequestLog;
 use Carbon\Carbon;
+use App\RequestLog;
 use Illuminate\Support\Facades\Storage;
 
 class CleanLogController extends Controller
 {
     /**
-     *
      * @return mixed
      */
     public function clean()
@@ -30,7 +28,6 @@ class CleanLogController extends Controller
       }
       Storage::disk('log')->put('request/'.$today.'.log', json_encode($jsonLogs));
       RequestLog::where('created_at', '>', $today)->delete();
-
 
     }
 }
