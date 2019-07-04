@@ -15,7 +15,7 @@ class CreateDiscordsTable extends Migration
     {
         Schema::create('discords', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('user_id')->unique();
+            $table->unsignedInteger('user_id')->unique();
             $table->text('discord_id')->comment('id of discord user account');
             $table->timestamps();
 

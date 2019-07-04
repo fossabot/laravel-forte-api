@@ -15,7 +15,7 @@ class CreateItemsTable extends Migration
     {
         Schema::create('items', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('client_id')->comment('discord bot related to the item');
+            $table->unsignedInteger('client_id')->comment('discord bot related to the item');
             $table->string('sku')->unique()->comment('unique item code from xsolla');
             $table->string('name');
             $table->string('image_url');

@@ -15,8 +15,8 @@ class CreateUserItemsTable extends Migration
     {
         Schema::create('user_items', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('user_id');
-            $table->integer('item_id');
+            $table->unsignedInteger('user_id');
+            $table->unsignedInteger('item_id');
             $table->boolean('expired')->default(false)->comment('whether expiration time has passed or the cash was refunded');
             $table->boolean('consumed')->default(false);
             $table->boolean('sync')->default(false)->comment('whether bot(items.client_id) is notified of the change in this item');
