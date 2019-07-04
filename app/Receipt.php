@@ -33,4 +33,12 @@ class Receipt extends Model
     {
         return self::where('user_id', $id)->where('id', $receiptId)->get();
     }
+
+    /**
+     * @param int $id
+     * @return mixed
+     */
+    public static function scopeObserverTransaction(int $id) {
+        return self::where('transaction_id', $id)->count();
+    }
 }

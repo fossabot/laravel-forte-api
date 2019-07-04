@@ -108,6 +108,13 @@ class XsollaWebhookService
     {
         $userData = $data['user'];
         $purchaseData = $data['purchase'];
+        $transactionData = $data['transaction'];
+
+        if (Receipt::scopeObserverTransaction($transactionData['id']) > 0) {
+            return response()->json([
+                'message' => 'This payment is a duplicate payment.',
+            ], 409);
+        }
 
         try {
             DB::beginTransaction();
