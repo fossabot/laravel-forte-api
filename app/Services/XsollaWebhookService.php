@@ -127,6 +127,7 @@ class XsollaWebhookService
                 }
             } else {
                 $receipt = new Receipt;
+                $receipt->transaction_id = $transactionData['id'];
                 $receipt->user_id = $user->id;
                 $receipt->client_id = 1;
                 $receipt->user_item_id = null;
