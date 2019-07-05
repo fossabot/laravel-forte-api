@@ -34,6 +34,7 @@ class CleanRequestLog extends Command
     /**
      * Execute the console command.
      *
+     * @param CleanLogController $cleanLog
      * @return mixed
      */
     public function handle(CleanLogController $cleanLog)
