@@ -48,7 +48,7 @@ class CleanLogController extends Controller
             mkdir(storage_path('requests'), 0777);
         }
 
-        $this->file->put(storage_path('requests/' . $this->today . '.log'), json_encode($logs, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        $this->file->put(storage_path('requests/'.$this->today.'.log'), json_encode($logs, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 
         RequestLog::scopeClearRequestLogs($this->today);
     }
