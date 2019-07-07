@@ -1,5 +1,9 @@
 preset: laravel
-enabled:
-  - newline_after_open_tag
-disabled:
-  - braces
+
+finder:
+  not-name:
+    - "*.php.twig"
+  exclude:
+    - "vendors"
+    - "storage"
+    - "node_modules"
