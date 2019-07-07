@@ -17,6 +17,9 @@ Route::get('/', function () {
 
 Route::get('shops/{token}', 'UserController@shortXsollaURL')->name('xsolla.short');
 
+/**
+ * @deprecated admin dashboard
+ */
 Route::prefix('dashboard/')->group(function () {
     Route::any('/signin', 'DashboardController@signin')->name('login');
     Route::middleware('auth')->group(function () {
