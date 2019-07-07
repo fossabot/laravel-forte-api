@@ -408,7 +408,8 @@ class UserController extends Controller
         return $this->us->authentication($id, $request->password);
     }
 
-    public function shortXsollaURL(string $token) {
+    public function shortXsollaURL(string $token)
+    {
         $url = XsollaUrl::where('token', $token)->first();
 
         return view('xsolla.short', ['token' => $url->token, 'redirect_url' => $url->redirect_url]);

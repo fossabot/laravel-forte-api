@@ -22,7 +22,8 @@ class CleanLogController extends Controller
      * CleanLogController constructor.
      * @param Filesystem $file
      */
-    public function __construct(FileSystem $file) {
+    public function __construct(FileSystem $file)
+    {
         $this->file = $file;
         $this->today = Carbon::now()->format('Y-m-d');
     }
@@ -30,7 +31,8 @@ class CleanLogController extends Controller
     /**
      * @param array $logs
      */
-    public function clean($logs = []) {
+    public function clean($logs = [])
+    {
         $requestLogs = RequestLog::where('created_at', '<', $this->today)->get();
 
         foreach ($requestLogs as $log) {

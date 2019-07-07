@@ -15,7 +15,8 @@ use Illuminate\Http\Request;
 
 class XsollaTestCaseController
 {
-    public function index(Request $request) {
+    public function index(Request $request)
+    {
         switch ($request['notification_type']) {
             case 'user_balance_operation':
                 try {
