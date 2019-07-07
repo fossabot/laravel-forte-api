@@ -28,7 +28,8 @@ class ClientController extends Controller
     /**
      * @return string
      */
-    private function generateToken() {
+    private function generateToken()
+    {
         $merge = '';
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 

@@ -14,7 +14,8 @@ class RequestLog extends Model
      * @param string $date
      * @return mixed
      */
-    public static function scopeClearRequestLogs(string $date) {
+    public static function scopeClearRequestLogs(string $date)
+    {
         return self::where('created_at', '<', $date)->delete();
     }
 }
