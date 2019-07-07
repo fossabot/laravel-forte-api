@@ -11,7 +11,7 @@
 |
 */
 
-Route::prefix('v1/')->middleware(['api.headers'])->group(function () {
+Route::prefix('v1/')->middleware(['api.trust.ip', 'api.headers'])->group(function () {
     Route::resource('users', 'UserController');
     Route::get('users/{user_id}/xsolla/token', 'UserController@xsollaToken');
     Route::post('users/{user_id}/signin', 'UserController@authentication');

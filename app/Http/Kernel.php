@@ -63,6 +63,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'api.headers' => \App\Http\Middleware\CheckApiHeader::class,
         'api.xsolla' => \App\Http\Middleware\VerifyXsollaAuthorization::class,
+        'api.trust.ip' => \App\Http\Middleware\CheckTrustIP::class,
         'jwt.auth' => \Tymon\JWTAuth\Middleware\GetUserFromToken::class,
         'jwt.refresh' => \Tymon\JWTAuth\Middleware\RefreshToken::class,
         'log.request' => \App\Http\Middleware\APIRequestLog::class,
