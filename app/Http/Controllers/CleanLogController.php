@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
-use App\RequestLog;
+use App\Models\RequestLog;
 use Illuminate\Filesystem\Filesystem;
 
 class CleanLogController extends Controller

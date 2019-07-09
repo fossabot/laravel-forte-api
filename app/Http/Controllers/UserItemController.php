@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
-use App\UserItem;
+use App\Models\User;
+use App\Models\UserItem;
 use Illuminate\Http\Request;
 
 class UserItemController extends Controller

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
-use App\XsollaUrl;
+use App\Models\User;
+use App\Models\XsollaUrl;
 use Illuminate\Http\Request;
 use App\Services\UserService;
 use App\Services\XsollaAPIService;

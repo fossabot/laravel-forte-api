@@ -8,9 +8,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Item;
-use App\User;
-use App\UserItem;
+use App\Models\Item;
+use App\Models\User;
+use App\Models\UserItem;
 use Illuminate\Http\Request;
 
 class XsollaTestCaseController

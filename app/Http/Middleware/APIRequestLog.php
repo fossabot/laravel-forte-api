@@ -3,7 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use App\RequestLog;
+use App\Models\RequestLog;
 
 class APIRequestLog
 {

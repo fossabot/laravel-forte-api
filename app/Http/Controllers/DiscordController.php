@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
-use App\Discord;
+use App\Models\User;
+use App\Models\Discord;
 use Illuminate\Http\Request;
 
 class DiscordController extends Controller

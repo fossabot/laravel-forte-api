@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-use App\Item;
-use App\User;
-use App\Receipt;
-use App\UserItem;
+use App\Models\Item;
+use App\Models\User;
+use App\Models\Receipt;
+use App\Models\UserItem;
 use Illuminate\Support\Facades\DB;
 
 /**

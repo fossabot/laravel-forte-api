@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
-use App\Client;
-use App\Receipt;
+use App\Models\User;
+use App\Models\Client;
+use App\Models\Receipt;
 use Illuminate\Http\Request;
 use App\Services\XsollaAPIService;
 

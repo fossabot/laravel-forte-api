@@ -3,7 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use App\Client;
+use App\Models\Client;
 use App\Http\Controllers\ClientController;
 
 class CheckApiHeader

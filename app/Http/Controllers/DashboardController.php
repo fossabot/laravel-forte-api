@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
-use App\ErrorLog;
-use App\UserItem;
+use App\Models\User;
+use App\Models\ErrorLog;
+use App\Models\UserItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 

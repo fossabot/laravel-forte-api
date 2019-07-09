@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Client;
-use App\ErrorLog;
+use App\Models\Client;
+use App\Models\ErrorLog;
 use NotificationChannels\Discord\Discord;
 
 class DiscordNotificationController extends Controller

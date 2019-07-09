@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Receipt;
+use App\Models\Receipt;
 
 class ReceiptController extends Controller
 {
