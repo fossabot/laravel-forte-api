@@ -157,7 +157,11 @@ class UserItem extends Model
      */
     public static function scopeUpdateUserItem(int $id, int $itemId, array $data, string $token)
     {
-        $items = [];
+        $items = [
+            'name' => User::scopeGetUser($id)->name,
+            'email' => User::scopeGetUser($id)->email,
+        ];
+
         $userItem = self::where('user_id', $id)->find($itemId);
 
         if (Item::scopeItemDetail($userItem->item_id)->consumable == 0 && ! empty($data['consumed']) && $data['consumed']) {
@@ -176,7 +180,11 @@ class UserItem extends Model
                 }
                 $userItem->$key = $item;
 
-                array_push($items, $item);
+                array_push($items, [
+                    'expired' => $userItem->expired ? 'true' : 'false',
+                    'consumed' => $userItem->consumed ? 'true' : 'false',
+                    'sync' => $userItem->sync ? 'true' : 'false',
+                ]);
             }
             $userItem->save();
 
