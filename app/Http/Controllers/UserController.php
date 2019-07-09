@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Client;
 use App\Models\XsollaUrl;
 use Illuminate\Http\Request;
 use App\Services\UserService;
@@ -335,6 +336,11 @@ class UserController extends Controller
                     'ui' => [
                         'theme' => 'default_dark',
                         'size' => 'large',
+                        'components' => [
+                            'virtual_items' => [
+                                'selected_group' => Client::bringNameByToken(request()->header('Authorization'))->xsolla_selected_group_name,
+                            ],
+                        ],
                     ],
                 ],
             ];

@@ -15,7 +15,7 @@ class Client extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'token', 'prev_token',
+        'name', 'xsolla_selected_group_name', 'token', 'prev_token',
     ];
 
     /**
