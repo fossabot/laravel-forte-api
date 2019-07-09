@@ -160,7 +160,7 @@ class UserItem extends Model
         $items = [];
         $userItem = self::where('user_id', $id)->find($itemId);
 
-        if (Item::scopeItemDetail($userItem->item_id)->consumable == 0 && ! empty ($data['consumed']) && $data['consumed']) {
+        if (Item::scopeItemDetail($userItem->item_id)->consumable == 0 && ! empty($data['consumed']) && $data['consumed']) {
             return response()->json([
                 'message' => 'Bad Request Consumed value is true',
             ], 400);
