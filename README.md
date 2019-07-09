@@ -116,6 +116,10 @@ issue tracking commit
 - Feature #1 - Title
 - Fix #1 - Title
 
+## Collaboration
+- 이슈 작성 시 `Merge when green` 라벨이 붙으면 TravisCI 및 StyleCI 가 정상 작동하면 자동으로 Merge
+- 이슈 제목 앞에 `WIP (work in progress)` 가 붙으면 해당 이슈는 잠김 처리
+
 ## Lara (Forte Support Bot)
 Lara 는 포르테 프로젝트를 도와주는 봇입니다. 
 <br>
