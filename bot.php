@@ -4,7 +4,7 @@ include __DIR__.'/vendor/autoload.php';
 
 use Discord\DiscordCommandClient;
 
-$dotenv = new Dotenv\Dotenv(__DIR__);
+$dotenv = Dotenv\Dotenv::create(__DIR__);
 $dotenv->load();
 
 $discord = new DiscordCommandClient([

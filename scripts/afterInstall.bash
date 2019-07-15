@@ -8,6 +8,7 @@ sudo composer install
 sudo cp /var/www/release-files/.env /var/www/laravel-central-api
 sudo cp /var/www/release-files/Controller.php /var/www/laravel-central-api/app/Http/Controllers
 sudo cp /var/www/release-files/requests /var/www/laravel-central-api/storage/requests
+sudo cp /var/www/release-files/backups /var/www/laravel-central-api/storage/backups
 sudo php artisan key:generate
 sudo php artisan config:cache
 sudo chmod -R 775 storage bootstrap/cache storage/framework storage/logs

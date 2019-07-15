@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Console\Commands\BackupDB;
 use App\Console\Commands\CleanRequestLog;
 use App\Console\Commands\SyncXsollaItems;
 use Illuminate\Console\Scheduling\Schedule;
@@ -19,6 +20,7 @@ class Kernel extends ConsoleKernel
         RenewalClientToken::class,
         SyncXsollaItems::class,
         CleanRequestLog::class,
+        BackupDB::class,
     ];
 
     /**
@@ -29,6 +31,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        $schedule->command(BackupDB::class)->daily();
         $schedule->command(CleanRequestLog::class)->daily();
         $schedule->command(RenewalClientToken::class)->hourly();
         $schedule->command(SyncXsollaItems::class)->dailyAt('02:00');

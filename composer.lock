@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "57508e44b8ec8168cb1f6fb1f360f9f7",
+    "content-hash": "88d3367f683b0b5d32597c93d1b21ec2",
     "packages": [
         {
             "name": "TrafficCophp/ByteBuffer",
@@ -4051,6 +4051,56 @@
                 "sentry"
             ],
             "time": "2019-02-25T09:08:51+00:00"
+        },
+        {
+            "name": "spatie/db-dumper",
+            "version": "2.14.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/db-dumper.git",
+                "reference": "093750d69c383fb14d9e7cd6caa052ea7b35e5b5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/db-dumper/zipball/093750d69c383fb14d9e7cd6caa052ea7b35e5b5",
+                "reference": "093750d69c383fb14d9e7cd6caa052ea7b35e5b5",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.3",
+                "symfony/process": "^4.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.0|^8.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\DbDumper\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Dump databases",
+            "homepage": "https://github.com/spatie/db-dumper",
+            "keywords": [
+                "database",
+                "db-dumper",
+                "dump",
+                "mysqldump",
+                "spatie"
+            ],
+            "time": "2019-06-28T08:23:04+00:00"
         },
         {
             "name": "swagger-api/swagger-ui",

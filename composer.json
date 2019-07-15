@@ -17,14 +17,15 @@
         "laravel-notification-channels/discord": "^1.0",
         "laravel/framework": "5.8.*",
         "laravel/tinker": "^1.0",
+        "mmieluch/laravel-vfs-provider": "^1.0",
         "predis/predis": "^1.1",
         "sentry/sentry-laravel": "1.0.0",
+        "spatie/db-dumper": "^2.14",
         "symfony/options-resolver": "^3.0",
         "symfony/psr-http-message-bridge": "^1.2",
         "team-reflex/discord-php": "^4.0",
         "tymon/jwt-auth": "^0.5.12",
-        "zircote/swagger-php": "2.*",
-        "mmieluch/laravel-vfs-provider": "^1.0"
+        "zircote/swagger-php": "2.*"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",
