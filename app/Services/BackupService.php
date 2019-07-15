@@ -19,7 +19,8 @@ class BackupService
     /**
      * BackupService constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->today = Carbon::now()->format('Y-m-d');
     }
 
@@ -27,7 +28,8 @@ class BackupService
      * @throws DumpFailed
      * @throws CannotStartDump
      */
-    public function database() {
+    public function database()
+    {
         if (! file_exists(storage_path('backups'))) {
             mkdir(storage_path('backups'), 0777);
         }
@@ -36,7 +38,7 @@ class BackupService
             ->setDbName(config('database.connections.mysql.database'))
             ->setUserName(config('database.connections.mysql.username'))
             ->setPassword(config('database.connections.mysql.password'))
-            ->dumpToFile(storage_path() . '/backups/'. $this->today . '.sql');
+            ->dumpToFile(storage_path().'/backups/'.$this->today.'.sql');
 
 //        (new \App\Http\Controllers\DiscordNotificationController)->backupSQL();
 
