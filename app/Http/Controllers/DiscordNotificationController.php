@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
 use App\Models\Client;
 use App\Models\ErrorLog;
 use NotificationChannels\Discord\Discord;
@@ -20,16 +19,16 @@ class DiscordNotificationController extends Controller
 
         ErrorLog::create([
             'environment' => config('app.env'),
-            'title' => $exception->getFile() . '(' . $exception->getLine() . ')',
+            'title' => $exception->getFile().'('.$exception->getLine().')',
             'message' => $exception->getMessage(),
             'parameters' => $params,
         ]);
 
         return app(Discord::class)->send('555413130872750091', [
-            'content' => '[' . config('app.env') . '> ' . now() . '] API ERROR',
+            'content' => '['.config('app.env').'> '.now().'] API ERROR',
             'tts' => false,
             'embed' => [
-                'title' => $exception->getFile() . '(' . $exception->getLine() . ')',
+                'title' => $exception->getFile().'('.$exception->getLine().')',
                 'description' => "`ERROR` \n {$exception->getMessage()} \n `PARAMS` \n ``` {$params} ```",
             ],
         ]);
@@ -45,7 +44,7 @@ class DiscordNotificationController extends Controller
         $params = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
 
         return app(Discord::class)->send('561429015433445376', [
-            'content' => '[' . config('app.env') . '> ' . now() . '] Xsolla Sync',
+            'content' => '['.config('app.env').'> '.now().'] Xsolla Sync',
             'tts' => false,
             'embed' => [
                 'title' => 'Sync Information',
@@ -88,7 +87,7 @@ class DiscordNotificationController extends Controller
         $name = [];
 
         foreach (Client::get() as $client) {
-            if (!in_array($client->name, Client::BOT_TOKEN_RENEWAL_EXCEPTION)) {
+            if (! in_array($client->name, Client::BOT_TOKEN_RENEWAL_EXCEPTION)) {
                 array_push($name, $client->name);
             }
         }
@@ -96,7 +95,7 @@ class DiscordNotificationController extends Controller
         $name = implode(', ', $name);
 
         return app(Discord::class)->send('561429015433445376', [
-            'content' => now() . '] Client Token Issue (' . date('H') . '/24)',
+            'content' => now().'] Client Token Issue ('.date('H').'/24)',
             'tts' => false,
             'embed' => [
                 'title' => 'Client Information',
@@ -115,7 +114,7 @@ class DiscordNotificationController extends Controller
         $params = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
 
         return app(Discord::class)->send('595192089457983490', [
-            'content' => now() . '] Xsolla User Log',
+            'content' => now().'] Xsolla User Log',
             'tts' => false,
             'embed' => [
                 'title' => $action,
@@ -126,15 +125,16 @@ class DiscordNotificationController extends Controller
 
     /**
      * I dont know how to discord file upload
-     * change discord to email
+     * change discord to email.
      * @deprecated
      * @return mixed
      */
-    public function backupSQL() {
+    public function backupSQL()
+    {
         return app(Discord::class)->send('600183416897404946', [
-            'content' => now() . '] FORTE DB BACKUP',
+            'content' => now().'] FORTE DB BACKUP',
             'embed' => [
-                'description' => '디스코드 파일 업로드 방법을 몰라 이메일로 쏩니당 ,,,,'
+                'description' => '디스코드 파일 업로드 방법을 몰라 이메일로 쏩니당 ,,,,',
             ],
             'tts' => false,
         ]);
