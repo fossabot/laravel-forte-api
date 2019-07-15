@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class BackupDB extends Mailable
 {
@@ -31,6 +30,6 @@ class BackupDB extends Mailable
     {
         return $this->to('api@team-crescendo.me')
             ->markdown('emails.backups.db')
-            ->attach(storage_path(). '/backups/'. Carbon::now()->format('Y-m-d') . '.sql');
+            ->attach(storage_path().'/backups/'.Carbon::now()->format('Y-m-d').'.sql');
     }
 }
