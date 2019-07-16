@@ -6,6 +6,21 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
+/**
+ * App\Models\User
+ *
+ * @property-read \App\Models\Discord $discord
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User allUsers()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User destoryUser()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User getUser()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User getUserById()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User query()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User updateUser($datas = array())
+ * @mixin \Eloquent
+ */
 class User extends Authenticatable
 {
     use Notifiable;

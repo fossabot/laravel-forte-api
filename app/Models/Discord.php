@@ -5,6 +5,20 @@ namespace App\Models;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\Discord
+ *
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Discord allDiscordAccounts()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Discord destoryDiscordAccount()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Discord newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Discord newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Discord query()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Discord selfDiscordAccount()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Discord selfDiscordSelectFieldAccount($id)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Discord updateDiscordAccount($datas = array())
+ * @mixin \Eloquent
+ */
 class Discord extends Model
 {
     /**

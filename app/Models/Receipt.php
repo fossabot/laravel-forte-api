@@ -4,6 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\Receipt
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt observerTransaction()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt query()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt userReceiptDetail($receiptId)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt userReceiptLists()
+ * @mixin \Eloquent
+ */
 class Receipt extends Model
 {
     /**

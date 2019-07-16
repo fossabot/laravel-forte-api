@@ -168,6 +168,7 @@ return [
         Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
         L5Swagger\L5SwaggerServiceProvider::class,
         NotificationChannels\Discord\DiscordServiceProvider::class,
+        Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
 
         /*
          * Application Service Providers...

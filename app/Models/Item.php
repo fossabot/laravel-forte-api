@@ -4,6 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\Item
+ *
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserItem[] $userItems
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item allItemLists()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item itemDetail()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item query()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item skuParseId()
+ * @mixin \Eloquent
+ */
 class Item extends Model
 {
     /**

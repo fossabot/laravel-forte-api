@@ -5,6 +5,21 @@ namespace App\Models;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\UserItem
+ *
+ * @property-read \App\Models\Item $item
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem countUserPurchaseDuplicateItem($itemId)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem destroyUserItem($itemId)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem purchaseUserItem($itemId, $token)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem query()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem updateUserItem($itemId, $data, $token)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem userItemDetail($itemId)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem userItemLists()
+ * @mixin \Eloquent
+ */
 class UserItem extends Model
 {
     /**
