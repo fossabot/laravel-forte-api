@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\Receipt
+ * App\Models\Receipt.
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt newQuery()

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\RequestLog
+ * App\Models\RequestLog.
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RequestLog clearRequestLogs()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RequestLog newModelQuery()
