@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\Item
+ * App\Models\Item.
  *
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserItem[] $userItems
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item allItemLists()

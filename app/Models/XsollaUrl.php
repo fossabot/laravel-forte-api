@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\XsollaUrl
+ * App\Models\XsollaUrl.
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XsollaUrl newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XsollaUrl newQuery()

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\ErrorLog
+ * App\Models\ErrorLog.
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ErrorLog newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ErrorLog newQuery()

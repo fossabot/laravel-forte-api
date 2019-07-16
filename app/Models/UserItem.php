@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\UserItem
+ * App\Models\UserItem.
  *
  * @property-read \App\Models\Item $item
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem countUserPurchaseDuplicateItem($itemId)
