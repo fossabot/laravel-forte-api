@@ -4,9 +4,6 @@
 # previous deployments. The servers auto scale so the directory may or may not
 # exist.
 
-if [ -d /var/www/laravel-central-api/storage/requests ]; then
-fi
-
 if [ -d /var/www/release ]; then
     sudo rm -rf /var/www/release
 fi
