@@ -316,10 +316,10 @@ class UserController extends Controller
             if (env('APP_ENV') == 'production') {
                 $mode = '';
             } else {
-                $mode = 'sandbox-';
+                $mode = 'sandbox-secure.';
             }
 
-            $url = 'https://'.$mode.'secure.xsolla.com/paystation2/?access_token=';
+            $url = 'https://'.$mode.'xsolla.com/paystation2/?access_token=';
 
             $datas = [
                 'user' => [
