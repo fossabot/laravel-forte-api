@@ -316,10 +316,10 @@ class UserController extends Controller
             if (env('APP_ENV') == 'production') {
                 $mode = '';
             } else {
-                $mode = 'sandbox-secure.';
+                $mode = 'sandbox-';
             }
 
-            $url = 'https://'.$mode.'xsolla.com/paystation2/?access_token=';
+            $url = 'https://'.$mode.'secure.xsolla.com/paystation2/?access_token=';
 
             $datas = [
                 'user' => [
@@ -332,7 +332,7 @@ class UserController extends Controller
                 ],
                 'settings' => [
                     'project_id' => (int) config('xsolla.projectId'),
-                    'mode' => isset($mode) ? 'sandbox' : '',
+                    'mode' => $mode ? 'sandbox' : '',
                     'ui' => [
                         'theme' => 'default_dark',
                         'size' => 'large',
