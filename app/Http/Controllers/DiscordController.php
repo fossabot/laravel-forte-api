@@ -120,7 +120,7 @@ class DiscordController extends Controller
         }
 
         if (isset($request->discord_id)) {
-            if (! empty(User::scopeGetUser($id)->withdraw_at)) {
+            if (! empty(User::scopeGetUser($id)->deleted_at)) {
                 return response([
                     'message' => 'Withdraw User Account',
                 ], 400);

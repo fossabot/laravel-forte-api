@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * App\Models\User.
@@ -24,6 +25,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable
 {
     use Notifiable;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -57,7 +59,7 @@ class User extends Authenticatable
      */
     public static function scopeAllUsers()
     {
-        return self::whereNull('withdraw_at')->get();
+        return self::whereNull('deleted_at')->get();
     }
 
     /**
@@ -133,7 +135,7 @@ class User extends Authenticatable
         $xsollaAPI = \App::make('App\Services\XsollaAPIService');
 
         self::where('id', $id)->update([
-            'withdraw_at' => date('Y-m-d'),
+            'deleted_at' => date('Y-m-d'),
         ]);
 
         $datas = [

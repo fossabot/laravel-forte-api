@@ -75,7 +75,7 @@ class PointController extends Controller
             ], 404);
         }
 
-        if (! empty($user->withdraw_at)) {
+        if (! empty($user->deleted_at)) {
             return response([
                 'message' => 'Withdraw User Account',
             ], 400);
