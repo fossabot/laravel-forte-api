@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Discord;
 use Socialite;
 use App\Models\User;
 use App\Models\Client;
+use App\Models\Discord;
 use App\Models\XsollaUrl;
 use Illuminate\Http\Request;
 use App\Services\XsollaAPIService;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\UserUpdateFormRequest;
-use App\Http\Requests\UserRegisterFormRequest;
 
 class UserController extends Controller
 {
@@ -68,6 +67,7 @@ class UserController extends Controller
         if (empty($discord)) {
             $this->store($discord_user);
         }
+
         return $this->xsollaToken($discord->user->id);
     }
 

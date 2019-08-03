@@ -71,6 +71,7 @@ class DiscordController extends Controller
     {
         return response()->json(Discord::scopeSelfDiscordAccount($id));
     }
+
     /**
      * 이용자의 디스코드 계정 정보를 갱신합니다.
      *
