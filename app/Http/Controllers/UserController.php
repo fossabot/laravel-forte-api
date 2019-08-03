@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Discord;
+use Socialite;
 use App\Models\User;
 use App\Models\Client;
 use App\Models\XsollaUrl;
 use Illuminate\Http\Request;
-use App\Services\UserService;
 use App\Services\XsollaAPIService;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\UserUpdateFormRequest;
@@ -18,20 +19,14 @@ class UserController extends Controller
      * @var XsollaAPIService
      */
     protected $xsollaAPI;
-    /**
-     * @var UserService
-     */
-    protected $us;
 
     /**
      * UserController constructor.
      * @param XsollaAPIService $xsollaAPI
-     * @param UserService $us
      */
-    public function __construct(XsollaAPIService $xsollaAPI, UserService $us)
+    public function __construct(XsollaAPIService $xsollaAPI)
     {
         $this->xsollaAPI = $xsollaAPI;
-        $this->us = $us;
     }
 
     /**
@@ -63,61 +58,38 @@ class UserController extends Controller
     }
 
     /**
+     * @return \Illuminate\Http\JsonResponse|string
+     * @throws \Exception
+     */
+    public function login()
+    {
+        $discord_user = Socialite::with('discord')->user();
+        $discord = Discord::scopeSelfDiscordAccount($discord_user->id);
+        if (empty($discord)) {
+            $this->store($discord_user);
+        }
+        return $this->xsollaToken($discord->user->id);
+    }
+
+    /**
      * 이용자를 추가(회원가입) 합니다.
      *
-     * @param UserRegisterFormRequest $request
+     * @param $discord_user
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      * @throws \Exception
-     *
-     * @SWG\Post(
-     *     path="/users",
-     *     description="Store(save) the User Information",
-     *     produces={"application/json"},
-     *     tags={"User"},
-     *      @SWG\Parameter(
-     *          name="Authorization",
-     *          in="header",
-     *          description="Authorization Token",
-     *          required=true,
-     *          type="string"
-     *      ),
-     *      @SWG\Parameter(
-     *          name="name",
-     *          in="query",
-     *          description="User Name",
-     *          required=true,
-     *          type="string"
-     *      ),
-     *      @SWG\Parameter(
-     *          name="email",
-     *          in="query",
-     *          description="User Email",
-     *          required=true,
-     *          type="string"
-     *      ),
-     *      @SWG\Parameter(
-     *          name="password",
-     *          in="query",
-     *          description="User Password",
-     *          required=true,
-     *          type="string"
-     *      ),
-     *     @SWG\Response(
-     *         response=201,
-     *         description="Successful Create User Information"
-     *     ),
-     * )
      */
-    public function store(UserRegisterFormRequest $request)
+    public function store($discord_user)
     {
         DB::beginTransaction();
         try {
             $user = new User;
-            $user->email = $request->email;
-            $user->name = $request->name;
-            $user->password = bcrypt($request->password);
+            $user->email = $discord_user->email;
+            $user->name = $discord_user->name;
             $user->save();
-
+            $discord = new Discord;
+            $discord->user_id = $user->id;
+            $discord->discord_id = $user->id;
+            $discord->save();
             $datas = [
                 'user_id' => $user->id,
                 'user_name' => $user->name,
@@ -134,7 +106,7 @@ class UserController extends Controller
             ], 201);
         } catch (\Exception $exception) {
             DB::rollBack();
-            (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $request->all());
+            (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $discord_user->all());
 
             return response()->json([
                 'error' => $exception,
@@ -273,35 +245,8 @@ class UserController extends Controller
     }
 
     /**
-     * 이용자의 엑솔라 상점 URL 을 발급받습니다.
-     *
      * @param int $id
-     * @return mixed|\Psr\Http\Message\ResponseInterface
-     *
-     * @SWG\GET(
-     *     path="/users/{userId}/xsolla/token",
-     *     description="Xsolla Shop Token",
-     *     produces={"application/json"},
-     *     tags={"Xsolla"},
-     *     @SWG\Parameter(
-     *         name="Authorization",
-     *         in="header",
-     *         description="Authorization Token",
-     *         required=true,
-     *         type="string"
-     *     ),
-     *     @SWG\Parameter(
-     *         name="userId",
-     *         in="path",
-     *         description="User Id",
-     *         required=true,
-     *         type="integer"
-     *     ),
-     *     @SWG\Response(
-     *         response=200,
-     *         description="Successful Xsolla Shop Token"
-     *     ),
-     * )
+     * @return \Illuminate\Http\JsonResponse|string
      */
     public function xsollaToken(int $id)
     {
@@ -362,56 +307,6 @@ class UserController extends Controller
 
             return $exception->getMessage();
         }
-    }
-
-    /**
-     * 2FA 용 이용자 회원가입.
-     *
-     * @param Request $request
-     * @param int $id
-     * @return \Illuminate\Http\JsonResponse
-     *
-     * @SWG\POST(
-     *     path="/users/{userId}/signin",
-     *     description="User 2FA",
-     *     produces={"application/json"},
-     *     tags={"User"},
-     *     @SWG\Parameter(
-     *         name="Authorization",
-     *         in="header",
-     *         description="Authorization Token",
-     *         required=true,
-     *         type="string"
-     *     ),
-     *     @SWG\Parameter(
-     *         name="userId",
-     *         in="path",
-     *         description="User Id",
-     *         required=true,
-     *         type="integer"
-     *     ),
-     *     @SWG\Parameter(
-     *         name="password",
-     *         in="query",
-     *         description="User Password",
-     *         required=true,
-     *         type="string"
-     *     ),
-     *     @SWG\Response(
-     *         response=200,
-     *         description="Successful User 2FA Auth"
-     *     ),
-     * )
-     */
-    public function authentication(Request $request, int $id)
-    {
-        if (empty($id) || empty($request->password)) {
-            return response()->json([
-               'message' => 'Notfound',
-            ], 404);
-        }
-
-        return $this->us->authentication($id, $request->password);
     }
 
     public function shortXsollaURL(string $token)

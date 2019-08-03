@@ -17,7 +17,6 @@ class CreateUsersTable extends Migration
             $table->increments('id');
             $table->string('name')->comment('username');
             $table->string('email')->unique();
-            $table->string('password');
             $table->bigInteger('points')->default(0)->comment('virtual currency balance');
             $table->softDeletes();
             $table->timestamps();

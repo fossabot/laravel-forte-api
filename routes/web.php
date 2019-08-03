@@ -30,3 +30,7 @@ Route::prefix('dashboard/')->group(function () {
         Route::post('logout', 'DashboardController@logout')->name('dashboard.logout');
     });
 });
+Route::get('login/discord', function() {
+    return \Socialite::with('discord')->redirect();
+});
+Route::get('login/discord/callback', 'UserController@login');
