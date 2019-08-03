@@ -39,8 +39,10 @@ return [
             'tolerance' => env('STRIPE_WEBHOOK_TOLERANCE', 300),
         ],
     ],
-
     'discord' => [
+        'client_id' => env('DISCORD_KEY', ''),
+        'client_secret' => env('DISCORD_SECRET', ''),
+        'redirect' => env('DISCORD_REDIRECT_URI', ''),
         'token' => env('DISCORD_BOT_TOKEN', ''),
         'channel' => [
             'log' => env('DISCORD_CENTRAL_API_LOGGING_CHANNEL', ''),
