@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
  * App\Models\User.
