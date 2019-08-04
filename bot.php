@@ -10,6 +10,9 @@ $dotenv->load();
 $discord = new DiscordCommandClient([
     'token' => getenv('DISCORD_BOT_TOKEN'),
     'description' => 'Command List',
+    'discordOptions' => [
+        'disabledEvents' => ['PRESENCE_UPDATE'],
+    ],
 ]);
 
 $discord->registerCommand('uptime', function () {
