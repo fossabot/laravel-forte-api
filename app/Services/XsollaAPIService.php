@@ -130,7 +130,7 @@ class XsollaAPIService
                     $convertSku = array_search($skuParse[0], SKU_PREFIX);
 
                     Item::create([
-                        'client_id' => \App\Client::where('name', $convertSku)->value('id'),
+                        'client_id' => \App\Models\Client::where('name', $convertSku)->value('id'),
                         'sku' => $xsollaDetailItem['sku'],
                         'name' => (! empty($xsollaDetailItem['name']['ko'])) ? $xsollaDetailItem['name']['ko'] : $xsollaDetailItem['name']['en'],
                         'image_url' => $xsollaDetailItem['image_url'],
