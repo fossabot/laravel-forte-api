@@ -258,7 +258,7 @@ class UserController extends Controller
                 ], 404);
             }
 
-            if (env('APP_ENV') == 'production') {
+            if (config('app.env') == 'production') {
                 $mode = '';
             } else {
                 $mode = 'sandbox-';
