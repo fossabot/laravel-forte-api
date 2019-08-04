@@ -51,11 +51,11 @@ $forte = $discord->registerCommand('forte', function ($discord) {
 ]);
 
 $forte->registerSubCommand('users', function ($discord, $params) {
-    $userId = isset($params[0])?$params[0]:'';
+    $userId = isset($params[0])?'/'.$params[0]:'';
     if (getenv('APP_ENV') === 'local') {
-        $users = exec('curl -X GET "http://localhost:8000/api/v1/users/'.$userId.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
+        $users = exec('curl -X GET "http://localhost:8000/api/v1/users'.$userId.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
     } else {
-        $users = exec('curl -X GET "https://forte.team-crescendo.me/api/v1/users/'.$userId.'"-H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
+        $users = exec('curl -X GET "https://forte.team-crescendo.me/api/v1/users'.$userId.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
     }
 
     $users = json_decode($users);
@@ -75,11 +75,11 @@ $forte->registerSubCommand('users', function ($discord, $params) {
 ]);
 
 $forte->registerSubCommand('items', function ($discord, $params) {
-    $itemId = isset($params[0])?$params[0]:'';
+    $itemId = isset($params[0])?'/'.$params[0]:'';
     if (getenv('APP_ENV') === 'local') {
-        $items = exec('curl -X GET "http://localhost:8000/api/v1/items/'.$itemId.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
+        $items = exec('curl -X GET "http://localhost:8000/api/v1/items'.$itemId.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
     } else {
-        $items = exec('curl -X GET "https://forte.team-crescendo.me/api/v1/items/'.$itemId.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
+        $items = exec('curl -X GET "https://forte.team-crescendo.me/api/v1/items'.$itemId.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
     }
 
     $items = json_decode($items);
