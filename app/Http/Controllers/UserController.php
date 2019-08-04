@@ -307,7 +307,9 @@ class UserController extends Controller
     public function shortXsollaURL(string $token)
     {
         $url = XsollaUrl::where('token', $token)->first();
-
+        if($url->expired){
+            return view('xsolla.short', ['token' => '', 'redirect_url' => '']);
+        }
         return view('xsolla.short', ['token' => $url->token, 'redirect_url' => $url->redirect_url]);
     }
 }

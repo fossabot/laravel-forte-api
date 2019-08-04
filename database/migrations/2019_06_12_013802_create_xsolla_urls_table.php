@@ -18,6 +18,7 @@ class CreateXsollaUrlsTable extends Migration
             $table->text('token');
             $table->text('redirect_url');
             $table->integer('hit');
+            $table->boolean('expired');
             $table->timestamps();
         });
     }
