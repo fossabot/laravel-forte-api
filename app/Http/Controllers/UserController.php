@@ -68,7 +68,7 @@ class UserController extends Controller
             $this->store($discord_user);
         }
 
-        return $this->xsollaToken($discord->user->id);
+        return $this->xsollaToken($discord->user_id);
     }
 
     /**
@@ -88,7 +88,7 @@ class UserController extends Controller
             $user->save();
             $discord = new Discord;
             $discord->user_id = $user->id;
-            $discord->discord_id = $user->id;
+            $discord->discord_id = $discord_user->id;
             $discord->save();
             $datas = [
                 'user_id' => $user->id,
@@ -283,7 +283,7 @@ class UserController extends Controller
                         'size' => 'large',
                         'components' => [
                             'virtual_items' => [
-                                'selected_group' => Client::bringNameByToken(request()->header('Authorization'))->xsolla_selected_group_name,
+                                'selected_group' => 'forte',
                             ],
                         ],
                     ],

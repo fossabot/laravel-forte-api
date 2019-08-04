@@ -73,6 +73,84 @@ class DiscordController extends Controller
     }
 
     /**
+     * @deprecated
+     * 이용자의 디스코드 계정을 연동합니다.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return array|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     *
+     * @SWG\Post(
+     *     path="/users/{userId}/discord",
+     *     description="Store(save) the User Discord Account Information",
+     *     produces={"application/json"},
+     *     tags={"Discord"},
+     *     @SWG\Parameter(
+     *         name="Authorization",
+     *         in="header",
+     *         description="Authorization Token",
+     *         required=true,
+     *         type="string"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="userId",
+     *         in="path",
+     *         description="User Id",
+     *         required=true,
+     *         type="integer"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="discord_id",
+     *         in="query",
+     *         description="User Discord Id",
+     *         required=true,
+     *         type="string"
+     *     ),
+     *    @SWG\Response(
+     *        response=201,
+     *        description="Successful Create User Discord Account Information"
+     *    ),
+     * )
+     */
+    public function store(Request $request, int $id)
+    {
+        if (! User::scopeGetUser($id)) {
+            return response([
+                'message' => 'Not found User Id',
+            ], 404);
+        }
+
+        if (isset($request->discord_id)) {
+            if (! empty(User::scopeGetUser($id)->deleted_at)) {
+                return response([
+                    'message' => 'Withdraw User Account',
+                ], 400);
+            }
+
+            if (Discord::scopeSelfDiscordSelectFieldAccount('user_id', $id)) {
+                return response([
+                    'message' => 'Duplicated User Id or Discord Account',
+                ], 400);
+            }
+
+            if (Discord::scopeSelfDiscordAccount($request->discord_id)) {
+                return response([
+                    'message' => 'Duplicated Discord Account',
+                ], 400);
+            }
+        }
+
+        Discord::create([
+            'user_id' => $id,
+            'discord_id' => $request->discord_id,
+        ]);
+
+        return response()->json([
+            'discord_id' => $request->discord_id,
+        ], 201);
+    }
+
+    /**
      * 이용자의 디스코드 계정 정보를 갱신합니다.
      *
      * @param Request $request
