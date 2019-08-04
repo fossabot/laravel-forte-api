@@ -67,8 +67,7 @@ class UserController extends Controller
         if (empty($discord)) {
             $this->store($discord_user);
         }
-
-        return $this->xsollaToken($discord->user_id);
+        return redirect()->route('xsolla.short', $this->xsollaToken($discord->user_id));
     }
 
     /**
@@ -297,11 +296,7 @@ class UserController extends Controller
                 'redirect_url' => $url.$request['token'],
                 'hit' => 0,
             ]);
-
-            return response()->json([
-                'url' => $url.$request['token'],
-                'test_url' => route('xsolla.short', $request['token']),
-            ], 200);
+            return $request['token'];
         } catch (\Exception $exception) {
             (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $datas);
 
