@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Auth\ShopGuard;
 use Illuminate\Support\Facades\Auth;
 use Socialite;
 use App\Models\User;
@@ -67,7 +68,7 @@ class UserController extends Controller
         if (empty($discord)) {
             $this->store($discord_user);
         }
-        if (Auth::attempt(['id' => $user->id, 'discord_id' => $user->discord_id])) {
+        if (ShopGuard::attempt(['id' => $user->id, 'discord_id' => $user->discord_id])) {
             return redirect()->route('xsolla.short', $this->xsollaToken($user->id));
         } else{
             return redirect()->route('login');
