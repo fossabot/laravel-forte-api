@@ -3,7 +3,9 @@
 namespace App\Http\Middleware;
 
 
+use App\Models\XsollaUrl;
 use Closure;
+use Illuminate\Support\Facades\Auth;
 
 class ForteAuth
 {
@@ -15,12 +17,12 @@ class ForteAuth
      */
     public function handle($request, Closure $next)
     {
-        if ($this->auth->check() and $this->auth->user)
+        if (Auth::check() and Auth::user()->id == XsollaUrl::where('token', $request->token->user_id))
         {
             return $next($request);
         } else
         {
-            return redirect()->guest('auth/login');
+            return redirect()->guest('login');
         }
     }
 }
