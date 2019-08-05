@@ -15,8 +15,9 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('discord_id')->unique();
             $table->string('name')->comment('username');
-            $table->string('email')->unique();
+            $table->string('email')->nullable();
             $table->bigInteger('points')->default(0)->comment('virtual currency balance');
             $table->softDeletes();
             $table->timestamps();

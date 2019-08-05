@@ -33,7 +33,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'points',
+        'name', 'discord_id', 'email', 'password', 'points',
     ];
 
     /**
@@ -45,14 +45,6 @@ class User extends Authenticatable
         'password',
     ];
 
-    /**
-     * @brief 1:1 relationship
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
-    public function discord()
-    {
-        return $this->hasOne(Discord::class, 'id', 'user_id');
-    }
 
     /**
      * @return mixed
@@ -81,9 +73,9 @@ class User extends Authenticatable
      * @param string $id
      * @return User|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|object|null
      */
-    public static function scopeGetUserById(string $id)
+    public static function scopeGetUserByDiscordId(string $id)
     {
-        return self::where('name', $id)->orWhere('email', $id)->first();
+        return self::where('discord_id', $id)->first();
     }
 
     /**

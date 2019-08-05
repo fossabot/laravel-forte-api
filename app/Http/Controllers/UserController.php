@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Socialite;
 use App\Models\User;
 use App\Models\Client;
-use App\Models\Discord;
 use App\Models\XsollaUrl;
 use Illuminate\Http\Request;
 use App\Services\XsollaAPIService;
@@ -63,7 +62,7 @@ class UserController extends Controller
     public function login()
     {
         $discord_user = Socialite::with('discord')->user();
-        $discord = Discord::scopeSelfDiscordAccount($discord_user->id);
+        $discord = User::scopeGetUserByDiscordId($discord_user->id);
         if (empty($discord)) {
             $this->store($discord_user);
         }
@@ -84,11 +83,8 @@ class UserController extends Controller
             $user = new User;
             $user->email = $discord_user->email;
             $user->name = $discord_user->name;
+            $user->discord_id = $discord_user->id;
             $user->save();
-            $discord = new Discord;
-            $discord->user_id = $user->id;
-            $discord->discord_id = $discord_user->id;
-            $discord->save();
             $datas = [
                 'user_id' => $user->id,
                 'user_name' => $user->name,
@@ -105,7 +101,7 @@ class UserController extends Controller
             ], 201);
         } catch (\Exception $exception) {
             DB::rollBack();
-            (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $discord_user->all());
+            (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $discord_user->user);
 
             return response()->json([
                 'error' => $exception,
