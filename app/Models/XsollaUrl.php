@@ -15,6 +15,6 @@ use Illuminate\Database\Eloquent\Model;
 class XsollaUrl extends Model
 {
     protected $fillable = [
-        'token', 'redirect_url', 'hit',
+        'token', 'redirect_url', 'hit', 'user_id','expired'
     ];
 }
