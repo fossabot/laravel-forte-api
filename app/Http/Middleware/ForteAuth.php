@@ -4,9 +4,8 @@ namespace App\Http\Middleware;
 
 
 use Closure;
-use Illuminate\Auth\Middleware\Authenticate as Middleware;
 
-class ForteAuth extends Middleware
+class ForteAuth
 {
 
     /**
