@@ -17,12 +17,12 @@ class ForteAuth
      */
     public function handle($request, Closure $next)
     {
-        if (Auth::check() and Auth::user()->id == XsollaUrl::where('token', $request->token->user_id))
+        if (Auth::check() and Auth::user()->id == XsollaUrl::where('token', $request->token)->first()->user_id)
         {
             return $next($request);
         } else
         {
-            return redirect()->guest('login');
+            return redirect()->route('login');
         }
     }
 }
