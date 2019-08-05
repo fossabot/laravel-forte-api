@@ -68,7 +68,7 @@ class UserController extends Controller
         if (empty($discord)) {
             $this->store($discord_user);
         }
-        if (ShopGuard::attempt(['id' => $user->id, 'discord_id' => $user->discord_id])) {
+        if (ShopGuard::validate(['id' => $user->id, 'discord_id' => $user->discord_id])) {
             return redirect()->route('xsolla.short', $this->xsollaToken($user->id));
         } else{
             return redirect()->route('login');

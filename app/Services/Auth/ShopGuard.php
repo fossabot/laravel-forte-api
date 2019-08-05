@@ -94,4 +94,16 @@ class ShopGuard implements Guard
         $this->user = $user;
         return $this;
     }
+
+    /**
+     * Get the ID for the currently authenticated user.
+     *
+     * @return int|string|null
+     */
+    public function id()
+    {
+        if ($user = $this->user()) {
+            return $this->user()->getAuthIdentifier();
+        }
+    }
 }
