@@ -14,7 +14,7 @@
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('shops/{token}', 'UserController@shortXsollaURL')->name('xsolla.short')->middleware('auth');
+Route::get('shops/{token}', 'UserController@shortXsollaURL')->name('xsolla.short')->middleware('auth.forte');
 /*
  * @deprecated admin dashboard
  */
