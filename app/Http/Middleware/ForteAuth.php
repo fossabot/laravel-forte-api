@@ -4,15 +4,15 @@ namespace App\Http\Middleware;
 
 
 use Closure;
+use Illuminate\Auth\Middleware\Authenticate as Middleware;
 
-class ForteAuth extends Authenticate
+class ForteAuth extends Middleware
 {
+
     /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
+     * @param \Illuminate\Http\Request $request
+     * @param Closure $next
+     * @return \Illuminate\Http\RedirectResponse|mixed
      */
     public function handle($request, Closure $next)
     {
