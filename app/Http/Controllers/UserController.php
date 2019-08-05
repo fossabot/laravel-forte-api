@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\Auth\ShopGuard;
 use Illuminate\Support\Facades\Auth;
 use Socialite;
 use App\Models\User;
@@ -61,14 +60,14 @@ class UserController extends Controller
      * @return \Illuminate\Http\JsonResponse|string
      * @throws \Exception
      */
-    public function login()
+    public function login(ShopGuard $shopGuard)
     {
         $discord_user = Socialite::with('discord')->user();
         $user = User::scopeGetUserByDiscordId($discord_user->id);
         if (empty($discord)) {
             $this->store($discord_user);
         }
-        if (ShopGuard::validate(['id' => $user->id, 'discord_id' => $user->discord_id])) {
+        if (Auth::loginUsingId($user->id)) {
             return redirect()->route('xsolla.short', $this->xsollaToken($user->id));
         } else{
             return redirect()->route('login');
