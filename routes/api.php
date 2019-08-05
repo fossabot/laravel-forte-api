@@ -16,12 +16,6 @@ Route::prefix('v1/')->middleware(['api.trust.ip', 'api.headers'])->group(functio
     Route::get('users/{user_id}/xsolla/token', 'UserController@xsollaToken');
     Route::post('users/{user_id}/signin', 'UserController@authentication');
 
-    Route::post('users/{user_id}/discord', 'DiscordController@store');
-    Route::put('users/{user_id}/discord', 'DiscordController@update');
-    Route::delete('users/{user_id}/discord', 'DiscordController@destroy');
-    Route::get('discords', 'DiscordController@index');
-    Route::get('discords/{discord_id}', 'DiscordController@show');
-
     Route::get('items', 'ItemController@index');
     Route::get('items/{item_id}', 'ItemController@show');
 

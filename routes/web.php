@@ -14,14 +14,14 @@
 Route::get('/', function () {
     return view('welcome');
 });
-
-Route::get('shops/{token}', 'UserController@shortXsollaURL')->name('xsolla.short');
-
+Route::middleware('auth')->group(function () {
+    Route::get('shops/{token}', 'UserController@shortXsollaURL')->name('xsolla.short');
+});
 /*
  * @deprecated admin dashboard
  */
 Route::prefix('dashboard/')->group(function () {
-    Route::any('/signin', 'DashboardController@signin')->name('login');
+    Route::any('/signin', 'DashboardController@signin');
     Route::middleware('auth')->group(function () {
         Route::get('/', 'DashboardController@index')->name('dashboard.index');
         Route::get('/users', 'DashboardController@users')->name('dashboard.users');
@@ -32,5 +32,5 @@ Route::prefix('dashboard/')->group(function () {
 });
 Route::get('login/discord', function () {
     return \Socialite::with('discord')->redirect();
-});
+})->name('login');
 Route::get('login/discord/callback', 'UserController@login');

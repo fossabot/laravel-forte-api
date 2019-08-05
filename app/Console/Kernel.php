@@ -33,7 +33,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command(BackupDB::class)->daily();
         $schedule->command(CleanRequestLog::class)->daily();
-        $schedule->command(RenewalClientToken::class)->hourly();
+        $schedule->command(RenewalClientToken::class)->twiceDaily(2, 14);;
         $schedule->command(SyncXsollaItems::class)->dailyAt('02:00');
     }
 

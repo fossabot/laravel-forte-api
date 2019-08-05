@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Auth;
 use Socialite;
 use App\Models\User;
 use App\Models\Client;
@@ -62,11 +63,13 @@ class UserController extends Controller
     public function login()
     {
         $discord_user = Socialite::with('discord')->user();
-        $discord = User::scopeGetUserByDiscordId($discord_user->id);
+        $user = User::scopeGetUserByDiscordId($discord_user->id);
         if (empty($discord)) {
             $this->store($discord_user);
         }
-        return redirect()->route('xsolla.short', $this->xsollaToken($discord->user_id));
+        if (Auth::attempt(['id' => $user->id, 'discord_id' => $user->discord_id])) {
+            return redirect()->route('xsolla.short', $this->xsollaToken($user->id));
+        }
     }
 
     /**
