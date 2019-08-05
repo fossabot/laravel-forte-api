@@ -69,6 +69,9 @@ class UserController extends Controller
         }
         if (Auth::attempt(['id' => $user->id, 'discord_id' => $user->discord_id])) {
             return redirect()->route('xsolla.short', $this->xsollaToken($user->id));
+        } else{
+            return redirect()->route('login');
+
         }
     }
 
