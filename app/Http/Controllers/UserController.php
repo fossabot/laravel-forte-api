@@ -60,7 +60,7 @@ class UserController extends Controller
      * @return \Illuminate\Http\JsonResponse|string
      * @throws \Exception
      */
-    public function login(ShopGuard $shopGuard)
+    public function login()
     {
         $discord_user = Socialite::with('discord')->user();
         $user = User::scopeGetUserByDiscordId($discord_user->id);
