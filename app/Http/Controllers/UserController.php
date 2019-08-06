@@ -69,7 +69,7 @@ class UserController extends Controller
         }
         if (Auth::loginUsingId($user->id)) {
             return redirect()->route('xsolla.short', $this->xsollaToken($user->id));
-        } else{
+        } else {
             return redirect()->route('login');
 
         }
@@ -118,7 +118,7 @@ class UserController extends Controller
     /**
      * 이용자의 정보를 조회합니다.
      *
-     * @param  int $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      *
      * @SWG\Get(
@@ -150,7 +150,41 @@ class UserController extends Controller
     {
         return response()->json(User::scopeGetUser($id));
     }
-
+    /**
+     * 디스코드 아이디로 조회합니다.
+     *
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     *
+     * @SWG\Get(
+     *     path="/discords/{discordId}",
+     *     description="Show Discord Account User Information",
+     *     produces={"application/json"},
+     *     tags={"Discord"},
+     *     @SWG\Parameter(
+     *         name="Authorization",
+     *         in="header",
+     *         description="Authorization Token",
+     *         required=true,
+     *         type="string"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="discordId",
+     *         in="path",
+     *         description="Discord Id",
+     *         required=true,
+     *         type="integer"
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Successful Discord User Account Information"
+     *     ),
+     * )
+     */
+    public function discord(int $id)
+    {
+        return response()->json(User::scopeGetUserByDiscordId($id));
+    }
     /**
      * 이용자의 정보를 갱신합니다.
      *
