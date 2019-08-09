@@ -208,7 +208,7 @@ class XsollaWebhookService
                 $this->operationPayment($data);
                 break;
             case 'inGamePurchase':
-                // $this->operationPurchase($data);
+                $this->operationPurchase($data);
                 break;
             case 'coupon':
                 $this->operationCoupon($data);
