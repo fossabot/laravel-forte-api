@@ -63,10 +63,14 @@ class UserController extends Controller
     public function login()
     {
         $discord_user = Socialite::with('discord')->user();
+        if (empty($discord_user)){
+            return redirect()->route('login');
+        }
         $user = User::scopeGetUserByDiscordId($discord_user->id);
-        if (empty($discord)) {
+        if (empty($user)) {
             $this->store($discord_user);
         }
+        $user = User::scopeGetUserByDiscordId($discord_user->id);
         if (Auth::loginUsingId($user->id)) {
             return redirect()->route('xsolla.short', $this->xsollaToken($user->id));
         } else {
