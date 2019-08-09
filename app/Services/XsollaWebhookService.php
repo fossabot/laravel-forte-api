@@ -115,7 +115,7 @@ class XsollaWebhookService
             return response([
                 'success' => [
                     'code' => 'SUCCESS_PAYMENT',
-                    'message' => 'The payment has been completed successfully.',
+                    'message' => 'The payment has already handled.',
                 ],
             ], HTTP_OK);
         }
