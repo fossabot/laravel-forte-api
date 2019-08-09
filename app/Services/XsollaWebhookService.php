@@ -156,7 +156,7 @@ class XsollaWebhookService
                     'amount' => $quantity,
                     'comment' => 'Purchase '.$quantity.' points',
                 ];
-                $this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->user_id.'/recharge', $datas);
+                // $this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->user_id.'/recharge', $datas);
             }
 
             $user->save();
@@ -205,7 +205,7 @@ class XsollaWebhookService
 
         switch ($operationType) {
             case 'payment':
-                // $this->operationPayment($data);
+                $this->operationPayment($data);
                 break;
             case 'inGamePurchase':
                 // $this->operationPurchase($data);
@@ -322,6 +322,7 @@ class XsollaWebhookService
         $needPoint = 0;
 
         $userData = $data['user'];
+        $transactionData = $data['transaction'];
         $virtualCurrencyBalance = $data['virtual_currency_balance'];
         $user = User::scopeGetUser($userData['id']);
 
@@ -331,9 +332,10 @@ class XsollaWebhookService
 
         $receipt = new Receipt;
         $receipt->user_id = $user->id;
+        $receipt->transaction_id = $transactionData['id'];
         $receipt->client_id = 1;
         $receipt->user_item_id = null;
-        $receipt->about_cash = 0;
+        $receipt->about_cash = 1;
         $receipt->refund = 0;
         $receipt->points_old = $oldPoints;
         $receipt->points_new = $user->points;
