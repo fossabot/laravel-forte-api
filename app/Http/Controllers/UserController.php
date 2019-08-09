@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
 use Socialite;
 use App\Models\User;
-use App\Models\Client;
 use App\Models\XsollaUrl;
 use Illuminate\Http\Request;
 use App\Services\XsollaAPIService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\UserUpdateFormRequest;
 
 class UserController extends Controller
@@ -63,7 +62,7 @@ class UserController extends Controller
     public function login()
     {
         $discord_user = Socialite::with('discord')->user();
-        if (empty($discord_user)){
+        if (empty($discord_user)) {
             return redirect()->route('login');
         }
         $user = User::scopeGetUserByDiscordId($discord_user->id);
@@ -75,7 +74,6 @@ class UserController extends Controller
             return redirect()->route('xsolla.short', $this->xsollaToken($user->id));
         } else {
             return redirect()->route('login');
-
         }
     }
 
@@ -154,6 +152,7 @@ class UserController extends Controller
     {
         return response()->json(User::scopeGetUser($id));
     }
+
     /**
      * 디스코드 아이디로 조회합니다.
      *
@@ -189,6 +188,7 @@ class UserController extends Controller
     {
         return response()->json(User::scopeGetUserByDiscordId($id));
     }
+
     /**
      * 이용자의 정보를 갱신합니다.
      *
@@ -338,6 +338,7 @@ class UserController extends Controller
                 'redirect_url' => $url.$request['token'],
                 'hit' => 0,
             ]);
+
             return $request['token'];
         } catch (\Exception $exception) {
             (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $datas);
@@ -349,9 +350,10 @@ class UserController extends Controller
     public function shortXsollaURL(string $token)
     {
         $url = XsollaUrl::where('token', $token)->first();
-        if($url->expired){
+        if ($url->expired) {
             return view('xsolla.short', ['token' => '', 'redirect_url' => '']);
         }
+
         return view('xsolla.short', ['token' => $url->token, 'redirect_url' => $url->redirect_url]);
     }
 }
