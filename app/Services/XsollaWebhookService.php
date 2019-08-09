@@ -323,6 +323,10 @@ class XsollaWebhookService
 
         $userData = $data['user'];
         $transactionData = $data['transaction'];
+        if (Receipt::scopeObserverTransaction($transactionData['id']) > 0) {
+            return ['error' => 'Duplicated point relevant'];
+        }
+
         $virtualCurrencyBalance = $data['virtual_currency_balance'];
         $user = User::scopeGetUser($userData['id']);
 
