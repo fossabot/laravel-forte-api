@@ -205,10 +205,10 @@ class XsollaWebhookService
 
         switch ($operationType) {
             case 'payment':
-                $this->operationPayment($data);
+                // $this->operationPayment($data);
                 break;
             case 'inGamePurchase':
-                $this->operationPurchase($data);
+                // $this->operationPurchase($data);
                 break;
             case 'coupon':
                 $this->operationCoupon($data);
