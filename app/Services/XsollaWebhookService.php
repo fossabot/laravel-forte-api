@@ -233,6 +233,8 @@ class XsollaWebhookService
     }
 
     /**
+     * handles in-game purchase.
+     * 
      * @param array $data
      * @return string
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_purchase
@@ -266,7 +268,6 @@ class XsollaWebhookService
 
         $userAction = [
             'name' => $userData['name'],
-            'email' => $userData['email'],
             'items' => $items,
             'balance' => $data['virtual_currency_balance'],
         ];
