@@ -234,7 +234,7 @@ class XsollaWebhookService
 
     /**
      * handles in-game purchase.
-     * 
+     *
      * @param array $data
      * @return string
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_purchase
