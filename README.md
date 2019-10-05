@@ -32,7 +32,7 @@
 ## Server Architecture
 - AWS EC2 (Ubuntu 18.06)
 - AWS Elastic Beanstalk
-- Docker
+- AWS RDS (Aurora via MySQL)
 
 ## Links
 - URL
@@ -193,7 +193,7 @@ $ sudo certbot --expand -d domain.com
 $ sudo service apache2 restart
 ```
 
-6. MySQL & PHPMyAdmin Install
+6. MySQL (Deprecated: use AWS RDS) & only PHPMyAdmin Install
 ```bash
 $ sudo apt-get install mysql-server php7.3-mysql
 $ service mysql restart
@@ -202,12 +202,30 @@ $ sudo apt-get install phpmyadmin php-mbstring php-gettext
 $ sudo phpenmod mcrypt
 $ sudo phpenmod mbstring
 $ service apache2 restart
+$ cd /etc/phpmyadmin/
+$ sudo vi config-db.php // edit dbname, dbpass, dbserver
+$ cd /usr/share/phpmyadmin
+$ sudo cp config.sample.inc.php config.inc.php
+```
 
+6-1. PHPMyAdmin RDS Setup
+```php
+// /usr/share/phpmyadmin/config.inc.php
+$i++;
+$cfg['Servers'][$i]['host'] = 'RDS HOST';
+$cfg['Servers'][$i]['port'] = '3306';
+$cfg['Servers'][$i]['socket'] = '';
+$cfg['Servers'][$i]['extension'] = 'mysql';
+$cfg['Servers'][$i]['compress'] = FALSE;
+$cfg['Servers'][$i]['compress'] = false;
+$cfg['Servers'][$i]['AllowNoPassword'] = false;
+$cfg['Servers'][$i]['connect_type'] = 'tcp';
+$cfg['Servers'][$i]['extension'] = 'mysqli';
 ```
 
 7. Clone
 ```
-$ git clone https://github.com/Team-Crescendo/laravel-central-api
+$ git clone https://github.com/team-crescendo/laravel-forte
 $ composer global require "laravel/installer"
 $ composer install
 $ chmod -R 775 storage bootstrap/cache storage/framework storage/logs
@@ -217,7 +235,7 @@ $ cp .env.example .env
 $ php artisan key:generate
 ```
 
-8. MySQL Setting
+8. MySQL Setting (Deprecated: use AWS RDS)
 ```bash
 $ sudo mysql -uroot -p
 mysql> create user 'sqluser'@'%' identified by 'password';
