@@ -11,7 +11,7 @@ sudo cp /var/www/release-files/requests /var/www/laravel-central-api/storage/req
 sudo cp /var/www/release-files/backups /var/www/laravel-central-api/storage/backups
 sudo php artisan key:generate
 sudo php artisan config:cache
-sudo chmod -R 775 storage bootstrap/cache storage/framework storage/logs
+sudo chmod -R 777 storage bootstrap/cache storage/framework storage/logs
 sudo chown -R $USER:www-data storage
 sudo chown -R $USER:www-data bootstrap/cache
 sudo pkill -9 -ef bot.php
