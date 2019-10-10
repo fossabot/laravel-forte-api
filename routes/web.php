@@ -14,6 +14,11 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('error', function () {
+    return view('xsolla.error');
+});
+
 Route::get('shops/{token}', 'UserController@shortXsollaURL')->name('xsolla.short')->middleware('auth.forte');
 /*
  * @deprecated admin dashboard
@@ -28,6 +33,7 @@ Route::prefix('dashboard/')->group(function () {
         Route::post('logout', 'DashboardController@logout')->name('dashboard.logout');
     });
 });
+
 Route::get('login/discord', function () {
     return \Socialite::with('discord')->redirect();
 })->name('login');

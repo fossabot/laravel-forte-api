@@ -331,6 +331,10 @@ class UserController extends Controller
 
             $request = json_decode($this->xsollaAPI->requestAPI('POST', 'merchants/:merchantId/token', $datas), true);
 
+            if (! $request['token']) {
+                return view('xsolla.error');
+            }
+
             XsollaUrl::create([
                 'token' => $request['token'],
                 'user_id' => $user->id,
