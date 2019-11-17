@@ -2,8 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use Closure;
 use App\Models\TrustIP;
+use Closure;
 use Illuminate\Http\Request;
 
 class CheckTrustIP

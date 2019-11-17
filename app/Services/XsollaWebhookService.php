@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Models\Item;
-use App\Models\User;
 use App\Models\Receipt;
+use App\Models\User;
 use App\Models\UserItem;
 use Illuminate\Support\Facades\DB;
 

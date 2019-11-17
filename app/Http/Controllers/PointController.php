@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\Client;
 use App\Models\Receipt;
-use Illuminate\Http\Request;
+use App\Models\User;
 use App\Services\XsollaAPIService;
+use Illuminate\Http\Request;
 
 class PointController extends Controller
 {
