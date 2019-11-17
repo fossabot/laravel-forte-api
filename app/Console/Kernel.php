@@ -4,9 +4,9 @@ namespace App\Console;
 
 use App\Console\Commands\BackupDB;
 use App\Console\Commands\CleanRequestLog;
+use App\Console\Commands\DepositUserPoint;
 use App\Console\Commands\RenewalClientToken;
 use App\Console\Commands\SyncXsollaItems;
-use App\Console\Commands\DepositUserPoint;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
