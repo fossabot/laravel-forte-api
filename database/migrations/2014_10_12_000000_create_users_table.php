@@ -19,6 +19,7 @@ class CreateUsersTable extends Migration
             $table->string('name')->comment('username');
             $table->string('email')->nullable();
             $table->bigInteger('points')->default(0)->comment('virtual currency balance');
+            $table->smallInteger('is_member')->comment('0: default, 1: support, 2: staff');
             $table->softDeletes();
             $table->timestamps();
         });
