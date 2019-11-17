@@ -2,12 +2,12 @@
 
 namespace App\Services;
 
-use Carbon\Carbon;
 use App\Mail\BackupDB;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Spatie\DbDumper\Databases\MySql;
-use Spatie\DbDumper\Exceptions\DumpFailed;
 use Spatie\DbDumper\Exceptions\CannotStartDump;
+use Spatie\DbDumper\Exceptions\DumpFailed;
 
 class BackupService
 {

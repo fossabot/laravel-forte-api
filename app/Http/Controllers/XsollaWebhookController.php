@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Services\XsollaWebhookService;
+use Illuminate\Http\Request;
 
 const TYPE_USER_VALIDATION = 'user_validation';
 const TYPE_USER_SEARCH = 'user_search';

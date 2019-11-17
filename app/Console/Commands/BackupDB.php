@@ -4,8 +4,8 @@ namespace App\Console\Commands;
 
 use App\Services\BackupService;
 use Illuminate\Console\Command;
-use Spatie\DbDumper\Exceptions\DumpFailed;
 use Spatie\DbDumper\Exceptions\CannotStartDump;
+use Spatie\DbDumper\Exceptions\DumpFailed;
 
 class BackupDB extends Command
 {

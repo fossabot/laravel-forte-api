@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Socialite;
+use App\Http\Requests\UserUpdateFormRequest;
 use App\Models\User;
 use App\Models\XsollaUrl;
-use Illuminate\Http\Request;
 use App\Services\XsollaAPIService;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\UserUpdateFormRequest;
+use Illuminate\Support\Facades\DB;
+use Socialite;
 
 class UserController extends Controller
 {

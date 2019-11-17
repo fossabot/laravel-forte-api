@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Http\Controllers\CleanLogController;
+use Illuminate\Console\Command;
 
 class CleanRequestLog extends Command
 {

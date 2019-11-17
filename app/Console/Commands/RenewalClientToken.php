@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Http\Controllers\ClientController;
+use Illuminate\Console\Command;
 
 class RenewalClientToken extends Command
 {
