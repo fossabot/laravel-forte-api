@@ -8,6 +8,8 @@ use App\Models\User;
 use App\Services\XsollaAPIService;
 use Illuminate\Http\Request;
 
+const MAX_POINT = 2000;
+
 class PointController extends Controller
 {
     /**
@@ -22,6 +24,54 @@ class PointController extends Controller
     public function __construct(XsollaAPIService $xsollaAPI)
     {
         $this->xsollaAPI = $xsollaAPI;
+    }
+
+    /**
+     * 스케쥴러에 의해 자동으로 스태프에게 MAX 포인트를 지급합니다.
+     */
+    public function schedule()
+    {
+        $staffs = User::where('is_member', '=', 2)->get();
+
+        foreach($staffs as $staff) {
+            $repetition = false;
+            $needPoint = 0;
+
+            if (! empty($staff->deleted_at)) {
+                continue;
+            }
+
+            $oldPoints = $staff->points;
+            $staff->points += MAX_POINT;
+            $staff->save();
+
+            $receipt = new Receipt;
+            $receipt->user_id = $staff->id;
+            $receipt->client_id = 5; // scheduler
+            $receipt->user_item_id = null;
+            $receipt->about_cash = 0;
+            $receipt->refund = 0;
+            $receipt->points_old = $oldPoints;
+            $receipt->points_new = $staff->points;
+            $receipt->save();
+
+            while (true) {
+                $datas = [
+                    'amount' => $repetition ? $needPoint : MAX_POINT,
+                    'comment' => 'Schedule Staff Deposit Point.',
+                ];
+
+                $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->user_id.'/recharge', $datas), true);
+
+                if ($staff->points !== $response['amount']) {
+                    $repetition = true;
+                    $needPoint = $staff->points - $response['amount'];
+                    continue;
+                } else {
+                    break;
+                }
+            }
+        }
     }
 
     /**

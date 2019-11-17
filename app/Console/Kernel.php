@@ -6,6 +6,7 @@ use App\Console\Commands\BackupDB;
 use App\Console\Commands\CleanRequestLog;
 use App\Console\Commands\RenewalClientToken;
 use App\Console\Commands\SyncXsollaItems;
+use App\Console\Commands\DepositUserPoint;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -35,6 +36,7 @@ class Kernel extends ConsoleKernel
         $schedule->command(CleanRequestLog::class)->daily();
         $schedule->command(RenewalClientToken::class)->twiceDaily(2, 14);
         $schedule->command(SyncXsollaItems::class)->dailyAt('02:00');
+        $schedule->command(DepositUserPoint::class)->monthlyOn(1, '00:30');
     }
 
     /**
