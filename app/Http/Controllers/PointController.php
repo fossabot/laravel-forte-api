@@ -33,7 +33,7 @@ class PointController extends Controller
     {
         $staffs = User::where('is_member', '=', 2)->get();
 
-        foreach($staffs as $staff) {
+        foreach ($staffs as $staff) {
             $repetition = false;
             $needPoint = 0;
 
