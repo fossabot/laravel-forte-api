@@ -100,4 +100,34 @@ $forte->registerSubCommand('items', function ($discord, $params) {
     'description' => 'Forte Items',
 ]);
 
+// discord id input convert user id
+$forte->registerSubCommand('deposit', function ($discord, $params) {
+    $id = $params[0];
+    $point = $params[1];
+
+    if (strlen($id) >= 18) {
+        if (getenv('APP_ENV') === 'local') {
+            $user = exec('curl -X GET "http://localhost:8000/api/v1/discords/'.$id.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
+        } else {
+            $user = exec('curl -X GET "https://forte.team-crescendo.me/api/v1/discords/'.$id.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
+        }
+
+        $user = json_decode($user);
+
+        $id = $user->id;
+    }
+
+    if (getenv('APP_ENV') === 'local') {
+        $res = exec('curl -X POST "http://localhost:8000/api/v1/users/'.$id.'/points?points='.$point.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
+    } else {
+        $res = exec('curl -X POST "https://forte.team-crescendo.me/api/v1/users/'.$id.'/points?points='.$point.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
+    }
+
+    $res = json_decode($res);
+
+    return $discord->reply('```'.$res->receipt_id.'```');
+}, [
+    'description' => 'Forte User Point Deposit',
+]);
+
 $discord->run();
