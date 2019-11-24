@@ -395,12 +395,17 @@ class UserController extends Controller
      */
     public function attendance(string $id)
     {
-        if (! Attendance::scopeTodayAttendance($id)) {
-            return 'a';
+        $attendance = Attendance::scopeTodayAttendance($id);
+        if (! $attendance) {
+            /**
+             * 일반 출석 체크: success
+             * 7일 개근: regular
+             */
         } else {
             return response()->json([
-                'status' => 'false',
+                'status' => 'exist_attendance',
                 'message' => 'exist today attend',
+                'created_at' => $attendance->created_at,
             ]);
         }
     }
