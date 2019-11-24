@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserUpdateFormRequest;
+use App\Models\Attendance;
 use App\Models\User;
 use App\Models\XsollaUrl;
 use App\Services\XsollaAPIService;
@@ -359,5 +360,48 @@ class UserController extends Controller
         }
 
         return view('xsolla.short', ['token' => $url->token, 'redirect_url' => $url->redirect_url]);
+    }
+
+    /**
+     * 팀 크레센도 디스코드 이용자가 출석체크를 합니다.
+     *
+     * @param string $id
+     * @return void
+     *
+     * @SWG\POST(
+     *     path="/discords/{discordId}/attendances",
+     *     description="User Attendance",
+     *     produces={"application/json"},
+     *     tags={"Discord"},
+     *     @SWG\Parameter(
+     *         name="Authorization",
+     *         in="header",
+     *         description="Authorization Token",
+     *         required=true,
+     *         type="string"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="discordId",
+     *         in="path",
+     *         description="Discord Id",
+     *         required=true,
+     *         type="string"
+     *     ),
+     *     @SWG\Response(
+     *         response=201,
+     *         description="Successful User Attendance"
+     *     ),
+     * )
+     */
+    public function attendance(string $id)
+    {
+        if (! Attendance::scopeTodayAttendance($id)) {
+            return 'a';
+        } else {
+            return response()->json([
+                'status' => 'false',
+                'message' => 'exist today attend',
+            ]);
+        }
     }
 }

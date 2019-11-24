@@ -15,6 +15,7 @@ Route::prefix('v1/')->middleware(['api.trust.ip', 'api.headers'])->group(functio
     Route::resource('users', 'UserController');
     Route::get('users/{user_id}/xsolla/token', 'UserController@xsollaToken');
     Route::get('discords/{discord_id}', 'UserController@discord');
+    Route::post('discords/{discord_id}/attendances', 'UserController@attendance');
 
     Route::get('items', 'ItemController@index');
     Route::get('items/{item_id}', 'ItemController@show');
