@@ -124,6 +124,23 @@ class DiscordNotificationController extends Controller
     }
 
     /**
+     * @param string $email
+     * @param int $discordId
+     * @param int $deposit
+     * @param int $point
+     * @return
+     */
+    public function point(string $email, int $discordId, int $deposit, int $point) {
+        return app(Discord::class)->send('648068498609799168', [
+            'content' => now().'] User Point Deposit Log',
+            'tts' => false,
+            'embed' => [
+                'description' => "EMAIL: {$email} \n Discord ID: {$discordId} \n Deposit: {$deposit} \n User Point: {$point}",
+            ],
+        ]);
+    }
+
+    /**
      * I dont know how to discord file upload
      * change discord to email.
      * @deprecated

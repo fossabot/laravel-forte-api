@@ -71,6 +71,8 @@ class PointController extends Controller
                     break;
                 }
             }
+
+            (new \App\Http\Controllers\DiscordNotificationController)->point($staff->email, $staff->discord_id, MAX_POINT, $staff->points);
         }
     }
 
@@ -169,6 +171,7 @@ class PointController extends Controller
             }
         }
 
+        (new \App\Http\Controllers\DiscordNotificationController)->point($user->email, $user->discord_id, $request->points, $user->points);
         return ['receipt_id' => $receipt->id];
     }
 }

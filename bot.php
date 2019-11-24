@@ -2,6 +2,7 @@
 
 include __DIR__.'/vendor/autoload.php';
 
+use Discord\Discord;
 use Discord\DiscordCommandClient;
 
 $dotenv = Dotenv\Dotenv::create(__DIR__);
@@ -14,6 +15,18 @@ $discord = new DiscordCommandClient([
         'disabledEvents' => ['PRESENCE_UPDATE'],
     ],
 ]);
+
+if (getenv('APP_ENV') === 'local') {
+    $discord->on('ready', function ($discord) {
+        echo "Bot is ready!", PHP_EOL;
+
+        // Listen for messages.
+        $discord->on('message', function ($message, $discord) {
+            echo $message->author->id;
+            echo "{$message->author->username}: {$message->content}", PHP_EOL;
+        });
+    });
+}
 
 $discord->registerCommand('uptime', function () {
     return exec('uptime', $system);
@@ -102,6 +115,14 @@ $forte->registerSubCommand('items', function ($discord, $params) {
 
 // discord id input convert user id
 $forte->registerSubCommand('deposit', function ($discord, $params) {
+    if (! $discord->author->roles[getenv('DISCORD_LARA_FORTE_DEPOSIT_AUTH_ROLE')]) {
+        return $discord->reply('You have no authority.');
+    }
+
+    if (! $params[0] || ! $params[1]) {
+        return $discord->reply('```Lara forte deposit <id> <point>```');
+    }
+
     $id = $params[0];
     $point = $params[1];
 
