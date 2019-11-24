@@ -42,13 +42,14 @@ if (getenv('APP_ENV') === 'local') {
                     print_r($attendance);
                     if ($attendance->status === 'exist_attendance') {
                         $now = new DateTime();
-                        $now->setTimezone(new DateTimeZone("Asia/Seoul"));
+                        $now->setTimezone(new DateTimeZone('Asia/Seoul'));
                         $tomorrow = new DateTime($attendance->created_at->date);
                         $tomorrow->modify('+1 day');
 
                         $diff = $tomorrow->diff($now);
-                        $diff = $diff->format("%hh %im %ss");
-                        return $message->reply('오늘은 이미 출석체크를 완료했습니다. ```'. $diff .'``` 후 다시 시도해주세요.');
+                        $diff = $diff->format('%hh %im %ss');
+
+                        return $message->reply('오늘은 이미 출석체크를 완료했습니다. ```'.$diff.'``` 후 다시 시도해주세요.');
                     } elseif ($attendance->status === 'success') {
                         return $message->reply(":zap:  **출석 체크 완료!** \n
 개근까지 앞으로 `5일` 남았습니다. 내일 또 만나요! \n
