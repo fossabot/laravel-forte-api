@@ -8,7 +8,7 @@ $dotenv = Dotenv\Dotenv::create(__DIR__);
 $dotenv->load();
 
 const API_VERSION = 'v1';
-define('PATH', (getenv('APP_ENV') === 'local' ? 'http://localhost:8000/api/'. API_VERSION : 'https://forte.team-crescendo.me/api/'. API_VERSION));
+define('PATH', (getenv('APP_ENV') === 'local' ? 'http://localhost:8000/api/'.API_VERSION : 'https://forte.team-crescendo.me/api/'.API_VERSION));
 
 $discord = new DiscordCommandClient([
     'token' => getenv('DISCORD_BOT_TOKEN'),
@@ -24,17 +24,17 @@ if (getenv('APP_ENV') === 'local') {
 
         // Listen for messages.
         $discord->on('message', function ($message, $discord) {
-            echo $message->author->id . " " . $message->content;
+            echo $message->author->id.' '.$message->content;
             if (strpos($message->content, '라라') !== false) {
                 if (strpos($message->content, '출석') || strpos($message->content, '출석체크') !== false) {
                     $id = $message->author->id; // discord id
-                    $attendance = exec('curl -X POST "'. PATH .'/users/'.$id.'/attendances" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
+                    $attendance = exec('curl -X POST "'.PATH.'/users/'.$id.'/attendances" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
                     $attendance = json_decode($attendance);
 
                     if ($attendance->status === 'false') {
                         return $message->reply('이미 출석체크를 했습니다.');
-                    } else if ($attendance->status === 'success') {
-                        return $message->reply('```' . $attendance . '```');
+                    } elseif ($attendance->status === 'success') {
+                        return $message->reply('```'.$attendance.'```');
                     }
                 }
             }
@@ -79,7 +79,7 @@ $forte = $discord->registerCommand('forte', function ($discord) {
 
 $forte->registerSubCommand('users', function ($discord, $params) {
     $userId = isset($params[0]) ? '/'.$params[0] : '';
-    $users = exec('curl -X GET "'. PATH .'/users'.$userId.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
+    $users = exec('curl -X GET "'.PATH.'/users'.$userId.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
 
     $users = json_decode($users);
     $string = '';
@@ -100,7 +100,7 @@ $forte->registerSubCommand('users', function ($discord, $params) {
 
 $forte->registerSubCommand('items', function ($discord, $params) {
     $itemId = isset($params[0]) ? '/'.$params[0] : '';
-    $items = exec('curl -X GET "'. PATH .'/items'.$itemId.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
+    $items = exec('curl -X GET "'.PATH.'/items'.$itemId.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
 
     $items = json_decode($items);
     $string = '';
@@ -133,14 +133,14 @@ $forte->registerSubCommand('deposit', function ($discord, $params) {
     $point = $params[1];
 
     if (strlen($id) >= 18) {
-        $user = exec('curl -X GET "'. PATH .'/discords/'.$id.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
+        $user = exec('curl -X GET "'.PATH.'/discords/'.$id.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
 
         $user = json_decode($user);
 
         $id = $user->id;
     }
 
-    $res = exec('curl -X POST "'. PATH .'/users/'.$id.'/points?points='.$point.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
+    $res = exec('curl -X POST "'.PATH.'/users/'.$id.'/points?points='.$point.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
 
     $res = json_decode($res);
 

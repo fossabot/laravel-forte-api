@@ -22,7 +22,7 @@ class Attendance extends Model
     /**
      * @param int $id
      */
-    public static function scope7daysAttendance(int $id) {
-
+    public static function scope7daysAttendance(int $id)
+    {
     }
 }
