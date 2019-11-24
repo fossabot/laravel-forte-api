@@ -18,7 +18,7 @@ $discord = new DiscordCommandClient([
 
 if (getenv('APP_ENV') === 'local') {
     $discord->on('ready', function ($discord) {
-        echo "Bot is ready!", PHP_EOL;
+        echo 'Bot is ready!', PHP_EOL;
 
         // Listen for messages.
         $discord->on('message', function ($message, $discord) {

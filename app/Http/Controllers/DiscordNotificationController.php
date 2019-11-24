@@ -130,7 +130,8 @@ class DiscordNotificationController extends Controller
      * @param int $point
      * @return
      */
-    public function point(string $email, int $discordId, int $deposit, int $point) {
+    public function point(string $email, int $discordId, int $deposit, int $point)
+    {
         return app(Discord::class)->send('648068498609799168', [
             'content' => now().'] User Point Deposit Log',
             'tts' => false,
