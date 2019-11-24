@@ -28,7 +28,16 @@ if (getenv('APP_ENV') === 'local') {
             if (strpos($message->content, '라라') !== false) {
                 if (strpos($message->content, '출석') || strpos($message->content, '출석체크') !== false) {
                     $id = $message->author->id; // discord id
-                    $attendance = exec('curl -X POST "'.PATH.'/users/'.$id.'/attendances" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
+                    $exist = json_decode(exec('curl -X GET "'.PATH.'/discords/'.$id.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system));
+                    print_r($exist);
+                    if (count(get_object_vars($exist)) <= 0) {
+                        return $message->reply(":warning: 팀 크레센도 FOTRE에 가입되어있지 않습니다.\n
+출석체크 및 개근 보상으로 POINT를 지급받기 위해선 FORTE 가입이 필요합니다.\n
+하단의 링크에서 Discord 계정 연동을 통해 가입해주세요.\n
+> https://forte.team-crescendo.me/login/discord");
+                    }
+
+                    $attendance = exec('curl -X POST "'.PATH.'/discords/'.$id.'/attendances" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
                     $attendance = json_decode($attendance);
 
                     if ($attendance->status === 'false') {
