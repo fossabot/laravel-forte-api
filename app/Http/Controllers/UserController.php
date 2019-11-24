@@ -397,7 +397,7 @@ class UserController extends Controller
     {
         $attendance = Attendance::scopeTodayAttendance($id);
         if (! $attendance) {
-            /**
+            /*
              * 일반 출석 체크: success
              * 7일 개근: regular
              */
