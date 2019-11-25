@@ -44,15 +44,15 @@ if (getenv('APP_ENV') === 'local') {
                     if ($attendance->status === 'exist_attendance') {
                         return $message->reply("오늘은 이미 출석체크를 완료했습니다. \n `{$attendance->diff}` 후 다시 시도해주세요.");
                     } elseif ($attendance->status === 'success') {
-                        $heart = "";
+                        $heart = '';
                         $day = 7 - $attendance->stack;
 
                         for ($i = 0; $i < $attendance->stack; $i++) {
-                            $heart .= ":hearts: ";
+                            $heart .= ':hearts: ';
                         }
 
                         for ($i = 0; $i < $day; $i++) {
-                            $heart .= ":black_heart: ";
+                            $heart .= ':black_heart: ';
                         }
 
                         return $message->reply(":zap:  **출석 체크 완료!** \n
