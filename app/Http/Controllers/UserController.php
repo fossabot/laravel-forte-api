@@ -426,6 +426,35 @@ class UserController extends Controller
                 'stack' => 1,
             ]);
         } else {
+            if ($attendance->stack == 0) {
+                $now = new DateTime();
+                $now->setTimezone(new DateTimeZone('Asia/Seoul'));
+                $tomorrow = new DateTime($attendance->updated_at);
+                $tomorrow->modify('+1 day');
+
+                if ($tomorrow > $now) {
+                    $data = $now->diff($tomorrow);
+                    $diff = $data->format('%hh %im %ss');
+
+                    return response()->json([
+                        'status' => 'exist_attendance',
+                        'message' => 'exist today attend',
+                        'diff' => $diff,
+                    ]);
+                } else {
+                    $attendance->update([
+                        'stack' => 1,
+                        'stacked_at' => json_encode([Carbon::now()->toDateTimeString()]),
+                        'updated_at' => now(),
+                    ]);
+
+                    return response()->json([
+                        'status' => 'success',
+                        'stack' => $attendance->stack,
+                    ]);
+                }
+            }
+
             $date = json_decode($attendance->stacked_at);
             $now = new DateTime();
             $now->setTimezone(new DateTimeZone('Asia/Seoul'));
@@ -461,8 +490,10 @@ class UserController extends Controller
                 $repetition = false;
                 $needPoint = 0;
 
+                $deposit = ($request->isPremium > 0 ? rand(20, 30) : rand(10, 20));
+
                 $oldPoints = $user->points;
-                $user->points += ($request->isPremium > 0 ? 20 : 10);
+                $user->points += $deposit;
                 $user->save();
 
                 $receipt = new Receipt;
@@ -477,7 +508,7 @@ class UserController extends Controller
 
                 while (true) {
                     $datas = [
-                        'amount' => $repetition ? $needPoint : ($request->isPremium > 0 ? 20 : 10),
+                        'amount' => $repetition ? $needPoint : $deposit,
                         'comment' => 'User Attendance Point.',
                     ];
 
@@ -492,7 +523,7 @@ class UserController extends Controller
                     }
                 }
 
-                (new \App\Http\Controllers\DiscordNotificationController)->point($user->email, $user->discord_id, ($request->isPremium > 0 ? 20 : 10), $user->points);
+                (new \App\Http\Controllers\DiscordNotificationController)->point($user->email, $user->discord_id, $deposit, $user->points);
 
                 $attendance->update([
                     'stack' => 0,
@@ -502,6 +533,7 @@ class UserController extends Controller
 
                 return response()->json([
                     'status' => 'regular',
+                    'point' => $deposit,
                 ]);
             }
         }
