@@ -8,13 +8,13 @@ use App\Models\Receipt;
 use App\Models\User;
 use App\Models\XsollaUrl;
 use App\Services\XsollaAPIService;
+use Carbon\Carbon;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Socialite;
-use Carbon\Carbon;
 
 class UserController extends Controller
 {
@@ -435,6 +435,7 @@ class UserController extends Controller
             $data = $tomorrow->diff($now);
             if ($data->invert > 0) {
                 $diff = $data->format('%hh %im %ss');
+
                 return response()->json([
                     'status' => 'exist_attendance',
                     'message' => 'exist today attend',
