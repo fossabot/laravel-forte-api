@@ -16,6 +16,8 @@ class CreateAttendancesTable extends Migration
         Schema::create('attendances', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('discord_id');
+            $table->smallInteger('stack')->default(1);
+            $table->json('stacked_at');
             $table->timestamps();
         });
     }

@@ -4,9 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserUpdateFormRequest;
 use App\Models\Attendance;
+use App\Models\Receipt;
 use App\Models\User;
 use App\Models\XsollaUrl;
 use App\Services\XsollaAPIService;
+use Carbon\Carbon;
+use DateTime;
+use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -365,9 +369,11 @@ class UserController extends Controller
     /**
      * 팀 크레센도 디스코드 이용자가 출석체크를 합니다.
      *
+     * @param Request $request
      * @param string $id
      * @return void
      *
+     * @throws \Exception
      * @SWG\POST(
      *     path="/discords/{discordId}/attendances",
      *     description="User Attendance",
@@ -387,21 +393,117 @@ class UserController extends Controller
      *         required=true,
      *         type="string"
      *     ),
+     *     @SWG\Parameter(
+     *         name="isPremium",
+     *         in="query",
+     *         description="User Premium Role Check",
+     *         required=true,
+     *         type="integer"
+     *     ),
      *     @SWG\Response(
      *         response=201,
      *         description="Successful User Attendance"
      *     ),
      * )
      */
-    public function attendance(string $id)
+    public function attendance(Request $request, string $id)
     {
-        if (! Attendance::scopeTodayAttendance($id)) {
-            return 'a';
-        } else {
-            return response()->json([
-                'status' => 'false',
-                'message' => 'exist today attend',
+        $attendance = Attendance::scopeExistAttendance($id);
+
+        // init attend
+        if (! $attendance) {
+            $date = [Carbon::now()->toDateTimeString()];
+            Attendance::insert([
+                'discord_id' => $id,
+                'stack' => 1,
+                'stacked_at' => json_encode($date),
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
+
+            return response()->json([
+                'status' => 'success',
+                'stack' => 1,
+            ]);
+        } else {
+            $date = json_decode($attendance->stacked_at);
+            $now = new DateTime();
+            $now->setTimezone(new DateTimeZone('Asia/Seoul'));
+            $tomorrow = new DateTime($date[count($date) - 1]);
+            $tomorrow->modify('+1 day');
+
+            $data = $tomorrow->diff($now);
+            if ($data->invert > 0) {
+                $diff = $data->format('%hh %im %ss');
+
+                return response()->json([
+                    'status' => 'exist_attendance',
+                    'message' => 'exist today attend',
+                    'data' => $data,
+                    'diff' => $diff,
+                ]);
+            }
+
+            if ($attendance->stack + 1 <= 6) {
+                array_push($date, Carbon::now()->toDateTimeString());
+                $attendance->update([
+                    'stack' => $attendance->stack + 1,
+                    'stacked_at' => json_encode($date),
+                    'updated_at' => now(),
+                ]);
+
+                return response()->json([
+                    'status' => 'success',
+                    'stack' => $attendance->stack,
+                ]);
+            } else {
+                $user = User::scopeGetUserByDiscordId($id);
+                $repetition = false;
+                $needPoint = 0;
+
+                $oldPoints = $user->points;
+                $user->points += ($request->isPremium > 0 ? 20 : 10);
+                $user->save();
+
+                $receipt = new Receipt;
+                $receipt->user_id = $user->id;
+                $receipt->client_id = 5; // Lara
+                $receipt->user_item_id = null;
+                $receipt->about_cash = 0;
+                $receipt->refund = 0;
+                $receipt->points_old = $oldPoints;
+                $receipt->points_new = $user->points;
+                $receipt->save();
+
+                while (true) {
+                    $datas = [
+                        'amount' => $repetition ? $needPoint : ($request->isPremium > 0 ? 20 : 10),
+                        'comment' => 'User Attendance Point.',
+                    ];
+
+                    $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->user_id.'/recharge', $datas), true);
+
+                    if ($user->points !== $response['amount']) {
+                        $repetition = true;
+                        $needPoint = $user->points - $response['amount'];
+                        continue;
+                    } else {
+                        break;
+                    }
+                }
+
+                (new \App\Http\Controllers\DiscordNotificationController)->point($user->email, $user->discord_id, ($request->isPremium > 0 ? 20 : 10), $user->points);
+
+                $attendance->update([
+                    'stack' => 0,
+                    'stacked_at' => json_encode([]),
+                    'updated_at' => now(),
+                ]);
+
+                return response()->json([
+                    'status' => 'regular',
+                ]);
+            }
         }
     }
 }

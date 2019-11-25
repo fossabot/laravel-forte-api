@@ -25,16 +25,53 @@ if (getenv('APP_ENV') === 'local') {
         // Listen for messages.
         $discord->on('message', function ($message, $discord) {
             echo $message->author->id.' '.$message->content;
-            if (strpos($message->content, '라라') !== false) {
+            if (strpos($message->content, '라라') !== false || strpos($message->content, '라라야') || explode(' ', $message->content)[0] == 'ㄹ') {
                 if (strpos($message->content, '출석') || strpos($message->content, '출석체크') !== false) {
                     $id = $message->author->id; // discord id
-                    $attendance = exec('curl -X POST "'.PATH.'/users/'.$id.'/attendances" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
+                    $isPremium = isset($message->author->roles[getenv('DISCORD_PREMIUM_ROLE')]) ? 1 : 0;
+                    $exist = json_decode(exec('curl -X GET "'.PATH.'/discords/'.$id.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system));
+
+                    if (count(get_object_vars($exist)) <= 0) {
+                        return $message->reply(":warning: 팀 크레센도 FOTRE에 가입되어있지 않습니다.\n
+출석체크 및 개근 보상으로 POINT를 지급받기 위해선 FORTE 가입이 필요합니다.\n
+하단의 링크에서 Discord 계정 연동을 통해 가입해주세요.\n
+> https://forte.team-crescendo.me/login/discord");
+                    }
+
+                    $attendance = exec('curl -X POST "'.PATH.'/discords/'.$id.'/attendances?isPremium='.$isPremium.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
                     $attendance = json_decode($attendance);
 
-                    if ($attendance->status === 'false') {
-                        return $message->reply('이미 출석체크를 했습니다.');
+                    if ($attendance->status === 'exist_attendance') {
+                        return $message->reply("오늘은 이미 출석체크를 완료했습니다. \n `{$attendance->diff}` 후 다시 시도해주세요.");
                     } elseif ($attendance->status === 'success') {
-                        return $message->reply('```'.$attendance.'```');
+                        $heart = '';
+                        $day = 7 - $attendance->stack;
+
+                        for ($i = 0; $i < $attendance->stack; $i++) {
+                            $heart .= ':hearts: ';
+                        }
+
+                        for ($i = 0; $i < $day; $i++) {
+                            $heart .= ':black_heart: ';
+                        }
+
+                        return $message->reply(":zap:  **출석 체크 완료!** \n
+개근까지 앞으로 `{$day}일` 남았습니다. 내일 또 만나요! \n
+{$heart} \n 
+
+__7일 연속으로__ 출석하면 FORTE STORE(포르테 스토어)에서 사용할 수 있는 개근 보상으로 :point~1: POINT를 지급해드립니다. \n 
+※ 개근 보상을 받을 때 `💎Premium` 역할을 보유하고 있다면 POINT가 추가로 지급됩니다! (자세한 사항은 #:book:premium_역할안내 를 확인해주세요.)");
+                    } elseif ($attendance->status === 'regular') {
+                        if ($isPremium > 0) {
+                            return $message->reply(":gift_heart: **개근 성공!** \n
+축하드립니다! 7일 연속 출석체크에 성공하여 개근 보상을 지급해드렸습니다. \n
+> `10`:point~1: \n
+> 프리미엄 추가 보상 `10`:point~1:");
+                        } else {
+                            return $message->reply(":gift_heart: **개근 성공!** \n
+축하드립니다! 7일 연속 출석체크에 성공하여 개근 보상을 지급해드렸습니다.\n
+> `10`:point~1:");
+                        }
                     }
                 }
             }
