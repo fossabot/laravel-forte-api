@@ -61,10 +61,11 @@ if (getenv('APP_ENV') === 'local' || getenv('APP_ENV') === 'production') {
 __7일 연속으로__ 출석하면 개근 보상으로 FORTE STORE(포르테 스토어)에서 사용할 수 있는 POINT를 지급해드립니다. \n
 ※ 개근 보상을 받을 때 `💎Premium` 역할을 보유하고 있다면 POINT가 추가로 지급됩니다! (자세한 사항은 #:book:premium_역할안내 를 확인해주세요.)");
                     } elseif ($attendance->status === 'regular') {
-                        echo 'point=============' . $attendance->point . "\n";
+                        echo 'point============='.$attendance->point."\n";
+
                         return $message->reply(":gift_heart: **개근 성공!** \n
 축하드립니다! 7일 연속으로 출석체크에 성공하여 개근 보상을 획득하였습니다. \n
-> `{$attendance->point}` POINT " . ($isPremium > 0 ? " (`💎Premium` 보유 보너스 포함) " : ""));
+> `{$attendance->point}` POINT ".($isPremium > 0 ? ' (`💎Premium` 보유 보너스 포함) ' : ''));
                     }
                 }
             }
