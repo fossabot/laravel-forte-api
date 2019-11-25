@@ -18,7 +18,7 @@ $discord = new DiscordCommandClient([
     ],
 ]);
 
-if (getenv('APP_ENV') === 'local') {
+if (getenv('APP_ENV') === 'local' || getenv('APP_ENV') === 'production') {
     $discord->on('ready', function ($discord) {
         echo 'Bot is ready!', PHP_EOL;
 
