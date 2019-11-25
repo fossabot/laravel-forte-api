@@ -28,6 +28,7 @@ if (getenv('APP_ENV') === 'local') {
             if (strpos($message->content, '라라') !== false || strpos($message->content, '라라야') || explode(' ', $message->content)[0] == 'ㄹ') {
                 if (strpos($message->content, '출석') || strpos($message->content, '출석체크') !== false) {
                     $id = $message->author->id; // discord id
+                    $isPremium = isset($message->author->roles[getenv('DISCORD_PREMIUM_ROLE')]) ? 1 : 0;
                     $exist = json_decode(exec('curl -X GET "'.PATH.'/discords/'.$id.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system));
 
                     if (count(get_object_vars($exist)) <= 0) {
@@ -37,30 +38,31 @@ if (getenv('APP_ENV') === 'local') {
 > https://forte.team-crescendo.me/login/discord");
                     }
 
-                    $attendance = exec('curl -X POST "'.PATH.'/discords/'.$id.'/attendances" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
+                    $attendance = exec('curl -X POST "'.PATH.'/discords/'.$id.'/attendances?isPremium='.$isPremium.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
                     $attendance = json_decode($attendance);
-                    print_r($attendance);
+
                     if ($attendance->status === 'exist_attendance') {
-                        $now = new DateTime();
-                        $now->setTimezone(new DateTimeZone('Asia/Seoul'));
-                        $tomorrow = new DateTime($attendance->created_at->date);
-                        $tomorrow->modify('+1 day');
-
-                        $diff = $tomorrow->diff($now);
-                        $diff = $diff->format('%hh %im %ss');
-
-                        return $message->reply('오늘은 이미 출석체크를 완료했습니다. ```'.$diff.'``` 후 다시 시도해주세요.');
+                        return $message->reply("오늘은 이미 출석체크를 완료했습니다. \n `{$attendance->diff}` 후 다시 시도해주세요.");
                     } elseif ($attendance->status === 'success') {
+                        $heart = "";
+                        $day = 7 - $attendance->stack;
+
+                        for ($i = 0; $i < $attendance->stack; $i++) {
+                            $heart .= ":hearts: ";
+                        }
+
+                        for ($i = 0; $i < $day; $i++) {
+                            $heart .= ":black_heart: ";
+                        }
+
                         return $message->reply(":zap:  **출석 체크 완료!** \n
-개근까지 앞으로 `5일` 남았습니다. 내일 또 만나요! \n
-:hearts: :hearts: :black_heart: :black_heart: :black_heart: :black_heart: :black_heart: \n 
+개근까지 앞으로 `{$day}일` 남았습니다. 내일 또 만나요! \n
+{$heart} \n 
 
 __7일 연속으로__ 출석하면 FORTE STORE(포르테 스토어)에서 사용할 수 있는 개근 보상으로 :point~1: POINT를 지급해드립니다. \n 
 ※ 개근 보상을 받을 때 `💎Premium` 역할을 보유하고 있다면 POINT가 추가로 지급됩니다! (자세한 사항은 #:book:premium_역할안내 를 확인해주세요.)");
                     } elseif ($attendance->status === 'regular') {
-                        $isPremium = $message->author->roles[getenv('DISCORD_LARA_FORTE_DEPOSIT_AUTH_ROLE')];
-
-                        if ($isPremium) {
+                        if ($isPremium > 0) {
                             return $message->reply(":gift_heart: **개근 성공!** \n
 축하드립니다! 7일 연속 출석체크에 성공하여 개근 보상을 지급해드렸습니다. \n
 > `10`:point~1: \n
