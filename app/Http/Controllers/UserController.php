@@ -426,6 +426,7 @@ class UserController extends Controller
                 'stack' => 1,
             ]);
         } else {
+            $date = json_decode($attendance->stacked_at);
             if ($attendance->stack == 0) {
                 $now = new DateTime();
                 $now->setTimezone(new DateTimeZone('Asia/Seoul'));
@@ -442,9 +443,10 @@ class UserController extends Controller
                         'diff' => $diff,
                     ]);
                 } else {
+                    array_push($date, Carbon::now()->toDateTimeString());
                     $attendance->update([
                         'stack' => 1,
-                        'stacked_at' => json_encode([Carbon::now()->toDateTimeString()]),
+                        'stacked_at' => json_encode($date),
                         'updated_at' => now(),
                     ]);
 
@@ -455,7 +457,6 @@ class UserController extends Controller
                 }
             }
 
-            $date = json_decode($attendance->stacked_at);
             $now = new DateTime();
             $now->setTimezone(new DateTimeZone('Asia/Seoul'));
             $tomorrow = new DateTime($date[count($date) - 1]);
