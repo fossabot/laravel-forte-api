@@ -17,6 +17,7 @@ class CreateAttendancesTable extends Migration
             $table->bigIncrements('id');
             $table->string('discord_id');
             $table->smallInteger('stack')->default(1);
+            $table->integer('accrue_stack')->default(1);
             $table->json('stacked_at');
             $table->timestamps();
         });

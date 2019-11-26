@@ -416,6 +416,7 @@ class UserController extends Controller
             Attendance::insert([
                 'discord_id' => $id,
                 'stack' => 1,
+                'accrue_stack' => 1,
                 'stacked_at' => json_encode($date),
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -446,6 +447,7 @@ class UserController extends Controller
                     array_push($date, Carbon::now()->toDateTimeString());
                     $attendance->update([
                         'stack' => 1,
+                        'accrue_stack' => $attendance->stack + 1,
                         'stacked_at' => json_encode($date),
                         'updated_at' => now(),
                     ]);
@@ -478,6 +480,7 @@ class UserController extends Controller
                 array_push($date, Carbon::now()->toDateTimeString());
                 $attendance->update([
                     'stack' => $attendance->stack + 1,
+                    'accrue_stack' => $attendance->stack + 1,
                     'stacked_at' => json_encode($date),
                     'updated_at' => now(),
                 ]);
@@ -538,5 +541,32 @@ class UserController extends Controller
                 ]);
             }
         }
+    }
+
+    /**
+     * 팀 크레센도 출석체크 랭킹을 불러옵니다.
+     *
+     * @return void
+     *
+     * @SWG\GET(
+     *     path="/discords/attendances/ranks",
+     *     description="User Attendance",
+     *     produces={"application/json"},
+     *     tags={"Discord"},
+     *     @SWG\Parameter(
+     *         name="Authorization",
+     *         in="header",
+     *         description="Authorization Token",
+     *         required=true,
+     *         type="string"
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Successful User Attendance Ranks"
+     *     ),
+     * )
+     */
+    public function attendanceRanks() {
+        return response()->json(Attendance::scopeAttendanceRanks());
     }
 }

@@ -26,7 +26,7 @@ if (getenv('APP_ENV') === 'local' || getenv('APP_ENV') === 'production') {
         $discord->on('message', function ($message, $discord) {
             echo $message->author->id.' '.$message->content;
             if (strpos($message->content, '라라') !== false || strpos($message->content, '라라야') || explode(' ', $message->content)[0] == 'ㄹ') {
-                if (strpos($message->content, '출석') || strpos($message->content, '출석체크') !== false) {
+                if (strpos($message->content, '출석체크') !== false) {
                     $id = $message->author->id; // discord id
                     $isPremium = isset($message->author->roles[getenv('DISCORD_PREMIUM_ROLE')]) ? 1 : 0;
                     $exist = json_decode(exec('curl -X GET "'.PATH.'/discords/'.$id.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system));
@@ -58,15 +58,25 @@ if (getenv('APP_ENV') === 'local' || getenv('APP_ENV') === 'production') {
                         return $message->reply(":zap:  **출석 체크 완료!** \n
 개근까지 앞으로 `{$day}일` 남았습니다. 내일 또 만나요! \n
 {$heart} \n 
-__7일 연속으로__ 출석하면 개근 보상으로 FORTE STORE(포르테 스토어)에서 사용할 수 있는 POINT를 지급해드립니다. \n
+__7일 연속으로__ 출석하면 출석 보상으로 FORTE STORE(포르테 스토어)에서 사용할 수 있는 POINT를 지급해드립니다. \n
 ※ 개근 보상을 받을 때 `💎Premium` 역할을 보유하고 있다면 POINT가 추가로 지급됩니다! (자세한 사항은 #:book:premium_역할안내 를 확인해주세요.)");
                     } elseif ($attendance->status === 'regular') {
-                        echo 'point============='.$attendance->point."\n";
-
-                        return $message->reply(":gift_heart: **개근 성공!** \n
-축하드립니다! 7일 연속으로 출석체크에 성공하여 개근 보상을 획득하였습니다. \n
+                        return $message->reply(":gift_heart: **출석 성공!** \n
+축하드립니다! 7일 누적으로 출석체크에 성공하여 개근 보상을 획득하였습니다. \n
 > `{$attendance->point}` POINT ".($isPremium > 0 ? ' (`💎Premium` 보유 보너스 포함) ' : ''));
                     }
+                } else if (strpos($message->content, '출석랭킹') !== false) {
+                    $ranks = exec('curl -X GET "'.PATH.'/discords/attendances/ranks" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
+
+                    $ranks = json_decode($ranks);
+                    $string = '';
+
+                    foreach ($ranks as $index => $rank) {
+                        $index++;
+                        $string .= $index.'. '.$rank->name.' ('. preg_replace('/(?<=.{3})./u','*', $rank->email) .') 누적 출석: ' . $rank->accrue_stack .PHP_EOL;
+                    }
+
+                    return $message->reply('```'.$string.'```');
                 }
             }
         });
