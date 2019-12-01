@@ -73,7 +73,7 @@ __7일 연속으로__ 출석하면 출석 보상으로 FORTE STORE(포르테 스
 
                     foreach ($ranks as $index => $rank) {
                         $index++;
-                        $string .= $index.'. '.substr($rank->name, 5)." \t(". preg_replace('/(?<=.{3})./u','*', substr($rank->email, 7)) .") \t누적 출석: " . $rank->accrue_stack .PHP_EOL;
+                        $string .= $index.'. '.substr($rank->name, 0, 5)." \t(". preg_replace('/(?<=.{3})./u','*', substr($rank->email, 0, 7)) .") \t누적 출석: " . $rank->accrue_stack .PHP_EOL;
                     }
 
                     return $message->reply('```'.$string.'```');
