@@ -65,7 +65,7 @@ __7일 연속으로__ 출석하면 출석 보상으로 FORTE STORE(포르테 스
 축하드립니다! 7일 누적으로 출석체크에 성공하여 개근 보상을 획득하였습니다. \n
 > `{$attendance->point}` POINT ".($isPremium > 0 ? ' (`💎Premium` 보유 보너스 포함) ' : ''));
                     }
-                } else if (strpos($message->content, '출석랭킹') !== false) {
+                } elseif (strpos($message->content, '출석랭킹') !== false) {
                     $ranks = exec('curl -X GET "'.PATH.'/discords/attendances/ranks" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
 
                     $ranks = json_decode($ranks);
@@ -73,7 +73,7 @@ __7일 연속으로__ 출석하면 출석 보상으로 FORTE STORE(포르테 스
 
                     foreach ($ranks as $index => $rank) {
                         $index++;
-                        $string .= $index.'. '.substr($rank->name, 0, 5)." \t(". preg_replace('/(?<=.{3})./u','*', substr($rank->email, 0, 7)) .") \t누적 출석: " . $rank->accrue_stack .PHP_EOL;
+                        $string .= $index.'. '.substr($rank->name, 0, 5)." \t(".preg_replace('/(?<=.{3})./u', '*', substr($rank->email, 0, 7)).") \t누적 출석: ".$rank->accrue_stack.PHP_EOL;
                     }
 
                     return $message->reply('```'.$string.'```');

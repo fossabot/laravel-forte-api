@@ -566,7 +566,8 @@ class UserController extends Controller
      *     ),
      * )
      */
-    public function attendanceRanks() {
+    public function attendanceRanks()
+    {
         return response()->json(Attendance::scopeAttendanceRanks());
     }
 }
