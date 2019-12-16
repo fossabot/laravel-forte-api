@@ -78,20 +78,20 @@ __7일 연속으로__ 출석하면 출석 보상으로 FORTE STORE(포르테 스
 
                     return $message->reply('```'.$string.'```');
                 } elseif ($command[1] == '구독') {
-                    $guild = $discord->guilds->get("name", "팀 크레센도 디스코드");
-                    if(! $message->author->roles->get("name", "구독자")) {
-                        $role = $guild->roles->get("name", "구독자");
-                        $message->author->addRole($role);
-                        $guild->members->save($message->author);
-                        return $message->reply('구독되었습니다.');
-                    }else{
-                        $role = $guild->roles->get("name", "구독자");
-                        $message->author->removeRole($role);
-                        $guild->members->save($message->author);
-                        return $message->reply('구독취소되었습니다.');
+                    if($message->channel->id == '648509969687117825'){
+                        $guild = $discord->guilds->get("name", "팀 크레센도 디스코드");
+                        if(! $message->author->roles->get("name", "구독자")) {
+                            $role = $guild->roles->get("name", "구독자");
+                            $message->author->addRole($role);
+                            $guild->members->save($message->author);
+                            return $message->reply('구독되었습니다.');
+                        }else{
+                            $role = $guild->roles->get("name", "구독자");
+                            $message->author->removeRole($role);
+                            $guild->members->save($message->author);
+                            return $message->reply('구독취소되었습니다.');
+                        }
                     }
-
-
                 }
             }
         });
