@@ -26,8 +26,8 @@ if (getenv('APP_ENV') === 'local' || getenv('APP_ENV') === 'production') {
             echo $message->author->id.' '.$message->content;
             $command = explode(' ', $message->content);
             if ($command[0] == '라라' || $command[0] == '라라야' || $command[0] == 'ㄹ') {
-                if($message->channel->guild_id != '348393122503458826' && $message->channel->guild_id != '399121287504723970'){
-                    return $message->reply(":warning: 팀 크레센도 디스코드에 서만 사용가능합니다.");
+                if ($message->channel->guild_id != '348393122503458826' && $message->channel->guild_id != '399121287504723970') {
+                    return $message->reply(':warning: 팀 크레센도 디스코드에 서만 사용가능합니다.');
                 }
                 if ($command[1] == '출석체크' || $command[1] == '출첵' || $command[1] == 'ㅊ') {
                     $id = $message->author->id; // discord id
@@ -42,8 +42,8 @@ if (getenv('APP_ENV') === 'local' || getenv('APP_ENV') === 'production') {
 
                     $attendance = exec('curl -X POST "'.PATH.'/discords/'.$id.'/attendances?isPremium='.$isPremium.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
                     $attendance = json_decode($attendance);
-                    if($attendance->error) {
-                        return $message->reply(":fire: 에러 발생. 잠시 후 다시 시도해주세요.");
+                    if ($attendance->error) {
+                        return $message->reply(':fire: 에러 발생. 잠시 후 다시 시도해주세요.');
                     }
                     if ($attendance->status === 'exist_attendance') {
                         return $message->reply("최근에 이미 출석체크를 완료했습니다. \n `{$attendance->diff}` 후 다시 시도해주세요.");
