@@ -62,8 +62,8 @@ if (getenv('APP_ENV') === 'local' || getenv('APP_ENV') === 'production') {
                         return $message->reply(":zap:  **출석 체크 완료!** \n
 개근까지 앞으로 `{$day}일` 남았습니다. 내일 또 만나요! \n
 {$heart} \n 
-__7일 연속으로__ 출석하면 출석 보상으로 FORTE STORE(포르테 스토어)에서 사용할 수 있는 POINT를 지급해드립니다. \n
-※ 개근 보상을 받을 때 `💎Premium` 역할을 보유하고 있다면 POINT가 추가로 지급됩니다! (자세한 사항은 #:book:premium_역할안내 를 확인해주세요.)");
+__7일 누적으로__ 출석하면 출석 보상으로 FORTE STORE(포르테 스토어)에서 사용할 수 있는 POINT를 지급해드립니다. \n
+※ 개근 보상을 받을 때 `💎Premium` 역할을 보유하고 있다면 POINT가 추가로 지급됩니다! (자세한 사항은 <#585653003122507796> 를 확인해주세요.)");
                     } elseif ($attendance->status === 'regular') {
                         return $message->reply(":gift_heart: **출석 성공!** \n
 축하드립니다! 7일 누적으로 출석체크에 성공하여 개근 보상을 획득하였습니다. \n
