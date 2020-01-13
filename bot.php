@@ -8,7 +8,7 @@ $dotenv = Dotenv\Dotenv::create(__DIR__);
 $dotenv->load();
 
 const API_VERSION = 'v1';
-define('PATH', (getenv('APP_ENV') === 'local' ? 'http://localhost:8000/api/'.API_VERSION : 'http://localhost:80/api/'.API_VERSION));
+define('PATH', (getenv('APP_ENV') === 'local' ? 'http://localhost:8000/api/'.API_VERSION : 'https://localhost/api/'.API_VERSION));
 
 $discord = new DiscordCommandClient([
     'token' => getenv('DISCORD_BOT_TOKEN'),
@@ -32,7 +32,7 @@ if (getenv('APP_ENV') === 'local' || getenv('APP_ENV') === 'production') {
                 if ($command[1] == '출석체크' || $command[1] == '출첵' || $command[1] == 'ㅊ') {
                     $id = $message->author->id; // discord id
                     $isPremium = isset($message->author->roles[getenv('DISCORD_PREMIUM_ROLE')]) ? 1 : 0;
-                    $exist = json_decode(exec('curl -X GET "'.PATH.'/discords/'.$id.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system));
+                    $exist = json_decode(exec('curl -X GET "'.PATH.'/discords/'.$id.'" -H "accept: application/json" -k -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system));
                     if (count(get_object_vars($exist)) <= 0) {
                         return $message->reply(":warning: 팀 크레센도 FOTRE에 가입되어있지 않습니다.\n
 출석체크 및 개근 보상으로 POINT를 지급받기 위해선 FORTE 가입이 필요합니다.\n
@@ -40,7 +40,7 @@ if (getenv('APP_ENV') === 'local' || getenv('APP_ENV') === 'production') {
 > https://forte.team-crescendo.me/login/discord");
                     }
 
-                    $attendance = exec('curl -X POST "'.PATH.'/discords/'.$id.'/attendances?isPremium='.$isPremium.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
+                    $attendance = exec('curl -X POST "'.PATH.'/discords/'.$id.'/attendances?isPremium='.$isPremium.'" -k -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
                     $attendance = json_decode($attendance);
                     if ($attendance->error) {
                         return $message->reply(':fire: 에러 발생. 잠시 후 다시 시도해주세요.');
@@ -70,7 +70,7 @@ __7일 누적으로__ 출석하면 출석 보상으로 FORTE STORE(포르테 스
 > `{$attendance->point}` POINT ".($isPremium > 0 ? ' (`💎Premium` 보유 보너스 포함) ' : ''));
                     }
                 } elseif ($command[1] == '출석랭킹') {
-                    $ranks = exec('curl -X GET "'.PATH.'/discords/attendances/ranks" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
+                    $ranks = exec('curl -X GET "'.PATH.'/discords/attendances/ranks" -H "accept: application/json" -k -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
 
                     $ranks = json_decode($ranks);
                     $string = '';
@@ -141,7 +141,7 @@ $forte = $discord->registerCommand('forte', function ($discord) {
 
 $forte->registerSubCommand('users', function ($discord, $params) {
     $userId = isset($params[0]) ? '/'.$params[0] : '';
-    $users = exec('curl -X GET "'.PATH.'/users'.$userId.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
+    $users = exec('curl -X GET "'.PATH.'/users'.$userId.'" -H "accept: application/json" -k -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
 
     $users = json_decode($users);
     $string = '';
@@ -162,7 +162,7 @@ $forte->registerSubCommand('users', function ($discord, $params) {
 
 $forte->registerSubCommand('items', function ($discord, $params) {
     $itemId = isset($params[0]) ? '/'.$params[0] : '';
-    $items = exec('curl -X GET "'.PATH.'/items'.$itemId.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
+    $items = exec('curl -X GET "'.PATH.'/items'.$itemId.'" -H "accept: application/json" -k -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
 
     $items = json_decode($items);
     $string = '';
@@ -195,14 +195,14 @@ $forte->registerSubCommand('deposit', function ($discord, $params) {
     $point = $params[1];
 
     if (strlen($id) >= 18) {
-        $user = exec('curl -X GET "'.PATH.'/discords/'.$id.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
+        $user = exec('curl -X GET "'.PATH.'/discords/'.$id.'" -H "accept: application/json" -k -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
 
         $user = json_decode($user);
 
         $id = $user->id;
     }
 
-    $res = exec('curl -X POST "'.PATH.'/users/'.$id.'/points?points='.$point.'" -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
+    $res = exec('curl -X POST "'.PATH.'/users/'.$id.'/points?points='.$point.'" -k -H "accept: application/json" -H "Authorization: '.getenv('DISCORD_LARA_TOKEN').'" -H "X-CSRF-TOKEN: "', $system);
 
     $res = json_decode($res);
 
