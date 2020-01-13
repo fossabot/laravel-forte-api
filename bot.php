@@ -8,7 +8,7 @@ $dotenv = Dotenv\Dotenv::create(__DIR__);
 $dotenv->load();
 
 const API_VERSION = 'v1';
-define('PATH', (getenv('APP_ENV') === 'local' ? 'http://localhost:8000/api/'.API_VERSION : 'https://forte.team-crescendo.me/api/'.API_VERSION));
+define('PATH', (getenv('APP_ENV') === 'local' ? 'http://localhost:8000/api/'.API_VERSION : 'http://localhost:80/api/'.API_VERSION));
 
 $discord = new DiscordCommandClient([
     'token' => getenv('DISCORD_BOT_TOKEN'),
