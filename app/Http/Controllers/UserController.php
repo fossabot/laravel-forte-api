@@ -321,7 +321,7 @@ class UserController extends Controller
                 ],
                 'settings' => [
                     'project_id' => (int) config('xsolla.projectId'),
-//                    'mode' => $mode ? 'sandbox' : '', // server is actually deployed, remove its contents
+                    //                    'mode' => $mode ? 'sandbox' : '', // server is actually deployed, remove its contents
                     'ui' => [
                         'theme' => 'default_dark',
                         'size' => 'large',
