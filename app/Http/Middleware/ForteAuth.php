@@ -15,7 +15,7 @@ class ForteAuth
      */
     public function handle($request, Closure $next)
     {
-        if (Auth::check() and Auth::user()->id == XsollaUrl::where('token', $request->token)->first()->user_id) {
+        if (Auth::check() && Auth::User()->id) {
             return $next($request);
         } else {
             return redirect()->route('login');
