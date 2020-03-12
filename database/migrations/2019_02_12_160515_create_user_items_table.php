@@ -20,7 +20,7 @@ class CreateUserItemsTable extends Migration
             $table->boolean('expired')->default(false)->comment('whether expiration time has passed or the cash was refunded');
             $table->boolean('consumed')->default(false);
             $table->boolean('sync')->default(false)->comment('whether bot(items.client_id) is notified of the change in this item');
-            $table->date('deleted_at')->nullable();
+            $table->timestamp('deleted_at')->nullable();
             $table->timestamps();
 
             $table->foreign('item_id')->references('id')->on('items');

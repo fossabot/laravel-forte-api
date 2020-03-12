@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\XsollaAPIService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -31,6 +32,10 @@ class UserItem extends Model
         'user_id', 'item_id', 'expired', 'consumed', 'sync',
     ];
 
+    protected $dates = [
+        'deleted_at',
+    ];
+
     /**
      * @brief 1:n relationship
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -46,7 +51,7 @@ class UserItem extends Model
      */
     public static function scopeUserItemLists(int $id)
     {
-        return self::with('item')->where('user_id', $id)->get();
+        return self::with('item')->where('user_id', $id)->orderBy('created_at', 'desc')->get();
     }
 
     /**
@@ -227,5 +232,31 @@ class UserItem extends Model
         ]);
 
         return ['message' => 'Successful Destroy User Item'];
+    }
+
+    /**
+     * @param int $itemId
+     * @return array
+     */
+    public static function scopeUserItemWithdraw(int $itemId) {
+        $user = User::scopeGetUser(\Auth::User()->id);
+
+        self::where('user_id', $user->id)->where('id', $itemId)->update([
+            'deleted_at' => date('Y-m-d H:m:s'),
+        ]);
+
+        $item = self::scopeUserItemDetail($user->id, $itemId);
+
+        $user->points = $user->points + $item->price;
+        $user->save();
+
+        $datas = [
+            'amount' => $item->price,
+            'comment' => 'User Item Withdraw Deposit Point.',
+        ];
+
+        (new \App\Services\XsollaAPIService)->requestAPI('POST', 'projects/:projectId/users/'.$user->id.'/recharge', $datas);
+
+        return ['message' => 'Successful Withdraw User Item'];
     }
 }
