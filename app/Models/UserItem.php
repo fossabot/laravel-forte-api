@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Services\XsollaAPIService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -238,7 +237,8 @@ class UserItem extends Model
      * @param int $itemId
      * @return array
      */
-    public static function scopeUserItemWithdraw(int $itemId) {
+    public static function scopeUserItemWithdraw(int $itemId)
+    {
         $user = User::scopeGetUser(\Auth::User()->id);
 
         self::where('user_id', $user->id)->where('id', $itemId)->update([
