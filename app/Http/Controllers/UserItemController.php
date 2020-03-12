@@ -255,19 +255,21 @@ class UserItemController extends Controller
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function inventory() {
+    public function inventory()
+    {
         $items = UserItem::scopeUserItemLists(\Auth::User()->id);
 
         return view('inventory', compact('items'));
     }
 
     /**
-     * 이용자 아이템 청약철회
+     * 이용자 아이템 청약철회.
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function withdraw(Request $request) {
+    public function withdraw(Request $request)
+    {
         $item = UserItem::scopeUserItemDetail(\Auth::User()->id, $request->id);
 
         if ($item) {
