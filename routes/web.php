@@ -19,9 +19,12 @@ Route::get('error', function () {
     return view('xsolla.error');
 });
 
-Route::get('inventory', 'UserItemController@inventory')->name('item.inventory')->middleware('auth.forte');
+// disable inventory and shops
+//Route::get('inventory', 'UserItemController@inventory')->name('item.inventory')->middleware('auth.forte');
+//Route::get('shops/{token}', 'UserController@shortXsollaURL')->name('xsolla.short')->middleware('auth.forte');
+Route::get('panel/{token}', 'UserController@panel')->name('user.panel')->middleware('auth.forte');
 Route::post('withdraw', 'UserItemController@withdraw');
-Route::get('shops/{token}', 'UserController@shortXsollaURL')->name('xsolla.short')->middleware('auth.forte');
+
 /*
  * @deprecated admin dashboard
  */

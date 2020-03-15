@@ -6,6 +6,7 @@ use App\Http\Requests\UserUpdateFormRequest;
 use App\Models\Attendance;
 use App\Models\Receipt;
 use App\Models\User;
+use App\Models\UserItem;
 use App\Models\XsollaUrl;
 use App\Services\XsollaAPIService;
 use Carbon\Carbon;
@@ -76,7 +77,7 @@ class UserController extends Controller
         }
         $user = User::scopeGetUserByDiscordId($discord_user->id);
         if (Auth::loginUsingId($user->id)) {
-            return redirect()->route('xsolla.short', $this->xsollaToken($user->id));
+            return redirect()->route('user.panel', $this->xsollaToken($user->id));
         } else {
             return redirect()->route('login');
         }
@@ -356,14 +357,22 @@ class UserController extends Controller
         }
     }
 
-    public function shortXsollaURL(string $token)
+    /**
+     * 2020. 03. 15
+     * shops/{token} 과 inventory 를 panel 로 합침
+     * panel 에서 포르테 상점과 인벤토리를 이용할 수 있도록.
+     *
+     * @param string $token
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function panel(string $token)
     {
         $url = XsollaUrl::where('token', $token)->first();
-        if ($url->expired) {
-            return view('xsolla.short', ['token' => '', 'redirect_url' => '']);
-        }
+        $items = UserItem::scopeUserItemLists($url->user_id);
 
-        return view('xsolla.short', ['token' => $url->token, 'redirect_url' => $url->redirect_url]);
+        if ($url->expired) $url->token = $url->redirect_url = '';
+
+        return view('panel', ['items' => $items, 'token' => $url->token, 'redirect_url' => $url->redirect_url]);
     }
 
     /**

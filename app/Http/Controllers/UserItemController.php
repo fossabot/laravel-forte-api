@@ -251,18 +251,6 @@ class UserItemController extends Controller
     }
 
     /**
-     * 이용자의 인벤토리 페이지를 반환합니다.
-     *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function inventory()
-    {
-        $items = UserItem::scopeUserItemLists(\Auth::User()->id);
-
-        return view('inventory', compact('items'));
-    }
-
-    /**
      * 이용자 아이템 청약철회.
      *
      * @param Request $request

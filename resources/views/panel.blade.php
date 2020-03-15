@@ -6,7 +6,7 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    <title>포르테 인벤토리</title>
+    <title>포르테 유저 패널 (User Panel)</title>
 
     <meta property="og:title" content="팀 크레센도 포르테 청약철회">
     <meta property="og:description" content="팀 크레센도 청약철회">
@@ -51,6 +51,7 @@
             padding-bottom: 3rem;
             margin-bottom: 0;
             background-color: #fff;
+            padding-left: 0 !important;
         }
 
         .jumbotron p:last-child {
@@ -79,52 +80,72 @@
 <main role="main">
     <section class="container">
         <div class="jumbotron">
-            <h1>포르테 인벤토리</h1>
+            <h1>포르테 유저 패널</h1>
+
+            <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="pills-inventory-tab" data-toggle="pill" href="#inventory" role="tab" aria-controls="inventory" aria-selected="true">인벤토리</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-shop-tab" data-toggle="pill" href="#shop" role="tab" aria-controls="shop" aria-selected="false">상점</a>
+                </li>
+            </ul>
         </div>
     </section>
 
     <div class="album py-5 bg-light">
         <div class="container">
-            <div class="row">
-                @if(count($items) < 1)
-                    <h1>아이템이 없습니다.</h1>
-                @endif
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade show active" id="inventory" role="tabpanel" aria-labelledby="pills-inventory-tab">
+                    <div class="row">
+                        @if(count($items) < 1)
+                            <h1>아이템이 없습니다.</h1>
+                        @endif
 
-                @foreach($items as $item)
-                    <div class="col-md-4">
-                        <div class="card mb-4 shadow-sm">
-                            <img class="card-img-top" src="{{ $item->item->image_url }}" alt="{{ $item->item->name }}">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ $item->item->name }}</h5>
-                                <p class="card-text">
-                                    @if($item->item->price > 0)
-                                        <img src="{{ asset('img/forte-point.png') }}" style="width: 18px; margin-top: -4px" /> {{ $item->item->price }}
-                                    @else
-                                        이벤트 지급
-                                    @endif
-                                </p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <small class="text-muted">
-                                    {{ isset($item->deleted_at) ? '철회: ' . $item->deleted_at->format('y년 m월 d일 H시 m분') : '구매: ' . $item->created_at->format('y년 m월 d일 H시 m분') }}
-                                    </small>
-                                    <div class="btn-group">
-                                        @if($item->consumed > 0)
-                                            <button type="button" class="btn btn-sm btn-outline-secondary" disabled>사용됨</button>
-                                        @elseif (date_diff(new \DateTime($item->created_at), new \DateTime())->format("%R%a") > 7)
-                                            <button type="button" class="btn btn-sm btn-outline-warning" disabled>
-                                                {{ date_diff(new \DateTime($item->created_at), new \DateTime())->format("%R%a")}} 일 지남
-                                            </button>
-                                        @elseif ($item->deleted_at)
-                                            <button type="button" class="btn btn-sm btn-outline-danger" disabled>청약철회 완료</button>
-                                        @else
-                                            <button id="btn-{{ $item->id }}" type="button" class="btn btn-sm btn-outline-success" onclick="withdraw({{ $item->id }})">청약철회</button>
-                                        @endif
+                        @foreach($items as $item)
+                            <div class="col-md-4">
+                                <div class="card mb-4 shadow-sm">
+                                    <img class="card-img-top" src="{{ $item->item->image_url }}" alt="{{ $item->item->name }}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ $item->item->name }}</h5>
+                                        <p class="card-text">
+                                            @if($item->item->price > 0)
+                                                <img src="{{ asset('img/forte-point.png') }}" style="width: 18px; margin-top: -4px" /> {{ $item->item->price }}
+                                            @else
+                                                이벤트 지급
+                                            @endif
+                                        </p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">
+                                            {{ isset($item->deleted_at) ? '철회: ' . $item->deleted_at->format('y년 m월 d일 H시 m분') : '구매: ' . $item->created_at->format('y년 m월 d일 H시 m분') }}
+                                            </small>
+                                            <div class="btn-group">
+                                                @if($item->consumed > 0)
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" disabled>사용됨</button>
+                                                @elseif (date_diff(new \DateTime($item->created_at), new \DateTime())->format("%R%a") > 7)
+                                                    <button type="button" class="btn btn-sm btn-outline-warning" disabled>
+                                                        {{ date_diff(new \DateTime($item->created_at), new \DateTime())->format("%R%a")}} 일 지남
+                                                    </button>
+                                                @elseif ($item->deleted_at)
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" disabled>청약철회 완료</button>
+                                                @else
+                                                    <button id="btn-{{ $item->id }}" type="button" class="btn btn-sm btn-outline-success" onclick="withdraw({{ $item->id }})">청약철회</button>
+                                                @endif
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        @endforeach
                     </div>
-                @endforeach
+                </div>
+
+                <div class="tab-pane fade" id="shop" role="tabpanel" aria-labelledby="pills-shop-tab">
+                    <div class="row">
+                        <embed type="text/html" src="{{ $redirect_url }}" style="top:0; left:0; width: 100%; height:550px;">
+{{--                        <iframe src="{{ $redirect_url }}" frameborder="0" allowfullscreen style="position:absolute; top:0; left:0; width: 100%; height:100%;" />--}}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -135,7 +156,7 @@
         <p class="float-right">
             <a href="#">Back to top</a>
         </p>
-        <img style="padding-bottom: 10px;" src="https://team-crescendo.me/wp-content/uploads/2019/07/Blue@2x.png">
+        <img style="width: 15rem; padding-bottom: 10px;" src="https://team-crescendo.me/wp-content/uploads/2019/07/Blue@2x.png">
         <p>© 2017-2020 Team Crescendo. All Right Reserved.</p>
     </div>
 </footer>
