@@ -6,7 +6,7 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    <title>포르테 유저 패널 (User Panel)</title>
+    <title>FORTE STORE</title>
 
     <meta property="og:title" content="팀 크레센도 포르테 청약철회">
     <meta property="og:description" content="팀 크레센도 청약철회">
@@ -80,7 +80,7 @@
 <main role="main">
     <section class="container">
         <div class="jumbotron">
-            <h1>포르테 유저 패널</h1>
+            <h1>FORTE STORE</h1>
 
             <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                 <li class="nav-item">
