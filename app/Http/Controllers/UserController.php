@@ -525,6 +525,8 @@ class UserController extends Controller
                     $datas = [
                         'amount' => $repetition ? $needPoint : $deposit,
                         'comment' => 'User Attendance Point.',
+                        'project_id' => env('XSOLLA_PROJECT_KEY'),
+                        'user_id' => $receipt->user_id,
                     ];
 
                     $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->user_id.'/recharge', $datas), true);

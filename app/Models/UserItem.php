@@ -257,6 +257,8 @@ class UserItem extends Model
             $datas = [
                 'amount' => $item->price,
                 'comment' => 'User Item Withdraw Deposit Point.',
+                'project_id' => env('XSOLLA_PROJECT_KEY'),
+                'user_id' => $user->id,
             ];
 
             $response = (new \App\Services\XsollaAPIService)->requestAPI('POST', 'projects/:projectId/users/'.$user->id.'/recharge', $datas);

@@ -350,6 +350,8 @@ class XsollaWebhookService
             $datas = [
                 'amount' => $repetition ? $needPoint : $virtualCurrencyBalance['new_value'],
                 'comment' => 'Updated User Point => xsolla',
+                'project_id' => env('XSOLLA_PROJECT_KEY'),
+                'user_id' => $receipt->user_id,
             ];
 
             $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->user_id.'/recharge', $datas), true);

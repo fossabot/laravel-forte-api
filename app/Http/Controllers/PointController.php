@@ -59,6 +59,8 @@ class PointController extends Controller
                 $datas = [
                     'amount' => $repetition ? $needPoint : MAX_POINT,
                     'comment' => 'Schedule Staff Deposit Point.',
+                    'project_id' => env('XSOLLA_PROJECT_KEY'),
+                    'user_id' => $receipt->user_id,
                 ];
 
                 $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->user_id.'/recharge', $datas), true);
@@ -158,6 +160,8 @@ class PointController extends Controller
             $datas = [
                 'amount' => $repetition ? $needPoint : $request->points,
                 'comment' => 'Updated User Point => '.Client::bringNameByToken($request->header('Authorization'))->name,
+                'project_id' => env('XSOLLA_PROJECT_KEY'),
+                'user_id' => $receipt->user_id,
             ];
 
             $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->user_id.'/recharge', $datas), true);
