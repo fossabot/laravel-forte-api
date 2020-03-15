@@ -22,6 +22,9 @@ Route::get('error', function () {
 // disable inventory and shops
 //Route::get('inventory', 'UserItemController@inventory')->name('item.inventory')->middleware('auth.forte');
 //Route::get('shops/{token}', 'UserController@shortXsollaURL')->name('xsolla.short')->middleware('auth.forte');
+Route::get('panel', function () {
+    return \Socialite::with('discord')->redirect();
+});
 Route::get('panel/{token}', 'UserController@panel')->name('user.panel')->middleware('auth.forte');
 Route::post('withdraw', 'UserItemController@withdraw');
 
