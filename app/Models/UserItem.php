@@ -239,6 +239,7 @@ class UserItem extends Model
      */
     public static function scopeUserItemWithdraw(int $itemId)
     {
+        $xsollaAPI = \App::make('App\Services\XsollaAPIService');
         $repetition = false;
         $needPoint = 0;
 
@@ -261,7 +262,7 @@ class UserItem extends Model
                 'user_id' => $user->id,
             ];
 
-            $response = (new \App\Services\XsollaAPIService)->requestAPI('POST', 'projects/:projectId/users/'.$user->id.'/recharge', $datas);
+            $response = json_decode($xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$user->id.'/recharge', $datas), true);
 
             if ($user->points !== $response['amount']) {
                 $repetition = true;
