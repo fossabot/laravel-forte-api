@@ -239,6 +239,9 @@ class UserItem extends Model
      */
     public static function scopeUserItemWithdraw(int $itemId)
     {
+        $repetition = false;
+        $needPoint = 0;
+
         $user = User::scopeGetUser(\Auth::User()->id);
 
         self::where('user_id', $user->id)->where('id', $itemId)->update([
@@ -250,12 +253,22 @@ class UserItem extends Model
         $user->points = $user->points + $item->price;
         $user->save();
 
-        $datas = [
-            'amount' => $item->price,
-            'comment' => 'User Item Withdraw Deposit Point.',
-        ];
+        while (true) {
+            $datas = [
+                'amount' => $item->price,
+                'comment' => 'User Item Withdraw Deposit Point.',
+            ];
 
-        (new \App\Services\XsollaAPIService)->requestAPI('POST', 'projects/:projectId/users/'.$user->id.'/recharge', $datas);
+            $response = (new \App\Services\XsollaAPIService)->requestAPI('POST', 'projects/:projectId/users/'.$user->id.'/recharge', $datas);
+
+            if ($user->points !== $response['amount']) {
+                $repetition = true;
+                $needPoint = $user->points - $response['amount'];
+                continue;
+            } else {
+                break;
+            }
+        }
 
         return ['message' => 'Successful Withdraw User Item'];
     }
