@@ -165,6 +165,10 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 
 <script>
+    $('.nav-link').click(function (e) {
+        window.location.href = e.currentTarget.href;
+    });
+
     function withdraw(id) {
         $.ajax({
             type:'POST',
