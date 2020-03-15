@@ -84,10 +84,10 @@
 
             <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" id="pills-inventory-tab" data-toggle="pill" href="#inventory" role="tab" aria-controls="inventory" aria-selected="true">인벤토리</a>
+                    <a class="nav-link active" id="pills-shop-tab" data-toggle="pill" href="#shop" role="tab" aria-controls="shop" aria-selected="false">상점</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="pills-shop-tab" data-toggle="pill" href="#shop" role="tab" aria-controls="shop" aria-selected="false">상점</a>
+                    <a class="nav-link" id="pills-inventory-tab" data-toggle="pill" href="#inventory" role="tab" aria-controls="inventory" aria-selected="true">인벤토리</a>
                 </li>
             </ul>
         </div>
@@ -96,7 +96,7 @@
     <div class="album py-5">
         <div class="container">
             <div class="tab-content" id="pills-tabContent">
-                <div class="tab-pane fade show active" id="inventory" role="tabpanel" aria-labelledby="pills-inventory-tab">
+                <div class="tab-pane fade" id="inventory" role="tabpanel" aria-labelledby="pills-inventory-tab">
                     <div class="row">
                         @if(count($items) < 1)
                             <h1>아이템이 없습니다.</h1>
@@ -140,7 +140,7 @@
                     </div>
                 </div>
 
-                <div class="tab-pane fade" id="shop" role="tabpanel" aria-labelledby="pills-shop-tab">
+                <div class="tab-pane fade show active" id="shop" role="tabpanel" aria-labelledby="pills-shop-tab">
                     <div class="row">
                         <embed type="text/html" src="{{ $redirect_url }}" style="top:0; left:0; width: 100%; height:550px;">
 {{--                        <iframe src="{{ $redirect_url }}" frameborder="0" allowfullscreen style="position:absolute; top:0; left:0; width: 100%; height:100%;" />--}}
