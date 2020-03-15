@@ -93,7 +93,7 @@
         </div>
     </section>
 
-    <div class="album py-5 bg-light">
+    <div class="album py-5">
         <div class="container">
             <div class="tab-content" id="pills-tabContent">
                 <div class="tab-pane fade show active" id="inventory" role="tabpanel" aria-labelledby="pills-inventory-tab">

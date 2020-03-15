@@ -324,7 +324,7 @@ class UserController extends Controller
                     'project_id' => (int) config('xsolla.projectId'),
                     //                    'mode' => $mode ? 'sandbox' : '', // server is actually deployed, remove its contents
                     'ui' => [
-                        'theme' => 'default_dark',
+                        'theme' => 'default',
                         'size' => 'large',
                         'components' => [
                             'virtual_items' => [
