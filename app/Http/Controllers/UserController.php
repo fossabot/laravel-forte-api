@@ -370,7 +370,9 @@ class UserController extends Controller
         $url = XsollaUrl::where('token', $token)->first();
         $items = UserItem::scopeUserItemLists($url->user_id);
 
-        if ($url->expired) $url->token = $url->redirect_url = '';
+        if ($url->expired) {
+            $url->token = $url->redirect_url = '';
+        }
 
         return view('panel', ['items' => $items, 'token' => $url->token, 'redirect_url' => $url->redirect_url]);
     }
