@@ -257,7 +257,7 @@ class UserItem extends Model
         while (true) {
             $datas = [
                 'amount' => $item->price,
-                'comment' => 'User Item Withdraw Deposit Point.',
+                'comment' => '포르테 아이템 청약철회',
                 'project_id' => env('XSOLLA_PROJECT_KEY'),
                 'user_id' => $user->id,
             ];

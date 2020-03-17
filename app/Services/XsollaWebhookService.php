@@ -154,7 +154,7 @@ class XsollaWebhookService
 
                 $datas = [
                     'amount' => $quantity,
-                    'comment' => 'Purchase '.$quantity.' points',
+                    'comment' => '구매 '.$quantity.' points',
                 ];
                 // $this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->user_id.'/recharge', $datas);
             }
@@ -349,7 +349,7 @@ class XsollaWebhookService
         while (true) {
             $datas = [
                 'amount' => $repetition ? $needPoint : $virtualCurrencyBalance['new_value'],
-                'comment' => 'Updated User Point => xsolla',
+                'comment' => '이용자 포인트 업데이트',
                 'project_id' => env('XSOLLA_PROJECT_KEY'),
                 'user_id' => $receipt->user_id,
             ];

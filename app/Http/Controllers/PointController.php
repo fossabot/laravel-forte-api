@@ -58,7 +58,7 @@ class PointController extends Controller
             while (true) {
                 $datas = [
                     'amount' => $repetition ? $needPoint : MAX_POINT,
-                    'comment' => 'Schedule Staff Deposit Point.',
+                    'comment' => '팀 크레센도 STAFF 보상',
                     'project_id' => env('XSOLLA_PROJECT_KEY'),
                     'user_id' => $receipt->user_id,
                 ];
@@ -159,7 +159,7 @@ class PointController extends Controller
         while (true) {
             $datas = [
                 'amount' => $repetition ? $needPoint : $request->points,
-                'comment' => 'Updated User Point => '.Client::bringNameByToken($request->header('Authorization'))->name,
+                'comment' => '이용자 포인트 지급',
                 'project_id' => env('XSOLLA_PROJECT_KEY'),
                 'user_id' => $receipt->user_id,
             ];
