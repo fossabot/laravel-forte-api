@@ -12,7 +12,6 @@ use App\Services\XsollaAPIService;
 use Carbon\Carbon;
 use Cassandra\Date;
 use DateTime;
-use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -444,7 +443,7 @@ class UserController extends Controller
                 $now = new DateTime();
 
                 if ($now->format('Y-m-d') === date_format(date_create($lastedAt), 'Y-m-d')) {
-                    $tomorrow = new DateTime(date('Y-m-d', strtotime('+1 days')) . ' 00:00:00');
+                    $tomorrow = new DateTime(date('Y-m-d', strtotime('+1 days')).' 00:00:00');
                     $data = $now->diff($tomorrow);
                     $diff = $data->format('%hh %im %ss');
 
