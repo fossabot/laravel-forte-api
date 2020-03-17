@@ -10,6 +10,7 @@ use App\Models\UserItem;
 use App\Models\XsollaUrl;
 use App\Services\XsollaAPIService;
 use Carbon\Carbon;
+use Cassandra\Date;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Http\Request;
@@ -427,10 +428,8 @@ class UserController extends Controller
             Attendance::insert([
                 'discord_id' => $id,
                 'stack' => 1,
-                'accrue_stack' => 1,
                 'stacked_at' => json_encode($date),
                 'created_at' => now(),
-                'updated_at' => now(),
             ]);
 
             return response()->json([
@@ -438,14 +437,14 @@ class UserController extends Controller
                 'stack' => 1,
             ]);
         } else {
-            $date = json_decode($attendance->stacked_at);
-            if ($attendance->stack == 0) {
-                $now = new DateTime();
-                $now->setTimezone(new DateTimeZone('Asia/Seoul'));
-                $tomorrow = new DateTime($attendance->updated_at);
-                $tomorrow->modify('+1 day');
+            $stackedAt = json_decode($attendance->stacked_at);
 
-                if ($tomorrow > $now) {
+            if ($attendance->stack < 6) {
+                $lastedAt = end($stackedAt);
+                $now = new DateTime();
+
+                if ($now->format('Y-m-d') === date_format(date_create($lastedAt), 'Y-m-d')) {
+                    $tomorrow = new DateTime(date('Y-m-d', strtotime('+1 days')) . ' 00:00:00');
                     $data = $now->diff($tomorrow);
                     $diff = $data->format('%hh %im %ss');
 
@@ -455,12 +454,11 @@ class UserController extends Controller
                         'diff' => $diff,
                     ]);
                 } else {
-                    array_push($date, Carbon::now()->toDateTimeString());
+                    array_push($stackedAt, Carbon::now()->toDateTimeString());
+
                     $attendance->update([
-                        'stack' => 1,
-                        'accrue_stack' => $attendance->stack + 1,
-                        'stacked_at' => json_encode($date),
-                        'updated_at' => now(),
+                        'stack' => $attendance->stack + 1,
+                        'stacked_at' => json_encode($stackedAt),
                     ]);
 
                     return response()->json([
@@ -468,38 +466,6 @@ class UserController extends Controller
                         'stack' => $attendance->stack,
                     ]);
                 }
-            }
-
-            $now = new DateTime();
-            $now->setTimezone(new DateTimeZone('Asia/Seoul'));
-            $tomorrow = new DateTime($date[count($date) - 1]);
-            $tomorrow->modify('+1 day');
-
-            $data = $tomorrow->diff($now);
-            if ($data->invert > 0) {
-                $diff = $data->format('%hh %im %ss');
-
-                return response()->json([
-                    'status' => 'exist_attendance',
-                    'message' => 'exist today attend',
-                    'data' => $data,
-                    'diff' => $diff,
-                ]);
-            }
-
-            if ($attendance->stack + 1 <= 6) {
-                array_push($date, Carbon::now()->toDateTimeString());
-                $attendance->update([
-                    'stack' => $attendance->stack + 1,
-                    'accrue_stack' => $attendance->stack + 1,
-                    'stacked_at' => json_encode($date),
-                    'updated_at' => now(),
-                ]);
-
-                return response()->json([
-                    'status' => 'success',
-                    'stack' => $attendance->stack,
-                ]);
             } else {
                 $user = User::scopeGetUserByDiscordId($id);
                 $repetition = false;
@@ -524,7 +490,7 @@ class UserController extends Controller
                 while (true) {
                     $datas = [
                         'amount' => $repetition ? $needPoint : $deposit,
-                        'comment' => 'User Attendance Point.',
+                        'comment' => '포르테 출석체크 보상',
                         'project_id' => env('XSOLLA_PROJECT_KEY'),
                         'user_id' => $receipt->user_id,
                     ];
@@ -542,10 +508,11 @@ class UserController extends Controller
 
                 (new \App\Http\Controllers\DiscordNotificationController)->point($user->email, $user->discord_id, $deposit, $user->points);
 
+                array_push($stackedAt, Carbon::now()->toDateTimeString());
+
                 $attendance->update([
                     'stack' => 0,
-                    'stacked_at' => json_encode([]),
-                    'updated_at' => now(),
+                    'stacked_at' => json_encode($stackedAt),
                 ]);
 
                 return response()->json([
