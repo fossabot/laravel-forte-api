@@ -443,7 +443,7 @@ class UserController extends Controller
                 $lastedAt = end($stackedAt);
                 $now = new DateTime();
 
-                if ($now->format('Y-m-d') === date_format(date_create($lastedAt), 'Y-m-d')) {
+                if ($lastedAt && $now->format('Y-m-d') === date_format(date_create($lastedAt), 'Y-m-d')) {
                     $tomorrow = new DateTime(date('Y-m-d', strtotime('+1 days')) . ' 00:00:00');
                     $data = $now->diff($tomorrow);
                     $diff = $data->format('%hh %im %ss');
