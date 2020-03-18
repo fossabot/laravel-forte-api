@@ -46,7 +46,7 @@ if (getenv('APP_ENV') === 'local' || getenv('APP_ENV') === 'production') {
                         return $message->reply(':fire: 에러 발생. 잠시 후 다시 시도해주세요.');
                     }
                     if ($attendance->status === 'exist_attendance') {
-                        return $message->reply("최근에 이미 출석체크를 완료했습니다. \n 내일 다시 시도해주세요.");
+                        return $message->reply("최근에 이미 출석체크를 완료했습니다. \n `{$attendance->diff}` 후 다시 시도해주세요.");
                     } elseif ($attendance->status === 'success') {
                         $heart = '';
                         $day = 7 - $attendance->stack;
