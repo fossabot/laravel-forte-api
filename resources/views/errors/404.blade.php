@@ -28,7 +28,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('img/favicon/favicon-16x16.png') }}">
 
     <style>
-        @import url('https://fonts.googleapis.com/css?family=Dosis:300,400,500');
+        @import url(//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-kr.css);
 
         @-moz-keyframes rocket-movement {
             100% {
@@ -152,7 +152,7 @@
             margin: 0;
             width: 100%;
             height: 100%;
-            font-family: 'Dosis', sans-serif;
+            font-family: 'Spoqa Han Sans', 'Spoqa Han Sans JP', 'Sans-serif', sans-serif;
             font-weight: 300;
             -webkit-user-select: none; /* Safari 3.1+ */
             -moz-user-select: none; /* Firefox 2+ */
@@ -270,7 +270,6 @@
 
         .central-body {
             /*    width: 100%;*/
-            padding: 17% 5% 10% 5%;
             text-align: center;
             color: white;
         }
@@ -393,10 +392,6 @@
             .box_astronaut {
                 top: 70%;
             }
-
-            .central-body {
-                padding-top: 25%;
-            }
         }
     </style>
 
@@ -416,19 +411,16 @@
         </div>
     </div>
     <div class="central-body">
-        <h1 style="margin-bottom: 100px;">FORTE API</h1>
-        <h1>죄송합니다, 에러가 발생하여 우주에서 길을 잃었습니다.</h1>
-        <h1>창을 닫고 재시도 해주시기 바랍니다.</h1>
+        <img src="{{ asset('img/forte-undefined.png') }}" style="width: 25rem">
+        <h1>앗! 오류가 발생했습니다!</h1>
+        <div style="line-height: 8px;">
+            <h3>이용에 불편을 드려서 죄송합니다.</h3>
+            <h3>잠시 후 다시 시도해주세요.</h3>
+            <h3>창을 닫고 재시도 해주시기 바랍니다.</h3>
+        </div>
     </div>
     <div class="objects">
         <img class="object_rocket" src="http://salehriaz.com/404Page/img/rocket.svg" width="40px">
-        <div class="earth-moon">
-            <img class="object_earth" src="http://salehriaz.com/404Page/img/earth.svg" width="100px">
-            <img class="object_moon" src="http://salehriaz.com/404Page/img/moon.svg" width="80px">
-        </div>
-        <div class="box_astronaut">
-            <img class="object_astronaut" src="http://salehriaz.com/404Page/img/astronaut.svg" width="140px">
-        </div>
     </div>
     <div class="glowing_stars">
         <div class="star"></div>
