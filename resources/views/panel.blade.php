@@ -185,8 +185,12 @@
                 $('#btn-' + id).addClass('btn-outline-danger');
                 $('#btn-' + id).prop('disabled', true);
                 $('#btn-' + id).attr('onclick', '');
-            }, error: function() {
-                alert('다시 시도해주세요.');
+            }, error: function(data) {
+                if (data.status === 403) {
+                    alert('해당 아이템은 구매 즉시 사용되는 것으로 간주되어 청약철회가 불가능합니다.');
+                } else {
+                    alert('다시 시도해주세요.');
+                }
             }
         });
     }

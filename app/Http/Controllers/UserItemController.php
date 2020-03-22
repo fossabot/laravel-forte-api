@@ -6,6 +6,10 @@ use App\Models\User;
 use App\Models\UserItem;
 use Illuminate\Http\Request;
 
+const DISABLE_WITHDRAW_ITEMS = [
+    'skb_5', 'skb_9', 'skb_12',
+];
+
 class UserItemController extends Controller
 {
     /**
@@ -260,10 +264,14 @@ class UserItemController extends Controller
     {
         $item = UserItem::scopeUserItemDetail(\Auth::User()->id, $request->id);
 
+        if (in_array($item->sku, DISABLE_WITHDRAW_ITEMS)) {
+            return response()->json(['message' => 'Upon purchase is considered to be used this item for withdrawal is not possible.'], 403);
+        }
+
         if ($item) {
             return response()->json(UserItem::scopeUserItemWithdraw($request->id));
         } else {
-            return response()->json(['message' => 'Accepted'], 400);
+            return response()->json(['message' => 'ERROR'], 400);
         }
     }
 }
