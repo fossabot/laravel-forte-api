@@ -254,6 +254,7 @@ class UserItem extends Model
         $user->points = $user->points + $item->price;
         $user->save();
 
+        $datas = [];
         while (true) {
             $datas = [
                 'amount' => $item->price,
@@ -272,6 +273,11 @@ class UserItem extends Model
                 break;
             }
         }
+
+        unset($datas['project_id']);
+        $datas['email'] = $user->email;
+        array_push($datas, $item);
+        (new \App\Http\Controllers\DiscordNotificationController)->xsollaUserAction('User Item Withdraw', $datas);
 
         return ['message' => 'Successful Withdraw User Item'];
     }
