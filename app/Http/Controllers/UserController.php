@@ -378,6 +378,32 @@ class UserController extends Controller
     }
 
     /**
+     * 팀 크레센도 출석체크를 불러옵니다.
+     * @return mixed
+     *
+     * @SWG\GET(
+     *     path="/discords/attendances",
+     *     description="User Attendances",
+     *     produces={"application/json"},
+     *     tags={"Discord"},
+     *     @SWG\Parameter(
+     *         name="Authorization",
+     *         in="header",
+     *         description="Authorization Token",
+     *         required=true,
+     *         type="string"
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Successful User Attendances"
+     *     ),
+     * )
+     */
+    public function attendances() {
+        return Attendance::scopeAttendances();
+    }
+
+    /**
      * 팀 크레센도 디스코드 이용자가 출석체크를 합니다.
      *
      * @param Request $request

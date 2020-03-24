@@ -21,8 +21,18 @@ class Attendance extends Model
         return self::where('discord_id', $id)->first();
     }
 
+    /**
+     * @return mixed
+     */
+    public static function scopeAttendances() {
+        return self::get();
+    }
+
+    /**
+     * @return mixed
+     */
     public static function scopeAttendanceRanks()
     {
-        return self::leftJoin('users', 'users.discord_id', '=', 'attendances.discord_id')->orderBy('stack', 'desc')->take(10)->get();
+        return self::leftJoin('users', 'users.discord_id', '=', 'attendances.discord_id')->orderBy('stacked_at', 'desc')->take(10)->get();
     }
 }
