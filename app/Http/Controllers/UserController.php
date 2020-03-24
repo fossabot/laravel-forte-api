@@ -10,8 +10,6 @@ use App\Models\UserItem;
 use App\Models\XsollaUrl;
 use App\Services\XsollaAPIService;
 use Carbon\Carbon;
-use Cassandra\Date;
-use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -399,7 +397,8 @@ class UserController extends Controller
      *     ),
      * )
      */
-    public function attendances() {
+    public function attendances()
+    {
         return Attendance::scopeAttendances();
     }
 
@@ -464,7 +463,7 @@ class UserController extends Controller
         } else {
             $stackedAt = json_decode($attendance->stacked_at);
             $lastedAt = end($stackedAt);
-            
+
             if ($lastedAt && Carbon::parse($lastedAt)->isToday()) {
                 $diff = Carbon::now()->diff(Carbon::tomorrow())->format('%hh %im %ss');
 
