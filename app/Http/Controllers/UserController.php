@@ -10,8 +10,6 @@ use App\Models\UserItem;
 use App\Models\XsollaUrl;
 use App\Services\XsollaAPIService;
 use Carbon\Carbon;
-use Cassandra\Date;
-use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -399,7 +397,8 @@ class UserController extends Controller
      *     ),
      * )
      */
-    public function attendances() {
+    public function attendances()
+    {
         return Attendance::scopeAttendances();
     }
 
@@ -463,34 +462,30 @@ class UserController extends Controller
             ]);
         } else {
             $stackedAt = json_decode($attendance->stacked_at);
+            $lastedAt = end($stackedAt);
+
+            if ($lastedAt && Carbon::parse($lastedAt)->isToday()) {
+                $diff = Carbon::now()->diff(Carbon::tomorrow())->format('%hh %im %ss');
+
+                return response()->json([
+                    'status' => 'exist_attendance',
+                    'message' => 'exist today attend',
+                    'diff' => $diff,
+                ]);
+            }
 
             if ($attendance->stack < 6) {
-                $lastedAt = end($stackedAt);
-                $now = new DateTime();
+                array_push($stackedAt, Carbon::now()->toDateTimeString());
 
-                if ($lastedAt && $now->format('Y-m-d') === date_format(date_create($lastedAt), 'Y-m-d')) {
-                    $tomorrow = new DateTime(date('Y-m-d', strtotime('+1 days')).' 00:00:00');
-                    $data = $now->diff($tomorrow);
-                    $diff = $data->format('%hh %im %ss');
+                $attendance->update([
+                    'stack' => $attendance->stack + 1,
+                    'stacked_at' => json_encode($stackedAt),
+                ]);
 
-                    return response()->json([
-                        'status' => 'exist_attendance',
-                        'message' => 'exist today attend',
-                        'diff' => $diff,
-                    ]);
-                } else {
-                    array_push($stackedAt, Carbon::now()->toDateTimeString());
-
-                    $attendance->update([
-                        'stack' => $attendance->stack + 1,
-                        'stacked_at' => json_encode($stackedAt),
-                    ]);
-
-                    return response()->json([
-                        'status' => 'success',
-                        'stack' => $attendance->stack,
-                    ]);
-                }
+                return response()->json([
+                    'status' => 'success',
+                    'stack' => $attendance->stack,
+                ]);
             } else {
                 $user = User::scopeGetUserByDiscordId($id);
                 $repetition = false;

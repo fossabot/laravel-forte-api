@@ -24,7 +24,8 @@ class Attendance extends Model
     /**
      * @return mixed
      */
-    public static function scopeAttendances() {
+    public static function scopeAttendances()
+    {
         return self::get();
     }
 
