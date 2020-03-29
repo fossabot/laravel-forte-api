@@ -9,6 +9,7 @@
 - 김민근 ([@getsolaris](https://github.com/getsolaris)) mingeun.k.k@gmail.com
 - 이정민 ([@GBS-Skile](https://github.com/GBS-Skile)) skile@team-crescendo.me
 - 강희원 ([@Kang-Heewon](https://github.com/Kang-Heewon)) heewon.dev@gmail.com
+- 모훈 ([@Mo-hun](https://github.com/Mo-hun)) twicemomo@kakao.com
 
 ## Infra Architecture
 - AWS EC2 (Ubuntu 18.06)
