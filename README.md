@@ -80,14 +80,42 @@ API 에러트래킹은 `Sentry`를 사용합니다. 디스코드 로깅 채널�
     - develop: 개발을 포함한 이슈에는 해당 라벨을 추가합니다.
     - feature: 신규 개발 시 해당 라벨을 추가합니다.
     
-### Commit Message
-- Added
-- Modify
-- Removed
+### Commit Message Rules
+1. 커밋 메시지는 *한글*로 작성합니다.
+2. 메세지 본문에는 3자가 쉽게 이해할 수 있도록 풀어서 작성합니다.
+3. 커밋 메시지에는 이모지를 넣지 않습니다.
 
-### Issue Tracking Message
-- Feature #1 - Title
-- Fix #1 - Title
+### Commit Message Type
+- 기능: 기능 추가, 삭제, 변경
+- 버그: 버그 수정
+- 리팩토링: 코드 리팩토링
+- 형식: 코드 형식, 정렬, 주석 등의 변경 (코드 수정, 하지만 동작에 영향은 없는 코드)
+- 테스트: 테스트 코드 추가, 삭제, 변경 등
+- 문서: 문서 추가, 삭제, 변경
+- 기타: 위 여섯가지에 해당되지 않는 모든 변경 (ex: 배포 스크립트 변경)을 포함
+
+### Commit Message Configuration
+
+```
+Type: Title
+
+ex) 기능: 포르테 스토어 서비스단 구현
+ex) 기능: 포르테 API 요청에 관련된 로그 출력 기능 구현
+ex) 형식: UserController store 메서드 주석 수정
+ex) 문서: 리드미 인프라 부분 수정 
+```
+
+### Issue Tracking Commit Type
+- 해결: 이슈 해결 시 사용
+- 관련: 이슈 해결되지 않은 경우
+- 참고: 참고할 이슈가 있을 때 사용
+
+### Issue Tracking Commit Configuration
+
+```
+Type: #n Title
+ex) 해결: #54 포르테 스토어 청약철회 에러 수정
+```
 
 ### Collaboration
 - 이슈 작성 시 `Merge when green` 라벨이 붙으면 TravisCI 및 StyleCI 가 정상 작동하면 자동으로 Merge
