@@ -16,26 +16,24 @@ TZ='Asia/Seoul'; export TZ
 $ source ~/.profile
 ```
 
-2. PHP 7.3 Install
+2. PHP 7.4 Install
 ```bash
 $ sudo add-apt-repository ppa:ondrej/php 
 $ sudo apt-get update
-# $ sudo apt-get install php7.1 php7.1-mcrypt php7.1-xml php7.1-gd php7.1-opcache php7.1-mbstring php7.1-curl php7.1-zip
-$ sudo apt install php7.3 php7.3-common php7.3-cli
-$ apt install php7.3-bcmath php7.3-bz2 php7.3-curl php7.3-gd php7.3-intl php7.3-json php7.3-mbstring php7.3-readline php7.3-xml php7.3-zip
+$ sudo apt install php7.4 php7.4-common php7.4-cli
+$ apt install php7.4-curl php7.4-json php7.4-xml php7.4-gd php7.4-mbstring php7.4-intl php7.4-bcmath php7.4-bz2 php7.4-readline php7.4-zip
 ```
 
-3. Apache Install (Apache 와 PHP를 연결하기 위해 libapache2-mod-php7.1 패키지를 설치해야함)
+3. Apache Install (Apache 와 PHP를 연결하기 위해 libapache2-mod-php7.4 패키지를 설치해야함)
 ```bash
-# $ sudo apt-get install apache2 libapache2-mod-php7.1
-$ sudo apt install php7.3-fpm
-$ sudo apt install libapache2-mod-php7.3
+$ sudo apt-get install apache2 libapache2-mod-php7.4
+# $ sudo apt install php7.4-fpm
 
-# enable PHP 7.3 and restart Apache2
-$ sudo a2enmod php7.3
+# enable PHP 7.4 and restart Apache2
+$ sudo a2enmod php7.4
 
 # If old PHP Version
-$ sudo apt purge php7.1 php7.1-common
+$ sudo apt purge php7.3 libapache2-mod-php7.3
 ```
 
 4. Laravel Install
