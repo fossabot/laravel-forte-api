@@ -2,12 +2,11 @@
 
 namespace App\Services;
 
-use App\Mail\BackupDB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Spatie\DbDumper\Databases\MySql;
 use Spatie\DbDumper\Exceptions\CannotStartDump;
 use Spatie\DbDumper\Exceptions\DumpFailed;
-use Illuminate\Support\Facades\Storage;
 
 class BackupService
 {
@@ -35,6 +34,6 @@ class BackupService
         $yymm = Carbon::now()->format('Y-m');
         $yymmdd = Carbon::now()->format('Y-m-d');
         $path = storage_path().'/backups/'.$this->today.'.sql';
-        Storage::disk('s3')->put('SQL/' . $yymm . '/' . $yymmdd . '.sql' , file_get_contents($path));
+        Storage::disk('s3')->put('SQL/'.$yymm.'/'.$yymmdd.'.sql', file_get_contents($path));
     }
 }
