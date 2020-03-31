@@ -4,10 +4,10 @@ namespace App\Services;
 
 use App\Mail\BackupDB;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Mail;
 use Spatie\DbDumper\Databases\MySql;
 use Spatie\DbDumper\Exceptions\CannotStartDump;
 use Spatie\DbDumper\Exceptions\DumpFailed;
+use Illuminate\Support\Facades\Storage;
 
 class BackupService
 {
@@ -15,14 +15,6 @@ class BackupService
      * @var string
      */
     protected $today;
-
-    /**
-     * BackupService constructor.
-     */
-    public function __construct()
-    {
-        $this->today = Carbon::now()->format('Y-m-d');
-    }
 
     /**
      * @throws DumpFailed
@@ -40,8 +32,9 @@ class BackupService
             ->setPassword(config('database.connections.mysql.password'))
             ->dumpToFile(storage_path().'/backups/'.$this->today.'.sql');
 
-//        (new \App\Http\Controllers\DiscordNotificationController)->backupSQL();
-
-        Mail::send(new BackupDB());
+        $yymm = Carbon::now()->format('Y-m');
+        $yymmdd = Carbon::now()->format('Y-m-d');
+        $path = storage_path().'/backups/'.$this->today.'.sql';
+        Storage::disk('s3')->put('SQL/' . $yymm . '/' . $yymmdd . '.sql' , file_get_contents($path));
     }
 }
