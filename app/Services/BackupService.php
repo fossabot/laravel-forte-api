@@ -42,9 +42,10 @@ class BackupService
     }
 
     /**
-     * Request Log backup
+     * Request Log backup.
      */
-    public function request() {
+    public function request()
+    {
         $path = storage_path().'/requests/'.$this->yesterday.'.log';
         Storage::disk('s3')->put('Request/'.substr($this->yesterday, 0, 7).'/'.$this->yesterday.'.log', file_get_contents($path));
         Storage::delete($path);
