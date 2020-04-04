@@ -13,11 +13,16 @@ class BackupService
     /**
      * @var string
      */
-    protected $today;
+    protected $yesterday;
+
+    public function __construct()
+    {
+        $this->yesterday = Carbon::yesterday()->format('Y-m-d');
+    }
 
     /**
-     * @throws DumpFailed
      * @throws CannotStartDump
+     * @throws DumpFailed
      */
     public function database()
     {
@@ -29,11 +34,19 @@ class BackupService
             ->setDbName(config('database.connections.mysql.database'))
             ->setUserName(config('database.connections.mysql.username'))
             ->setPassword(config('database.connections.mysql.password'))
-            ->dumpToFile(storage_path().'/backups/'.$this->today.'.sql');
+            ->dumpToFile(storage_path().'/backups/'.$this->yesterday.'.sql');
 
-        $yymm = Carbon::now()->format('Y-m');
-        $yymmdd = Carbon::now()->format('Y-m-d');
-        $path = storage_path().'/backups/'.$this->today.'.sql';
-        Storage::disk('s3')->put('SQL/'.$yymm.'/'.$yymmdd.'.sql', file_get_contents($path));
+        $path = storage_path().'/backups/'.$this->yesterday.'.sql';
+        Storage::disk('s3')->put('SQL/'.substr($this->yesterday, 0, 7).'/'.$this->yesterday.'.sql', file_get_contents($path));
+        Storage::delete($path);
+    }
+
+    /**
+     * Request Log backup
+     */
+    public function request() {
+        $path = storage_path().'/requests/'.$this->yesterday.'.log';
+        Storage::disk('s3')->put('Request/'.substr($this->yesterday, 0, 7).'/'.$this->yesterday.'.log', file_get_contents($path));
+        Storage::delete($path);
     }
 }
