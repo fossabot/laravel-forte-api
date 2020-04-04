@@ -31,15 +31,11 @@ class PointController extends Controller
      */
     public function schedule()
     {
-        $staffs = User::where('is_member', '=', 2)->get();
+        $staffs = User::where('is_member', '=', 2)->whereNull('deleted_at')->get();
 
         foreach ($staffs as $staff) {
             $repetition = false;
             $needPoint = 0;
-
-            if (! empty($staff->deleted_at)) {
-                continue;
-            }
 
             $oldPoints = $staff->points;
             $staff->points += MAX_POINT;
