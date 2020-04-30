@@ -350,7 +350,7 @@ class XsollaWebhookService
             $datas = [
                 'amount' => $repetition ? $needPoint : $virtualCurrencyBalance['new_value'],
                 'comment' => '이용자 포인트 업데이트',
-                'project_id' => env('XSOLLA_PROJECT_KEY'),
+                'project_id' => config('xsolla.projectKey'),
                 'user_id' => $receipt->user_id,
             ];
 

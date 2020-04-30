@@ -269,7 +269,7 @@ class UserItem extends Model
             $datas = [
                 'amount' => $item->price,
                 'comment' => '포르테 아이템 청약철회',
-                'project_id' => env('XSOLLA_PROJECT_KEY'),
+                'project_id' => config('xsolla.projectKey'),
                 'user_id' => $user->id,
             ];
 

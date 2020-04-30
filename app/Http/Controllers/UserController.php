@@ -511,7 +511,7 @@ class UserController extends Controller
                     $datas = [
                         'amount' => $repetition ? $needPoint : $deposit,
                         'comment' => '포르테 출석체크 보상',
-                        'project_id' => env('XSOLLA_PROJECT_KEY'),
+                        'project_id' => config('xsolla.projectKey'),
                         'user_id' => $receipt->user_id,
                     ];
 

@@ -55,7 +55,7 @@ class PointController extends Controller
                 $datas = [
                     'amount' => $repetition ? $needPoint : self::MAX_POINT,
                     'comment' => '팀 크레센도 STAFF 보상',
-                    'project_id' => env('XSOLLA_PROJECT_KEY'),
+                    'project_id' => config('xsolla.projectKey'),
                     'user_id' => $receipt->user_id,
                 ];
 
@@ -156,7 +156,7 @@ class PointController extends Controller
             $datas = [
                 'amount' => $repetition ? $needPoint : $request->points,
                 'comment' => '이용자 포인트 지급',
-                'project_id' => env('XSOLLA_PROJECT_KEY'),
+                'project_id' => config('xsolla.projectKey'),
                 'user_id' => $receipt->user_id,
             ];
 
