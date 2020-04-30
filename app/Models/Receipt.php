@@ -51,7 +51,7 @@ class Receipt extends Model
      * @param int $id
      * @return mixed
      */
-    public static function scopeUserReceiptLists(int $id)
+    public static function scopeUserReceiptLists(int $id): Receipt
     {
         return self::where(self::USER_ID, $id)->get();
     }
@@ -61,7 +61,7 @@ class Receipt extends Model
      * @param int $receiptId
      * @return mixed
      */
-    public static function scopeUserReceiptDetail(int $id, int $receiptId)
+    public static function scopeUserReceiptDetail(int $id, int $receiptId): Receipt
     {
         return self::find($receiptId)->where(self::USER_ID, $id)->get();
     }
@@ -70,7 +70,7 @@ class Receipt extends Model
      * @param int $id
      * @return mixed
      */
-    public static function scopeObserverTransaction(int $id)
+    public static function scopeObserverTransaction(int $id): int
     {
         return self::where(self::TRANSACTION_ID, $id)->count();
     }
