@@ -65,20 +65,19 @@ class UserController extends Controller
      */
     public function login()
     {
-        $discord_user = Socialite::with('discord')->user();
-        if (empty($discord_user)) {
-            return redirect()->route('login');
+        $socialite = Socialite::driver('discord')->user();
+        $user = User::scopeGetUserByDiscordId($socialite->id);
+
+        if (! $user) {
+            $user = self::store($socialite);
+        } else if ($user && ($user->name !== $socialite->name)) {
+            User::update([
+                'name' => $socialite->name,
+            ]);
         }
-        $user = User::scopeGetUserByDiscordId($discord_user->id);
-        if (empty($user)) {
-            $this->store($discord_user);
-        }
-        $user = User::scopeGetUserByDiscordId($discord_user->id);
-        if (Auth::loginUsingId($user->id)) {
-            return redirect()->route('user.panel', $this->xsollaToken($user->id));
-        } else {
-            return redirect()->route('login');
-        }
+
+        Auth::login($user);
+        return redirect()->route('user.panel', $this->xsollaToken($user->id));
     }
 
     /**
@@ -88,15 +87,11 @@ class UserController extends Controller
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      * @throws \Exception
      */
-    public function store($discord_user)
+    public function store($user)
     {
         DB::beginTransaction();
         try {
-            $user = new User;
-            $user->{USER::EMAIL} = $discord_user->email;
-            $user->{USER::NAME} = $discord_user->name;
-            $user->{USER::DISCORD_ID} = $discord_user->id;
-            $user->save();
+            $user = User::scopeCreateUser($user);
 
             $datas = [
                 'user_id' => $user->id,
@@ -114,7 +109,7 @@ class UserController extends Controller
             ], 201);
         } catch (\Exception $exception) {
             DB::rollBack();
-            (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $discord_user->user);
+            (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $user);
 
             return response()->json([
                 'error' => $exception,

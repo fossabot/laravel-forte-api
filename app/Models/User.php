@@ -46,6 +46,19 @@ class User extends Authenticatable
     ];
 
     /**
+     * @param $user
+     * @return User|\Illuminate\Database\Eloquent\Model
+     */
+    public static function scopeCreateUser($user)
+    {
+        return self::create([
+            self::EMAIL => $user->{self::EMAIL},
+            self::NAME => $user->{self::NAME},
+            self::DISCORD_ID => $user->id,
+        ]);
+    }
+
+    /**
      * @return mixed
      */
     public static function scopeAllUsers()
