@@ -17,8 +17,6 @@ class CreateXsollaUrlsTable extends Migration
             $table->increments('id');
             $table->text('token');
             $table->text('redirect_url');
-            $table->integer('hit');
-            $table->boolean('expired')->default(0);
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')
                 ->references('id')->on('users')

@@ -16,11 +16,9 @@ class XsollaUrl extends Model
 {
     const TOKEN = 'token';
     const REDIRECT_URL = 'redirect_url';
-    const HIT = 'hit';
     const USER_ID = 'user_id';
-    const EXPIRED = 'expired';
 
     protected $fillable = [
-        self::TOKEN, self::REDIRECT_URL, self::HIT, self::USER_ID, self::EXPIRED
+        self::TOKEN, self::REDIRECT_URL, self::USER_ID,
     ];
 }
