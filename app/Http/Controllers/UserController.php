@@ -473,7 +473,7 @@ class UserController extends Controller
                 array_push($stackedAt, Carbon::now()->toDateTimeString());
 
                 $attendance->update([
-                    Attendance::STACK => $attendance->stack + 1,
+                    Attendance::STACK => $attendance->{Attendance::STACK} + 1,
                     Attendance::STACKED_AT => json_encode($stackedAt),
                 ]);
 
