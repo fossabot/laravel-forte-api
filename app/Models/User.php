@@ -27,13 +27,22 @@ class User extends Authenticatable
     use Notifiable;
     use SoftDeletes;
 
+    const NAME = 'name';
+    const EMAIL = 'email';
+    const POINTS = 'points';
+    const DISCORD_ID = 'discord_id';
+    const IS_MEMBER = 'is_member';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
+    const DELETED_AT = 'deleted_at';
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'name', 'discord_id', 'email', 'password', 'points',
+        self::NAME, self::DISCORD_ID, self::EMAIL, self::POINTS,
     ];
 
     /**
@@ -50,7 +59,7 @@ class User extends Authenticatable
      */
     public static function scopeAllUsers()
     {
-        return self::whereNull('deleted_at')->get();
+        return self::whereNull(self::DELETED_AT)->get();
     }
 
     /**
@@ -74,7 +83,7 @@ class User extends Authenticatable
      */
     public static function scopeGetUserByDiscordId(string $id)
     {
-        return self::where('discord_id', $id)->first();
+        return self::where(self::DISCORD_ID, $id)->first();
     }
 
     /**
@@ -126,7 +135,7 @@ class User extends Authenticatable
         $xsollaAPI = \App::make('App\Services\XsollaAPIService');
 
         self::find($id)->update([
-            'deleted_at' => date('Y-m-d'),
+            self::DELETED_AT => date('Y-m-d'),
         ]);
 
         $datas = [
@@ -136,5 +145,13 @@ class User extends Authenticatable
         $xsollaAPI->requestAPI('PUT', 'projects/:projectId/users/'.$id, $datas);
 
         return ['message' => 'success'];
+    }
+
+    /**
+     * @return mixed
+     */
+    public static function scopeAllStaffs()
+    {
+        self::where(self::IS_MEMBER, '=', 2)->whereNull('deleted_at')->get();
     }
 }

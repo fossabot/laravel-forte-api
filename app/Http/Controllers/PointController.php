@@ -31,7 +31,7 @@ class PointController extends Controller
      */
     public function schedule()
     {
-        $staffs = User::where('is_member', '=', 2)->whereNull('deleted_at')->get();
+        $staffs = User::scopeAllStaffs();
 
         foreach ($staffs as $staff) {
             $repetition = false;
