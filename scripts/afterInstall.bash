@@ -12,7 +12,6 @@ sudo php artisan config:cache
 sudo chmod -R 777 storage bootstrap/cache storage/framework storage/logs
 sudo chown -R $USER:www-data storage
 sudo chown -R $USER:www-data bootstrap/cache
-sudo php artisan aws:codedeploy finish
 
 if [ -d /var/www/release ]; then
     sudo rm -rf /var/www/release
