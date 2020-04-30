@@ -44,6 +44,7 @@ class Receipt extends Model
         self::REFUND,
         self::POINTS_OLD,
         self::POINTS_NEW,
+        self::TRANSACTION_ID,
     ];
 
     /**
@@ -72,5 +73,31 @@ class Receipt extends Model
     public static function scopeObserverTransaction(int $id)
     {
         return self::where(self::TRANSACTION_ID, $id)->count();
+    }
+
+    /**
+     * @param int $userId
+     * @param int $clientId
+     * @param int $userItemId
+     * @param int $aboutCash
+     * @param int $refund
+     * @param int $oldPoint
+     * @param int $newPoint
+     * @param int $transactionId
+     * @return Receipt|Model
+     */
+    public static function scopeCreateReceipt(int $userId, int $clientId, int $userItemId, int $aboutCash,
+                                              int $refund, int $oldPoint, int $newPoint, int $transactionId): Receipt
+    {
+        return self::create([
+            self::USER_ID => $userId,
+            self::CLIENT_ID => $clientId,
+            self::USER_ITEM_ID => $userItemId,
+            self::ABOUT_CASH => $aboutCash,
+            self::REFUND => $refund,
+            self::POINTS_OLD => $oldPoint,
+            self::POINTS_NEW => $newPoint,
+            self::TRANSACTION_ID => $transactionId,
+        ]);
     }
 }

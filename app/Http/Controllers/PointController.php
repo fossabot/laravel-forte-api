@@ -41,15 +41,7 @@ class PointController extends Controller
             $staff->points += self::MAX_POINT;
             $staff->save();
 
-            $receipt = new Receipt;
-            $receipt->user_id = $staff->id;
-            $receipt->client_id = 5; // scheduler
-            $receipt->user_item_id = null;
-            $receipt->about_cash = 0;
-            $receipt->refund = 0;
-            $receipt->points_old = $oldPoints;
-            $receipt->points_new = $staff->points;
-            $receipt->save();
+            $receipt = Receipt::scopeCreateReceipt($staff->id, 5, null, 0, 0, $oldPoints, $staff->{USER::POINTS}, 0);
 
             while (true) {
                 $datas = [
@@ -125,25 +117,19 @@ class PointController extends Controller
             ], 404);
         }
 
-        if (! empty($user->deleted_at)) {
+        if (! empty($user->{USER::DELETED_AT})) {
             return response([
                 'message' => 'Withdraw User Account',
             ], 400);
         }
 
-        $oldPoints = $user->points;
-        $user->points += $request->points;
+        $oldPoints = $user->{USER::POINTS};
+        $user->{USER::POINTS} += $request->points;
         $user->save();
 
-        $receipt = new Receipt;
-        $receipt->user_id = $id;
-        $receipt->client_id = Client::bringNameByToken($request->header('Authorization'))->id;
-        $receipt->user_item_id = null;
-        $receipt->about_cash = 0;
-        $receipt->refund = 0;
-        $receipt->points_old = $oldPoints;
-        $receipt->points_new = $user->points;
-        $receipt->save();
+        $clientId = Client::bringNameByToken($request->header('Authorization'))->id;
+
+        $receipt = Receipt::scopeCreateReceipt($id, $clientId, null, 0, 0, $oldPoints, $user->{USER::POINTS}, 0);
 
         /*
          * @brief sync Xsolla DB from Crescendo API \n
@@ -157,21 +143,21 @@ class PointController extends Controller
                 'amount' => $repetition ? $needPoint : $request->points,
                 'comment' => '이용자 포인트 지급',
                 'project_id' => config('xsolla.projectKey'),
-                'user_id' => $receipt->user_id,
+                'user_id' => $receipt->{Receipt::USER_ID},
             ];
 
             $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->user_id.'/recharge', $datas), true);
 
-            if ($user->points !== $response['amount']) {
+            if ($user->{USER::POINTS} !== $response['amount']) {
                 $repetition = true;
-                $needPoint = $user->points - $response['amount'];
+                $needPoint = $user->{USER::POINTS} - $response['amount'];
                 continue;
             } else {
                 break;
             }
         }
 
-        (new \App\Http\Controllers\DiscordNotificationController)->point($user->email, $user->discord_id, $request->points, $user->points);
+        (new \App\Http\Controllers\DiscordNotificationController)->point($user->{USER::EMAIL}, $user->{User::DISCORD_ID}, $request->points, $user->{USER::POINTS});
 
         return ['receipt_id' => $receipt->id];
     }

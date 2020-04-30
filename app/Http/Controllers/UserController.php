@@ -93,14 +93,15 @@ class UserController extends Controller
         DB::beginTransaction();
         try {
             $user = new User;
-            $user->email = $discord_user->email;
-            $user->name = $discord_user->name;
-            $user->discord_id = $discord_user->id;
+            $user->{USER::EMAIL} = $discord_user->email;
+            $user->{USER::NAME} = $discord_user->name;
+            $user->{USER::DISCORD_ID} = $discord_user->id;
             $user->save();
+
             $datas = [
                 'user_id' => $user->id,
-                'user_name' => $user->name,
-                'email' => $user->email,
+                'user_name' => $user->{USER::NAME},
+                'email' => $user->{USER::EMAIL},
             ];
 
             $this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users', $datas);
@@ -315,7 +316,7 @@ class UserController extends Controller
                         'value' => (string) $id,
                     ],
                     'name' => [
-                        'value' => $user->name,
+                        'value' => $user->{USER::NAME},
                     ],
                 ],
                 'settings' => [
@@ -340,11 +341,9 @@ class UserController extends Controller
             }
 
             XsollaUrl::create([
-                'token' => $request['token'],
-                'user_id' => $user->id,
-                'expired' => 0,
-                'redirect_url' => $url.$request['token'],
-                'hit' => 0,
+                XsollaUrl::TOKEN => $request['token'],
+                XsollaUrl::USER_ID => $user->id,
+                XsollaUrl::REDIRECT_URL => $url.$request['token'],
             ]);
 
             return $request['token'];
@@ -365,14 +364,10 @@ class UserController extends Controller
      */
     public function panel(string $token)
     {
-        $url = XsollaUrl::where('token', $token)->first();
-        $items = UserItem::scopeUserItemLists($url->user_id);
+        $url = XsollaUrl::where(XsollaUrl::TOKEN, $token)->first();
+        $items = UserItem::scopeUserItemLists($url->{XsollaUrl::USER_ID});
 
-        if ($url->expired) {
-            $url->token = $url->redirect_url = '';
-        }
-
-        return view('panel', ['items' => $items, 'token' => $url->token, 'redirect_url' => $url->redirect_url]);
+        return view('panel', ['items' => $items, 'token' => $url->{XsollaUrl::TOKEN}, 'redirect_url' => $url->{XsollaUrl::REDIRECT_URL}]);
     }
 
     /**
@@ -450,10 +445,10 @@ class UserController extends Controller
         if (! $attendance) {
             $date = [Carbon::now()->toDateTimeString()];
             Attendance::insert([
-                'discord_id' => $id,
-                'stack' => 1,
-                'stacked_at' => json_encode($date),
-                'created_at' => now(),
+                Attendance::DISCORD_ID => $id,
+                Attendance::STACK => 1,
+                Attendance::STACKED_AT => json_encode($date),
+                Attendance::CREATED_AT => now(),
             ]);
 
             return response()->json([
@@ -461,7 +456,7 @@ class UserController extends Controller
                 'stack' => 1,
             ]);
         } else {
-            $stackedAt = json_decode($attendance->stacked_at);
+            $stackedAt = json_decode($attendance->{Attendance::STACKED_AT});
             $lastedAt = end($stackedAt);
 
             if ($lastedAt && Carbon::parse($lastedAt)->isToday()) {
@@ -478,13 +473,13 @@ class UserController extends Controller
                 array_push($stackedAt, Carbon::now()->toDateTimeString());
 
                 $attendance->update([
-                    'stack' => $attendance->stack + 1,
-                    'stacked_at' => json_encode($stackedAt),
+                    Attendance::STACK => $attendance->stack + 1,
+                    Attendance::STACKED_AT => json_encode($stackedAt),
                 ]);
 
                 return response()->json([
                     'status' => 'success',
-                    'stack' => $attendance->stack,
+                    Attendance::STACK => $attendance->{Attendance::STACK},
                 ]);
             } else {
                 $user = User::scopeGetUserByDiscordId($id);
@@ -493,46 +488,38 @@ class UserController extends Controller
 
                 $deposit = ($request->isPremium > 0 ? rand(20, 30) : rand(10, 20));
 
-                $oldPoints = $user->points;
-                $user->points += $deposit;
+                $oldPoints = $user->{User::POINTS};
+                $user->{User::POINTS} += $deposit;
                 $user->save();
 
-                $receipt = new Receipt;
-                $receipt->user_id = $user->id;
-                $receipt->client_id = 5; // Lara
-                $receipt->user_item_id = null;
-                $receipt->about_cash = 0;
-                $receipt->refund = 0;
-                $receipt->points_old = $oldPoints;
-                $receipt->points_new = $user->points;
-                $receipt->save();
+                $receipt = Receipt::scopeCreateReceipt($user->id, 5, null, 0, 0, $oldPoints, $user->{USER::POINTS}, 0);
 
                 while (true) {
                     $datas = [
                         'amount' => $repetition ? $needPoint : $deposit,
                         'comment' => '포르테 출석체크 보상',
                         'project_id' => config('xsolla.projectKey'),
-                        'user_id' => $receipt->user_id,
+                        'user_id' => $receipt->{Receipt::USER_ID},
                     ];
 
-                    $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->user_id.'/recharge', $datas), true);
+                    $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->{Receipt::USER_ID}.'/recharge', $datas), true);
 
-                    if ($user->points !== $response['amount']) {
+                    if ($user->{USER::POINTS} !== $response['amount']) {
                         $repetition = true;
-                        $needPoint = $user->points - $response['amount'];
+                        $needPoint = $user->{USER::POINTS} - $response['amount'];
                         continue;
                     } else {
                         break;
                     }
                 }
 
-                (new \App\Http\Controllers\DiscordNotificationController)->point($user->email, $user->discord_id, $deposit, $user->points);
+                (new \App\Http\Controllers\DiscordNotificationController)->point($user->{USER::EMAIL}, $user->{USER::DISCORD_ID}, $deposit, $user->{USER::POINTS});
 
                 array_push($stackedAt, Carbon::now()->toDateTimeString());
 
                 $attendance->update([
-                    'stack' => 0,
-                    'stacked_at' => json_encode($stackedAt),
+                    Attendance::STACK => 0,
+                    Attendance::STACKED_AT => json_encode($stackedAt),
                 ]);
 
                 return response()->json([

@@ -160,9 +160,9 @@ class UserItem extends Model
         $item = Item::scopeItemDetail($itemId);
 
         if ($token != 'xsolla') {
-            $currentPoints = $user->points - $item->price;
+            $currentPoints = $user->{USER::POINTS} - $item->{ITEM::PRICE};
         } else {
-            $currentPoints = $user->points;
+            $currentPoints = $user->{USER::POINTS};
         }
 
         $receiptId = Receipt::insertGetId([
@@ -171,11 +171,11 @@ class UserItem extends Model
             Receipt::USER_ITEM_ID => $userItemId,
             Receipt::ABOUT_CASH => 1,
             Receipt::REFUND => 0,
-            Receipt::POINTS_OLD => $user->points,
+            Receipt::POINTS_OLD => $user->{USER::POINTS},
             Receipt::POINTS_NEW => $currentPoints,
         ]);
 
-        $user->points = $currentPoints;
+        $user->{USER::POINTS} = $currentPoints;
         $user->save();
 
         return $receiptId;
@@ -215,9 +215,9 @@ class UserItem extends Model
                 $userItem->$key = $item;
 
                 array_push($items, [
-                    'expired' => $userItem->{self::EXPIRED} ? 'true' : 'false',
-                    'consumed' => $userItem->{self::CONSUMED} ? 'true' : 'false',
-                    'sync' => $userItem->{self::SYNC} ? 'true' : 'false',
+                    self::EXPIRED => $userItem->{self::EXPIRED} ? 'true' : 'false',
+                    self::CONSUMED => $userItem->{self::CONSUMED} ? 'true' : 'false',
+                    self::SYNC => $userItem->{self::SYNC} ? 'true' : 'false',
                 ]);
             }
             $userItem->save();

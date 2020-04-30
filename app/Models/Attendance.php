@@ -11,6 +11,7 @@ class Attendance extends Model
     const DISCORD_ID = 'discord_id';
     const STACK = 'stack';
     const STACKED_AT = 'stacked_at';
+    const CREATED_AT = 'created_at';
 
     protected $fillable = [
         self::DISCORD_ID, self::STACK, self::STACKED_AT

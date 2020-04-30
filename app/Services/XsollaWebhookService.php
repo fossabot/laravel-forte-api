@@ -130,20 +130,11 @@ class XsollaWebhookService
                     UserItem::scopePurchaseUserItem($user->id, $purchaseItem->id, 'xsolla');
                 }
             } else {
-                $receipt = new Receipt;
-                $receipt->transaction_id = $transactionData['id'];
-                $receipt->user_id = $user->id;
-                $receipt->client_id = 1;
-                $receipt->user_item_id = null;
-                $receipt->about_cash = 1;
-                $receipt->refund = 0;
-                $receipt->points_old = $user->points;
-
+                $oldPoint = $user->{USER::POINTS};
                 $quantity = $purchaseData['virtual_currency']['quantity'];
-                $user->points += $quantity;
+                $user->{USER::POINTS} += $quantity;
 
-                $receipt->points_new = $user->points;
-                $receipt->save();
+                Receipt::scopeCreateReceipt($user->id, 1, null, 1, 0, $oldPoint, $user->{USER::POINTS}, $transactionData['id']);
 
                 $userAction = [
                     'name' => $userData,
@@ -256,7 +247,7 @@ class XsollaWebhookService
                 }
             }
 
-            $user->points = $data['virtual_currency_balance']['new_value'];
+            $user->{USER::POINTS} = $data['virtual_currency_balance']['new_value'];
             $user->save();
             DB::commit();
         } catch (\Exception $exception) {
@@ -331,20 +322,11 @@ class XsollaWebhookService
         $virtualCurrencyBalance = $data['virtual_currency_balance'];
         $user = User::scopeGetUser($userData['id']);
 
-        $oldPoints = $user->points;
-        $user->points += $virtualCurrencyBalance['new_value'] - $virtualCurrencyBalance['old_value'];
+        $oldPoints = $user->{USER::POINTS};
+        $user->{USER::POINTS} += $virtualCurrencyBalance['new_value'] - $virtualCurrencyBalance['old_value'];
         $user->save();
 
-        $receipt = new Receipt;
-        $receipt->user_id = $user->id;
-        $receipt->transaction_id = $transactionData['id'];
-        $receipt->client_id = 1;
-        $receipt->user_item_id = null;
-        $receipt->about_cash = 1;
-        $receipt->refund = 0;
-        $receipt->points_old = $oldPoints;
-        $receipt->points_new = $user->points;
-        $receipt->save();
+        $receipt = Receipt::scopeCreateReceipt($user->id, 1, null, 1, 0, $oldPoints, $user->{USER::POINTS}, $transactionData['id']);
 
         while (true) {
             $datas = [
@@ -358,7 +340,7 @@ class XsollaWebhookService
 
             if ($user->points !== $response['amount']) {
                 $repetition = true;
-                $needPoint = $user->points - $response['amount'];
+                $needPoint = $user->{USER::POINTS} - $response['amount'];
                 continue;
             } else {
                 break;
