@@ -104,7 +104,7 @@ class UserItem extends Model
     {
         $user = User::scopeGetUser($id);
         $item = Item::scopeItemDetail($itemId);
-        if ($user->{USER::POINTS} < $item->{ITEM::PRICE}) {
+        if ($user->{User::POINTS} < $item->{Item::PRICE}) {
             return response()->json([
                 'message' => 'Insufficient points',
             ], 400);
@@ -160,9 +160,9 @@ class UserItem extends Model
         $item = Item::scopeItemDetail($itemId);
 
         if ($token != 'xsolla') {
-            $currentPoints = $user->{USER::POINTS} - $item->{ITEM::PRICE};
+            $currentPoints = $user->{User::POINTS} - $item->{Item::PRICE};
         } else {
-            $currentPoints = $user->{USER::POINTS};
+            $currentPoints = $user->{User::POINTS};
         }
 
         $receiptId = Receipt::insertGetId([
@@ -171,11 +171,11 @@ class UserItem extends Model
             Receipt::USER_ITEM_ID => $userItemId,
             Receipt::ABOUT_CASH => 1,
             Receipt::REFUND => 0,
-            Receipt::POINTS_OLD => $user->{USER::POINTS},
+            Receipt::POINTS_OLD => $user->{User::POINTS},
             Receipt::POINTS_NEW => $currentPoints,
         ]);
 
-        $user->{USER::POINTS} = $currentPoints;
+        $user->{User::POINTS} = $currentPoints;
         $user->save();
 
         return $receiptId;
@@ -192,8 +192,8 @@ class UserItem extends Model
     public static function scopeUpdateUserItem(int $id, int $itemId, array $data, string $token)
     {
         $items = [
-            USER::NAME => User::scopeGetUser($id)->{USER::NAME},
-            USER::EMAIL => User::scopeGetUser($id)->{USER::EMAIL},
+            User::NAME => User::scopeGetUser($id)->{User::NAME},
+            User::EMAIL => User::scopeGetUser($id)->{User::EMAIL},
         ];
 
         $userItem = self::find($itemId)->where(self::USER_ID, $id);
@@ -266,7 +266,7 @@ class UserItem extends Model
 
         $item = self::scopeUserItemDetail($user->id, $itemId);
 
-        $user->{USER::POINTS} = $user->{USER::POINTS} + $item->{ITEM::PRICE};
+        $user->{User::POINTS} = $user->{User::POINTS} + $item->{Item::PRICE};
         $user->save();
 
         $datas = [];
@@ -282,7 +282,7 @@ class UserItem extends Model
 
             if ($user->points !== $response['amount']) {
                 $repetition = true;
-                $needPoint = $user->{USER::POINTS} - $response['amount'];
+                $needPoint = $user->{User::POINTS} - $response['amount'];
                 continue;
             } else {
                 break;
@@ -290,7 +290,7 @@ class UserItem extends Model
         }
 
         unset($datas['project_id']);
-        $datas['email'] = $user->{USER::EMAIL};
+        $datas['email'] = $user->{User::EMAIL};
         array_push($datas, $item);
         (new \App\Http\Controllers\DiscordNotificationController)->xsollaUserAction('User Item Withdraw', $datas);
 

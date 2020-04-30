@@ -95,8 +95,8 @@ class UserController extends Controller
 
             $datas = [
                 'user_id' => $user->id,
-                'user_name' => $user->{USER::NAME},
-                'email' => $user->{USER::EMAIL},
+                'user_name' => $user->{User::NAME},
+                'email' => $user->{User::EMAIL},
             ];
 
             $this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users', $datas);
@@ -311,7 +311,7 @@ class UserController extends Controller
                         'value' => (string) $id,
                     ],
                     'name' => [
-                        'value' => $user->{USER::NAME},
+                        'value' => $user->{User::NAME},
                     ],
                 ],
                 'settings' => [
@@ -487,7 +487,7 @@ class UserController extends Controller
                 $user->{User::POINTS} += $deposit;
                 $user->save();
 
-                $receipt = Receipt::scopeCreateReceipt($user->id, 5, null, 0, 0, $oldPoints, $user->{USER::POINTS}, 0);
+                $receipt = Receipt::scopeCreateReceipt($user->id, 5, null, 0, 0, $oldPoints, $user->{User::POINTS}, 0);
 
                 while (true) {
                     $datas = [
@@ -499,16 +499,16 @@ class UserController extends Controller
 
                     $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->{Receipt::USER_ID}.'/recharge', $datas), true);
 
-                    if ($user->{USER::POINTS} !== $response['amount']) {
+                    if ($user->{User::POINTS} !== $response['amount']) {
                         $repetition = true;
-                        $needPoint = $user->{USER::POINTS} - $response['amount'];
+                        $needPoint = $user->{User::POINTS} - $response['amount'];
                         continue;
                     } else {
                         break;
                     }
                 }
 
-                (new \App\Http\Controllers\DiscordNotificationController)->point($user->{USER::EMAIL}, $user->{USER::DISCORD_ID}, $deposit, $user->{USER::POINTS});
+                (new \App\Http\Controllers\DiscordNotificationController)->point($user->{User::EMAIL}, $user->{User::DISCORD_ID}, $deposit, $user->{User::POINTS});
 
                 array_push($stackedAt, Carbon::now()->toDateTimeString());
 

@@ -130,11 +130,11 @@ class XsollaWebhookService
                     UserItem::scopePurchaseUserItem($user->id, $purchaseItem->id, 'xsolla');
                 }
             } else {
-                $oldPoint = $user->{USER::POINTS};
+                $oldPoint = $user->{User::POINTS};
                 $quantity = $purchaseData['virtual_currency']['quantity'];
-                $user->{USER::POINTS} += $quantity;
+                $user->{User::POINTS} += $quantity;
 
-                Receipt::scopeCreateReceipt($user->id, 1, null, 1, 0, $oldPoint, $user->{USER::POINTS}, $transactionData['id']);
+                Receipt::scopeCreateReceipt($user->id, 1, null, 1, 0, $oldPoint, $user->{User::POINTS}, $transactionData['id']);
 
                 $userAction = [
                     'name' => $userData,
@@ -322,25 +322,25 @@ class XsollaWebhookService
         $virtualCurrencyBalance = $data['virtual_currency_balance'];
         $user = User::scopeGetUser($userData['id']);
 
-        $oldPoints = $user->{USER::POINTS};
-        $user->{USER::POINTS} += $virtualCurrencyBalance['new_value'] - $virtualCurrencyBalance['old_value'];
+        $oldPoints = $user->{User::POINTS};
+        $user->{User::POINTS} += $virtualCurrencyBalance['new_value'] - $virtualCurrencyBalance['old_value'];
         $user->save();
 
-        $receipt = Receipt::scopeCreateReceipt($user->id, 1, null, 1, 0, $oldPoints, $user->{USER::POINTS}, $transactionData['id']);
+        $receipt = Receipt::scopeCreateReceipt($user->id, 1, null, 1, 0, $oldPoints, $user->{User::POINTS}, $transactionData['id']);
 
         while (true) {
             $datas = [
                 'amount' => $repetition ? $needPoint : $virtualCurrencyBalance['new_value'],
                 'comment' => '이용자 포인트 업데이트',
                 'project_id' => config('xsolla.projectKey'),
-                'user_id' => $receipt->user_id,
+                'user_id' => $receipt->{Receipt::USER_ID},
             ];
 
-            $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->user_id.'/recharge', $datas), true);
+            $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->{Receipt::USER_ID}.'/recharge', $datas), true);
 
             if ($user->points !== $response['amount']) {
                 $repetition = true;
-                $needPoint = $user->{USER::POINTS} - $response['amount'];
+                $needPoint = $user->{User::POINTS} - $response['amount'];
                 continue;
             } else {
                 break;
