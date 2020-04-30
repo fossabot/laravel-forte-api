@@ -14,8 +14,15 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Client extends Model
 {
-    public const BOT_CLIENT = ['skilebot', 'baechubotv2'];
-    public const BOT_TOKEN_RENEWAL_EXCEPTION = ['lara'];
+    const SKILEBOT = 'skilebot';
+    const BAECHUBOT = 'baechubotv2';
+
+    const BOT_CLIENT = [
+        self::SKILEBOT,
+        self::BAECHUBOT,
+    ];
+
+    const BOT_TOKEN_RENEWAL_EXCEPTION = ['lara'];
 
     /**
      * The attributes that are mass assignable.
