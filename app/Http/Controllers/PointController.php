@@ -8,10 +8,10 @@ use App\Models\User;
 use App\Services\XsollaAPIService;
 use Illuminate\Http\Request;
 
-const MAX_POINT = 2000;
-
 class PointController extends Controller
 {
+    const MAX_POINT = 2000;
+
     /**
      * @var XsollaAPIService
      */
@@ -38,7 +38,7 @@ class PointController extends Controller
             $needPoint = 0;
 
             $oldPoints = $staff->points;
-            $staff->points += MAX_POINT;
+            $staff->points += self::MAX_POINT;
             $staff->save();
 
             $receipt = new Receipt;
@@ -53,7 +53,7 @@ class PointController extends Controller
 
             while (true) {
                 $datas = [
-                    'amount' => $repetition ? $needPoint : MAX_POINT,
+                    'amount' => $repetition ? $needPoint : self::MAX_POINT,
                     'comment' => '팀 크레센도 STAFF 보상',
                     'project_id' => env('XSOLLA_PROJECT_KEY'),
                     'user_id' => $receipt->user_id,

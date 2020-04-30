@@ -5,23 +5,14 @@ namespace App\Http\Controllers;
 use App\Services\XsollaWebhookService;
 use Illuminate\Http\Request;
 
-const TYPE_USER_VALIDATION = 'user_validation';
-const TYPE_USER_SEARCH = 'user_search';
-const TYPE_PAYMENT = 'payment';
-const TYPE_REFUND = 'refund';
-const TYPE_AFS_REJECT = 'afs_reject';
-const TYPE_CREATE_SUBSCRIPTION = 'create_subscription';
-const TYPE_UPDATE_SUBSCRIPTION = 'update_subscription';
-const TYPE_CANCEL_SUBSCRIPTION = 'cancel_subscription';
-const TYPE_GET_PINCODE = 'get_pincode';
-const TYPE_USER_BALANCE_OPERATION = 'user_balance_operation';
-const TYPE_REDEEM_KEY = 'redeem_key';
-const TYPE_INVENTORY_GET = 'inventory_get';
-const TYPE_INVENTORY_PULL = 'inventory_pull';
-const TYPE_INVENTORY_PUSH = 'inventory_push';
-
 class XsollaWebhookController extends Controller
 {
+    const TYPE_USER_VALIDATION = 'user_validation';
+    const TYPE_USER_SEARCH = 'user_search';
+    const TYPE_PAYMENT = 'payment';
+    const TYPE_REFUND = 'refund';
+    const TYPE_USER_BALANCE_OPERATION = 'user_balance_operation';
+
     /**
      * @var XsollaWebhookService
      */
@@ -45,15 +36,15 @@ class XsollaWebhookController extends Controller
     public function index(Request $request)
     {
         switch ($request['notification_type']) {
-            case TYPE_USER_VALIDATION:
+            case self::TYPE_USER_VALIDATION:
                 return $this->xws->userValidation($request->all());
-            case TYPE_USER_SEARCH: // disable
+            case self::TYPE_USER_SEARCH: // disable
                 return $this->xws->userSearch();
-            case TYPE_PAYMENT:
+            case self::TYPE_PAYMENT:
                 return $this->xws->payment($request->all());
-            case TYPE_REFUND:
+            case self::TYPE_REFUND:
                 return $this->xws->refund($request->all());
-            case TYPE_USER_BALANCE_OPERATION:
+            case self::TYPE_USER_BALANCE_OPERATION:
                 return $this->xws->userBalanceOperation($request->all());
         }
     }
