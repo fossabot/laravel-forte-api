@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Hash;
 class ClientController extends Controller
 {
     /**
-     * @return array
+     * @return void
      */
     public function renewal()
     {
@@ -21,8 +21,6 @@ class ClientController extends Controller
                 ]);
             }
         }
-
-        return (new \App\Http\Controllers\DiscordNotificationController)->clientToken();
     }
 
     /**
