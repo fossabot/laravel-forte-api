@@ -69,7 +69,7 @@ class UserController extends Controller
         $user = User::scopeGetUserByDiscordId($socialite->id);
 
         if (! $user) {
-            $user = self::store($socialite);
+            $user = $this->store($socialite);
         } else if ($user && ($user->name !== $socialite->name)) {
             User::update([
                 'name' => $socialite->name,
