@@ -14,7 +14,13 @@ use Illuminate\Database\Eloquent\Model;
  */
 class XsollaUrl extends Model
 {
+    const TOKEN = 'token';
+    const REDIRECT_URL = 'redirect_url';
+    const HIT = 'hit';
+    const USER_ID = 'user_id';
+    const EXPIRED = 'expired';
+
     protected $fillable = [
-        'token', 'redirect_url', 'hit', 'user_id', 'expired',
+        self::TOKEN, self::REDIRECT_URL, self::HIT, self::USER_ID, self::EXPIRED
     ];
 }

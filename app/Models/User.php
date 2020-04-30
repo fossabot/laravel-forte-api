@@ -46,15 +46,6 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password',
-    ];
-
-    /**
      * @return mixed
      */
     public static function scopeAllUsers()
@@ -109,8 +100,8 @@ class User extends Authenticatable
 
             $datas = [
                 'enabled' => true,
-                'user_name' => $user->name,
-                'email' => $user->email,
+                'user_name' => $user->{self::NAME},
+                'email' => $user->{self::EMAIL},
             ];
 
             $xsollaAPI->requestAPI('PUT', 'projects/:projectId/users/'.$id, $datas);

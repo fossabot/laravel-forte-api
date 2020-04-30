@@ -17,13 +17,33 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Receipt extends Model
 {
+    const RECEIPT_ID = 'receipt_id';
+    const USER_ID = 'user_id';
+    const CLIENT_ID = 'client_id';
+    const USER_ITEM_ID = 'user_item_id';
+    const ABOUT_CASH = 'about_cash';
+    const REFUND = 'refund';
+    const TRANSACTION_ID = 'transaction_id';
+    const POINTS_OLD = 'points_old';
+    const POINTS_NEW = 'points_new';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
+
+    public $timestamps = true;
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'user_id', 'client_id', 'user_item_id', 'about_cash', 'refund', 'points_old', 'points_new',
+        self::USER_ID,
+        self::CLIENT_ID,
+        self::USER_ITEM_ID,
+        self::ABOUT_CASH,
+        self::REFUND,
+        self::POINTS_OLD,
+        self::POINTS_NEW,
     ];
 
     /**
@@ -32,7 +52,7 @@ class Receipt extends Model
      */
     public static function scopeUserReceiptLists(int $id)
     {
-        return self::where('user_id', $id)->get();
+        return self::where(self::USER_ID, $id)->get();
     }
 
     /**
@@ -42,7 +62,7 @@ class Receipt extends Model
      */
     public static function scopeUserReceiptDetail(int $id, int $receiptId)
     {
-        return self::find($receiptId)->where('user_id', $id)->get();
+        return self::find($receiptId)->where(self::USER_ID, $id)->get();
     }
 
     /**
@@ -51,6 +71,6 @@ class Receipt extends Model
      */
     public static function scopeObserverTransaction(int $id)
     {
-        return self::where('transaction_id', $id)->count();
+        return self::where(self::TRANSACTION_ID, $id)->count();
     }
 }

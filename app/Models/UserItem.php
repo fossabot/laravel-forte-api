@@ -32,17 +32,26 @@ class UserItem extends Model
         self::SKB_12,
     ];
 
+    const USER_ID = 'user_id';
+    const ITEM_ID = 'item_id';
+    const EXPIRED = 'expired';
+    const CONSUMED = 'consumed';
+    const SYNC = 'sync';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
+    const DELETED_AT = 'deleted_at';
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'user_id', 'item_id', 'expired', 'consumed', 'sync',
+        self::USER_ID, self::ITEM_ID, self::EXPIRED, self::CONSUMED, self::SYNC,
     ];
 
     protected $dates = [
-        'deleted_at',
+        self::DELETED_AT,
     ];
 
     /**
@@ -60,7 +69,7 @@ class UserItem extends Model
      */
     public static function scopeUserItemLists(int $id)
     {
-        return self::with('item')->where('user_id', $id)->orderBy('created_at', 'desc')->get();
+        return self::with('item')->where(self::USER_ID, $id)->orderBy('desc')->get();
     }
 
     /**
@@ -81,7 +90,7 @@ class UserItem extends Model
      */
     public static function scopeCountUserPurchaseDuplicateItem(int $id, int $itemId)
     {
-        return self::where('user_id', $id)->where('item_id', $itemId)->whereNull('deleted_at')->count();
+        return self::where(self::USER_ID, $id)->where(self::ITEM_ID, $itemId)->whereNull(self::DELETED_AT)->count();
     }
 
     /**
@@ -95,7 +104,7 @@ class UserItem extends Model
     {
         $user = User::scopeGetUser($id);
         $item = Item::scopeItemDetail($itemId);
-        if ($user->points < $item->price) {
+        if ($user->{USER::POINTS} < $item->{ITEM::PRICE}) {
             return response()->json([
                 'message' => 'Insufficient points',
             ], 400);
@@ -105,7 +114,7 @@ class UserItem extends Model
             ], 400);
         }
 
-        if (self::scopeCountUserPurchaseDuplicateItem($id, $itemId) < Item::scopeItemDetail($itemId)->purchase_limit) {
+        if (self::scopeCountUserPurchaseDuplicateItem($id, $itemId) < Item::scopeItemDetail($itemId)->{ITEM::PURCHASE_LIMIT}) {
             return response()->json([
                 'message' => 'over user purchase limit !',
             ], 400);
@@ -115,13 +124,11 @@ class UserItem extends Model
             DB::beginTransaction();
 
             $userItemId = self::insertGetId([
-                'user_id' => $id,
-                'item_id' => $itemId,
-                'expired' => 0,
-                'consumed' => 0,
-                'sync' => 0,
-                'created_at' => date('Y-m-d H:m:s'),
-                'updated_at' => date('Y-m-d H:m:s'),
+                self::USER_ID => $id,
+                self::ITEM_ID => $itemId,
+                self::EXPIRED => 0,
+                self::CONSUMED => 0,
+                self::SYNC => 0,
             ]);
 
             $createUserReceipt = self::createUserReceipt($id, $itemId, $userItemId, $token);
@@ -134,8 +141,8 @@ class UserItem extends Model
         }
 
         return response()->json([
-            'user_item_id' => $userItemId,
-            'receipt_id' => $createUserReceipt,
+            Receipt::USER_ITEM_ID => $userItemId,
+            Receipt::RECEIPT_ID => $createUserReceipt,
         ], 201);
     }
 
@@ -148,7 +155,7 @@ class UserItem extends Model
      */
     private static function createUserReceipt(int $id, int $itemId, int $userItemId, string $token)
     {
-        $client = $token == 'xsolla' ?: Client::bringNameByToken($token);
+        $client = $token === 'xsolla' ?: Client::bringNameByToken($token);
         $user = User::scopeGetUser($id);
         $item = Item::scopeItemDetail($itemId);
 
@@ -159,15 +166,13 @@ class UserItem extends Model
         }
 
         $receiptId = Receipt::insertGetId([
-            'user_id' => $id,
-            'client_id' => $token == 'xsolla' ? 1 : $client->id,
-            'user_item_id' => $userItemId,
-            'about_cash' => 1,
-            'refund' => 0,
-            'points_old' => $user->points,
-            'points_new' => $currentPoints,
-            'created_at' => date('Y-m-d H:m:s'),
-            'updated_at' => date('Y-m-d H:m:s'),
+            Receipt::USER_ID => $id,
+            Receipt::CLIENT_ID => $token == 'xsolla' ? 1 : $client->id,
+            Receipt::USER_ITEM_ID => $userItemId,
+            Receipt::ABOUT_CASH => 1,
+            Receipt::REFUND => 0,
+            Receipt::POINTS_OLD => $user->points,
+            Receipt::POINTS_NEW => $currentPoints,
         ]);
 
         $user->points = $currentPoints;
@@ -187,13 +192,13 @@ class UserItem extends Model
     public static function scopeUpdateUserItem(int $id, int $itemId, array $data, string $token)
     {
         $items = [
-            'name' => User::scopeGetUser($id)->name,
-            'email' => User::scopeGetUser($id)->email,
+            USER::NAME => User::scopeGetUser($id)->{USER::NAME},
+            USER::EMAIL => User::scopeGetUser($id)->{USER::EMAIL},
         ];
 
-        $userItem = self::where('user_id', $id)->find($itemId);
+        $userItem = self::find($itemId)->where(self::USER_ID, $id);
 
-        if (Item::scopeItemDetail($userItem->item_id)->consumable == 0 && ! empty($data['consumed']) && $data['consumed']) {
+        if (Item::scopeItemDetail($userItem->{self::ITEM_ID})->{ITEM::CONSUMABLE} === 0) {
             return response()->json([
                 'message' => 'Bad Request Consumed value is true',
             ], 400);
@@ -203,16 +208,16 @@ class UserItem extends Model
             DB::beginTransaction();
 
             foreach ($data as $key => $item) {
-                if ($key === 'sync') {
+                if ($key === self::SYNC) {
                     $userItem->$key = in_array(Client::bringNameByToken($token)->name, Client::BOT_CLIENT) ? 1 : 0;
                     continue;
                 }
                 $userItem->$key = $item;
 
                 array_push($items, [
-                    'expired' => $userItem->expired ? 'true' : 'false',
-                    'consumed' => $userItem->consumed ? 'true' : 'false',
-                    'sync' => $userItem->sync ? 'true' : 'false',
+                    'expired' => $userItem->{self::EXPIRED} ? 'true' : 'false',
+                    'consumed' => $userItem->{self::CONSUMED} ? 'true' : 'false',
+                    'sync' => $userItem->{self::SYNC} ? 'true' : 'false',
                 ]);
             }
             $userItem->save();
@@ -236,8 +241,8 @@ class UserItem extends Model
      */
     public static function scopeDestroyUserItem(int $id, int $itemId)
     {
-        self::where('user_id', $id)->where('item_id', $itemId)->update([
-            'deleted_at' => date('Y-m-d H:m:s'),
+        self::where(self::USER_ID, $id)->where(self::ITEM_ID, $itemId)->update([
+            self::DELETED_AT => date('Y-m-d H:m:s'),
         ]);
 
         return ['message' => 'Successful Destroy User Item'];
@@ -255,19 +260,19 @@ class UserItem extends Model
 
         $user = User::scopeGetUser(\Auth::User()->id);
 
-        self::find($itemId)->where('user_id', $user->id)->update([
-            'deleted_at' => date('Y-m-d H:m:s'),
+        self::find($itemId)->where(self::USER_ID, $user->id)->update([
+            self::DELETED_AT => date('Y-m-d H:m:s'),
         ]);
 
         $item = self::scopeUserItemDetail($user->id, $itemId);
 
-        $user->points = $user->points + $item->price;
+        $user->{USER::POINTS} = $user->{USER::POINTS} + $item->{ITEM::PRICE};
         $user->save();
 
         $datas = [];
         while (true) {
             $datas = [
-                'amount' => $item->price,
+                'amount' => $item->{ITEM::PRICE},
                 'comment' => '포르테 아이템 청약철회',
                 'project_id' => config('xsolla.projectKey'),
                 'user_id' => $user->id,
@@ -277,7 +282,7 @@ class UserItem extends Model
 
             if ($user->points !== $response['amount']) {
                 $repetition = true;
-                $needPoint = $user->points - $response['amount'];
+                $needPoint = $user->{USER::POINTS} - $response['amount'];
                 continue;
             } else {
                 break;
@@ -285,7 +290,7 @@ class UserItem extends Model
         }
 
         unset($datas['project_id']);
-        $datas['email'] = $user->email;
+        $datas['email'] = $user->{USER::EMAIL};
         array_push($datas, $item);
         (new \App\Http\Controllers\DiscordNotificationController)->xsollaUserAction('User Item Withdraw', $datas);
 

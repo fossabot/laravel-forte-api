@@ -18,13 +18,35 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Item extends Model
 {
+    const CLIENT_ID = 'client_id';
+    const SKU = 'sku';
+    const NAME = 'name';
+    const IMAGE_URL = 'image_url';
+    const PRICE = 'price';
+    const ENABLED = 'enabled';
+    const CONSUMABLE = 'consumable';
+    const EXPIRATION_TIME = 'expiration_time';
+    const PURCHASE_LIMIT = 'purchase_limit';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
+
+    public $timestamps = true;
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'client_id', 'sku', 'name', 'image_url', 'price', 'enabled', 'consumable', 'expiration_time', 'purchase_limit',
+        self::CLIENT_ID,
+        self::SKU,
+        self::NAME,
+        self::IMAGE_URL,
+        self::PRICE,
+        self::ENABLED,
+        self::CONSUMABLE,
+        self::EXPIRATION_TIME,
+        self::PURCHASE_LIMIT,
     ];
 
     /**
@@ -59,6 +81,6 @@ class Item extends Model
      */
     public static function scopeSkuParseId(string $sku)
     {
-        return self::where('sku', $sku)->first()->id;
+        return self::where(self::SKU, $sku)->first()->id;
     }
 }

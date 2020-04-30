@@ -14,7 +14,14 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ErrorLog extends Model
 {
+    const ENVIRONMENT = 'environment';
+    const TITLE = 'title';
+    const MESSAGE = 'message';
+    const PARAMETERS = 'parameters';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
+
     protected $fillable = [
-        'environment', 'title', 'message', 'parameters',
+        self::ENVIRONMENT, self::TITLE, self::MESSAGE, self::PARAMETERS
     ];
 }

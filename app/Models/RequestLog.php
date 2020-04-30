@@ -15,8 +15,17 @@ use Illuminate\Database\Eloquent\Model;
  */
 class RequestLog extends Model
 {
+    const DURATION = 'duration';
+    const URL = 'url';
+    const METHOD = 'method';
+    const IP = 'ip';
+    const REQUEST = 'request';
+    const RESPONSE = 'response';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
+
     protected $fillable = [
-        'duration', 'url', 'method', 'ip', 'request', 'response',
+        self::DURATION, self::URL, self::METHOD, self::IP, self::REQUEST, self::RESPONSE
     ];
 
     /**
@@ -25,6 +34,6 @@ class RequestLog extends Model
      */
     public static function scopeClearRequestLogs(string $date)
     {
-        return self::where('created_at', '<', $date)->delete();
+        return self::where(self::CREATED_AT, '<', $date)->delete();
     }
 }

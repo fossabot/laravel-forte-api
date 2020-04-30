@@ -14,6 +14,11 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Client extends Model
 {
+    const NAME = 'name';
+    const XSOLLA_SELECTED_GROUP_NAME = 'xsolla_selected_group_name';
+    const TOKEN = 'token';
+    const PREV_TOKEN = 'token';
+
     const SKILEBOT = 'skilebot';
     const BAECHUBOT = 'baechubotv2';
 
@@ -30,7 +35,7 @@ class Client extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'xsolla_selected_group_name', 'token', 'prev_token',
+        self::NAME, self::XSOLLA_SELECTED_GROUP_NAME, self::TOKEN, self::PREV_TOKEN
     ];
 
     /**
@@ -39,6 +44,6 @@ class Client extends Model
      */
     public static function bringNameByToken(string $token)
     {
-        return self::where('token', $token)->first();
+        return self::where(self::TOKEN, $token)->first();
     }
 }

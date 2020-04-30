@@ -8,8 +8,12 @@ class Attendance extends Model
 {
     public $timestamps = false;
 
+    const DISCORD_ID = 'discord_id';
+    const STACK = 'stack';
+    const STACKED_AT = 'stacked_at';
+
     protected $fillable = [
-        'discord_id', 'stack', 'stacked_at',
+        self::DISCORD_ID, self::STACK, self::STACKED_AT
     ];
 
     /**
@@ -18,7 +22,7 @@ class Attendance extends Model
      */
     public static function scopeExistAttendance(int $id)
     {
-        return self::where('discord_id', $id)->first();
+        return self::where(self::DISCORD_ID, $id)->first();
     }
 
     /**
