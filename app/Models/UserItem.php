@@ -22,6 +22,16 @@ use Illuminate\Support\Facades\DB;
  */
 class UserItem extends Model
 {
+    const SBK_5 = 'skb_5';
+    const SKB_9 = 'skb_9';
+    const SKB_12 = 'skb_12';
+
+    const DISABLE_WITHDRAW_ITEMS = [
+        self::SBK_5,
+        self::SKB_9,
+        self::SKB_12,
+    ];
+
     /**
      * The attributes that are mass assignable.
      *
