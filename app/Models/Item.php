@@ -50,7 +50,7 @@ class Item extends Model
      */
     public static function scopeItemDetail(int $id)
     {
-        return self::where('id', $id)->first();
+        return self::find($id)->first();
     }
 
     /**

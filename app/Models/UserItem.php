@@ -255,7 +255,7 @@ class UserItem extends Model
 
         $user = User::scopeGetUser(\Auth::User()->id);
 
-        self::where('user_id', $user->id)->where('id', $itemId)->update([
+        self::find($itemId)->where('user_id', $user->id)->update([
             'deleted_at' => date('Y-m-d H:m:s'),
         ]);
 

@@ -125,7 +125,7 @@ class User extends Authenticatable
     {
         $xsollaAPI = \App::make('App\Services\XsollaAPIService');
 
-        self::where('id', $id)->update([
+        self::find($id)->update([
             'deleted_at' => date('Y-m-d'),
         ]);
 

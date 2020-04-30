@@ -42,7 +42,7 @@ class Receipt extends Model
      */
     public static function scopeUserReceiptDetail(int $id, int $receiptId)
     {
-        return self::where('user_id', $id)->where('id', $receiptId)->get();
+        return self::find($receiptId)->where('user_id', $id)->get();
     }
 
     /**
