@@ -6,8 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 /**
- * App\Models\UserItem.
+ * App\Models\UserItem
  *
+ * @property int $id
+ * @property int $user_id
+ * @property int $item_id
+ * @property int $expired whether expiration time has passed or the cash was refunded
+ * @property int $consumed
+ * @property int $sync whether bot(items.client_id) is notified of the change in this item
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Item $item
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem countUserPurchaseDuplicateItem($itemId)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem destroyUserItem($itemId)
@@ -18,6 +27,16 @@ use Illuminate\Support\Facades\DB;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem updateUserItem($itemId, $data, $token)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem userItemDetail($itemId)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem userItemLists()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem userItemWithdraw()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem whereConsumed($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem whereExpired($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem whereItemId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem whereSync($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem whereUserId($value)
  * @mixin \Eloquent
  */
 class UserItem extends Model

@@ -2,24 +2,50 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
 
 /**
- * App\Models\User.
+ * App\Models\User
  *
- * @property-read \App\Models\Discord $discord
+ * @property int $id
+ * @property string $discord_id
+ * @property string $name username
+ * @property string|null $email
+ * @property int $points virtual currency balance
+ * @property int $is_member 0: default, 1: support, 2: staff
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
+ * @property-read int|null $notifications_count
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User allStaffs()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User allUsers()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User createUser()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User destoryUser()
+ * @method static bool|null forceDelete()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User getUser()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User getUserById()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User getUserByDiscordId()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User newQuery()
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\User onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User query()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User updateUser($datas = array())
+ * @method static bool|null restore()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User updateUser($datas = [])
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereDiscordId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereIsMember($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User wherePoints($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\User withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\User withoutTrashed()
  * @mixin \Eloquent
  */
 class User extends Authenticatable
@@ -61,7 +87,7 @@ class User extends Authenticatable
     /**
      * @return mixed
      */
-    public static function scopeAllUsers()
+    public static function scopeAllUsers(): Collection
     {
         return self::whereNull(self::DELETED_AT)->get();
     }

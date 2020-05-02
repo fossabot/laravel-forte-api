@@ -5,11 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\Client.
+ * App\Models\Client
  *
+ * @property int $id
+ * @property string $name skilebot and xsolla
+ * @property string|null $xsolla_selected_group_name xsolla selected_group name
+ * @property string $token authentication token
+ * @property string $prev_token
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client query()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client wherePrevToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client whereToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client whereXsollaSelectedGroupName($value)
  * @mixin \Eloquent
  */
 class Client extends Model
