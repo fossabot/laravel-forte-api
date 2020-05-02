@@ -61,11 +61,12 @@ class ClientController extends Controller
      *     ),
      * )
      */
-    public function issue()
+    public function issue(): JsonResponse
     {
-        $client = Client::where('prev_token', $_SERVER['HTTP_AUTHORIZATION'])->first() ?: null;
+        $client = Client::where(Client::PREV_TOKEN, $_SERVER['HTTP_AUTHORIZATION'])->first() ?: null;
+
         if (! empty($client)) {
-            return response()->json([
+            return new JsonResponse([
                 'token' => $client->{Client::TOKEN},
                 'updated_at' => $client->{Client::UPDATED_AT},
             ]);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Receipt;
 use Illuminate\Http\JsonResponse;
+use Psy\Util\Json;
 
 class ReceiptController extends Controller
 {
@@ -38,9 +39,9 @@ class ReceiptController extends Controller
      *     ),
      * )
      */
-    public function index(int $id)
+    public function index(int $id): JsonResponse
     {
-        return response()->json(Receipt::scopeUserReceiptLists($id));
+        return new JsonResponse(Receipt::scopeUserReceiptLists($id));
     }
 
     /**
@@ -82,8 +83,8 @@ class ReceiptController extends Controller
      *     ),
      * )
      */
-    public function show(int $id, int $receiptId)
+    public function show(int $id, int $receiptId): JsonResponse
     {
-        return response()->json(Receipt::scopeUserReceiptDetail($id, $receiptId));
+        return new JsonResponse(Receipt::scopeUserReceiptDetail($id, $receiptId));
     }
 }

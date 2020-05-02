@@ -5,15 +5,14 @@ namespace App\Http\Controllers;
 use App\Services\XsollaWebhookService;
 use Exception;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class XsollaWebhookController extends Controller
 {
     const TYPE_USER_VALIDATION = 'user_validation';
-    const TYPE_USER_SEARCH = 'user_search';
     const TYPE_PAYMENT = 'payment';
-    const TYPE_REFUND = 'refund';
     const TYPE_USER_BALANCE_OPERATION = 'user_balance_operation';
 
     /**
@@ -32,23 +31,26 @@ class XsollaWebhookController extends Controller
 
     /**
      * @param Request $request
-     * @return ResponseFactory|Response|mixed
+     * @return JsonResponse
      * @throws Exception
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_webhooks_list
      */
     public function index(Request $request)
     {
+        $data = null;
+
         switch ($request['notification_type']) {
             case self::TYPE_USER_VALIDATION:
-                return $this->xws->userValidation($request->all());
-            case self::TYPE_USER_SEARCH: // disable
-                return $this->xws->userSearch();
+                $data = $this->xws->userValidation($request->all());
+                break;
             case self::TYPE_PAYMENT:
-                return $this->xws->payment($request->all());
-            case self::TYPE_REFUND:
-                return $this->xws->refund($request->all());
+                $data = $this->xws->payment($request->all());
+                break;
             case self::TYPE_USER_BALANCE_OPERATION:
-                return $this->xws->userBalanceOperation($request->all());
+                $data = $this->xws->userBalanceOperation($request->all());
+                break;
         }
+
+        return new JsonResponse($data);
     }
 }

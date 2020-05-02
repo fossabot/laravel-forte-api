@@ -40,7 +40,7 @@ class UserController extends Controller
     /**
      * 전체 이용자를 조회합니다.
      *
-     * @return Response
+     * @return JsonResponse
      *
      * @SWG\Get(
      *     path="/users",
@@ -60,9 +60,9 @@ class UserController extends Controller
      *     ),
      * )
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        return response()->json(User::scopeAllUsers());
+        return new JsonResponse(User::scopeAllUsers());
     }
 
     /**
@@ -88,10 +88,10 @@ class UserController extends Controller
      * 이용자를 추가(회원가입) 합니다.
      *
      * @param $user
-     * @return ResponseFactory|Response
+     * @return JsonResponse
      * @throws Exception
      */
-    public function store($user)
+    public function store($user): JsonResponse
     {
         DB::beginTransaction();
         try {
@@ -106,19 +106,19 @@ class UserController extends Controller
             $this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users', $datas);
 
             DB::commit();
-
-            return response()->json([
-                'status' => 'success',
-                'data' => $user,
-            ], 201);
         } catch (Exception $exception) {
             DB::rollBack();
             (new DiscordNotificationController)->exception($exception, $user);
 
-            return response()->json([
-                'error' => $exception,
+            return new JsonResponse([
+                'error' => $exception->getMessage(),
             ], 400);
         }
+
+        return new JsonResponse([
+            'status' => 'success',
+            'data' => $user,
+        ], 201);
     }
 
     /**
@@ -152,9 +152,9 @@ class UserController extends Controller
      *     ),
      * )
      */
-    public function show(int $id)
+    public function show(int $id): JsonResponse
     {
-        return response()->json(User::scopeGetUser($id));
+        return new JsonResponse(User::scopeGetUser($id));
     }
 
     /**
@@ -188,17 +188,17 @@ class UserController extends Controller
      *     ),
      * )
      */
-    public function discord(int $id)
+    public function discord(int $id): JsonResponse
     {
-        return response()->json(User::scopeGetUserByDiscordId($id));
+        return new JsonResponse(User::scopeGetUserByDiscordId($id));
     }
 
     /**
      * 이용자의 정보를 갱신합니다.
      *
      * @param UserUpdateFormRequest $request
-     * @param  int $id
-     * @return Response
+     * @param int $id
+     * @return JsonResponse
      * @throws Exception
      * @SWG\Put(
      *     path="/users/{userId}",
@@ -246,9 +246,9 @@ class UserController extends Controller
      *     ),
      * )
      */
-    public function update(UserUpdateFormRequest $request, int $id)
+    public function update(UserUpdateFormRequest $request, int $id): JsonResponse
     {
-        return response()->json(User::scopeUpdateUser($id, $request->all()));
+        return new JsonResponse(User::scopeUpdateUser($id, $request->all()));
     }
 
     /**
@@ -391,9 +391,9 @@ class UserController extends Controller
      *     ),
      * )
      */
-    public function attendances()
+    public function attendances(): JsonResponse
     {
-        return response()->json(Attendance::scopeAttendances());
+        return new JsonResponse(Attendance::scopeAttendances());
     }
 
     /**
@@ -401,7 +401,7 @@ class UserController extends Controller
      *
      * @param Request $request
      * @param string $id
-     * @return void
+     * @return JsonResponse
      *
      * @throws Exception
      * @SWG\POST(
@@ -436,7 +436,7 @@ class UserController extends Controller
      *     ),
      * )
      */
-    public function attendance(Request $request, string $id)
+    public function attendance(Request $request, string $id): JsonResponse
     {
         $attendance = Attendance::scopeExistAttendance($id);
 
@@ -521,39 +521,11 @@ class UserController extends Controller
                     Attendance::STACKED_AT => json_encode($stackedAt),
                 ]);
 
-                return response()->json([
+                return new JsonResponse([
                     'status' => 'regular',
                     'point' => $deposit,
                 ]);
             }
         }
-    }
-
-    /**
-     * 팀 크레센도 출석체크 랭킹을 불러옵니다.
-     *
-     * @return void
-     *
-     * @SWG\GET(
-     *     path="/discords/attendances/ranks",
-     *     description="User Attendance",
-     *     produces={"application/json"},
-     *     tags={"Discord"},
-     *     @SWG\Parameter(
-     *         name="Authorization",
-     *         in="header",
-     *         description="Authorization Token",
-     *         required=true,
-     *         type="string"
-     *     ),
-     *     @SWG\Response(
-     *         response=200,
-     *         description="Successful User Attendance Ranks"
-     *     ),
-     * )
-     */
-    public function attendanceRanks()
-    {
-        return response()->json(Attendance::scopeAttendanceRanks());
     }
 }

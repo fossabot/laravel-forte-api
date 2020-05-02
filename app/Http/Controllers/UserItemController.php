@@ -16,7 +16,7 @@ class UserItemController extends Controller
      * 이용자의 보유한 아이템 목록을 조회합니다.
      *
      * @param int $id
-     * @return Response
+     * @return JsonResponse
      *
      * @SWG\Get(
      *     path="/users/{userId}/items",
@@ -43,9 +43,9 @@ class UserItemController extends Controller
      *     ),
      * )
      */
-    public function index(int $id)
+    public function index(int $id): JsonResponse
     {
-        return response()->json(UserItem::scopeUserItemLists($id));
+        return new JsonResponse(UserItem::scopeUserItemLists($id));
     }
 
     /**
@@ -88,23 +88,23 @@ class UserItemController extends Controller
      *     ),
      * )
      */
-    public function store(Request $request, int $id)
+    public function store(Request $request, int $id): JsonResponse
     {
         if (isset($request->item_id) && User::scopeGetUser($id)) {
-            return response()->json(UserItem::scopePurchaseUserItem($id, $request->item_id, $request->header('Authorization')));
-        } else {
-            return response()->json([
-                'message' => 'Not found Item Id or User Id',
-            ], 404);
+            return new JsonResponse(UserItem::scopePurchaseUserItem($id, $request->item_id, $request->header('Authorization')));
         }
+
+        return new JsonResponse([
+            'message' => 'Not found Item Id or User Id',
+        ], 404);
     }
 
     /**
      * 이용자가 보유중인 아이템 상세 정보를 조회합니다.
      *
-     * @param  int $id
+     * @param int $id
      * @param int $itemId
-     * @return mixed
+     * @return JsonResponse
      *
      * @SWG\Get(
      *     path="/users/{userId}/items/{userItemId}",
@@ -138,20 +138,19 @@ class UserItemController extends Controller
      *     ),
      * )
      */
-    public function show(int $id, int $itemId)
+    public function show(int $id, int $itemId): JsonResponse
     {
-        return response()->json(UserItem::scopeUserItemDetail($id, $itemId));
+        return new JsonResponse(UserItem::scopeUserItemDetail($id, $itemId));
     }
 
     /**
      * 이용자의 아이템 정보를 갱신합니다.
      *
      * @param Request $request
-     * @param  int $id
+     * @param int $id
      * @param int $itemId
-     * @return Response
+     * @return JsonResponse
      * @throws Exception
-     *
      * @SWG\Put(
      *     path="/users/{userId}/items/{userItemId}",
      *     description="Update User Item",
@@ -205,17 +204,17 @@ class UserItemController extends Controller
      *     ),
      * )
      */
-    public function update(Request $request, int $id, int $itemId)
+    public function update(Request $request, int $id, int $itemId): JsonResponse
     {
-        return response()->json(UserItem::scopeUpdateUserItem($id, $itemId, $request->all(), $request->header('Authorization')));
+        return new JsonResponse(UserItem::scopeUpdateUserItem($id, $itemId, $request->all(), $request->header('Authorization')));
     }
 
     /**
      * 이용자의 아이템을 제거합니다.
      *
-     * @param  int $id
+     * @param int $id
      * @param int $itemId
-     * @return mixed
+     * @return JsonResponse
      *
      * @SWG\Delete(
      *     path="/users/{userId}/items/{userItemId}",
@@ -249,9 +248,9 @@ class UserItemController extends Controller
      *     ),
      * )
      */
-    public function destroy(int $id, int $itemId)
+    public function destroy(int $id, int $itemId): JsonResponse
     {
-        return response()->json(UserItem::scopeDestroyUserItem($id, $itemId));
+        return new JsonResponse(UserItem::scopeDestroyUserItem($id, $itemId));
     }
 
     /**
@@ -260,18 +259,18 @@ class UserItemController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function withdraw(Request $request)
+    public function withdraw(Request $request): JsonResponse
     {
         $item = UserItem::scopeUserItemDetail(Auth::User()->id, $request->id);
 
         if (in_array($item->sku, UserItem::DISABLE_WITHDRAW_ITEMS)) {
-            return response()->json(['message' => 'Upon purchase is considered to be used this item for withdrawal is not possible.'], 403);
+            return new JsonResponse(['message' => 'Upon purchase is considered to be used this item for withdrawal is not possible.'], 403);
         }
 
         if ($item) {
-            return response()->json(UserItem::scopeUserItemWithdraw($request->id));
-        } else {
-            return response()->json(['message' => 'ERROR'], 400);
+            return new JsonResponse(UserItem::scopeUserItemWithdraw($request->id));
         }
+
+        return new JsonResponse(['message' => 'ERROR'], 400);
     }
 }

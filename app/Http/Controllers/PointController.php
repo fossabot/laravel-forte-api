@@ -6,6 +6,7 @@ use App\Models\Client;
 use App\Models\Receipt;
 use App\Models\User;
 use App\Services\XsollaAPIService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class PointController extends Controller
@@ -105,20 +106,20 @@ class PointController extends Controller
      *     ),
      * )
      */
-    public function store(Request $request, int $id)
+    public function store(Request $request, int $id): JsonResponse
     {
         $repetition = false;
         $needPoint = 0;
         $user = User::scopeGetUser($id);
 
         if (! $user) {
-            return response([
+            return new JsonResponse([
                 'message' => 'User does not exist',
             ], 404);
         }
 
         if (! empty($user->{User::DELETED_AT})) {
-            return response([
+            return new JsonResponse([
                 'message' => 'Withdraw User Account',
             ], 400);
         }
@@ -159,6 +160,6 @@ class PointController extends Controller
 
         (new DiscordNotificationController)->point($user->{User::EMAIL}, $user->{User::DISCORD_ID}, $request->points, $user->{User::POINTS});
 
-        return ['receipt_id' => $receipt->id];
+        return new JsonResponse(['receipt_id' => $receipt->id]);
     }
 }
