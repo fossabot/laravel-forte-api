@@ -8,8 +8,10 @@ use Auth;
 use Eloquent;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -49,6 +51,8 @@ use Illuminate\Support\Facades\DB;
  */
 class UserItem extends Model
 {
+    use SoftDeletes;
+
     const SBK_5 = 'skb_5';
     const SKB_9 = 'skb_9';
     const SKB_12 = 'skb_12';
@@ -94,7 +98,7 @@ class UserItem extends Model
      * @param int $id
      * @return mixed
      */
-    public static function scopeUserItemLists(int $id)
+    public static function scopeUserItemLists(int $id): Collection
     {
         return self::with('item')->where(self::USER_ID, $id)->orderBy('desc')->get();
     }
@@ -104,7 +108,7 @@ class UserItem extends Model
      * @param int $itemId
      * @return mixed
      */
-    public static function scopeUserItemDetail(int $id, int $itemId)
+    public static function scopeUserItemDetail(int $id, int $itemId): UserItem
     {
         return self::join('items', 'items.id', '=', 'user_items.item_id')->where('user_items.user_id', $id)
             ->where('user_items.id', $itemId)->first();
@@ -115,7 +119,7 @@ class UserItem extends Model
      * @param int $itemId
      * @return mixed
      */
-    public static function scopeCountUserPurchaseDuplicateItem(int $id, int $itemId)
+    public static function scopeCountUserPurchaseDuplicateItem(int $id, int $itemId): int
     {
         return self::where(self::USER_ID, $id)->where(self::ITEM_ID, $itemId)->whereNull(self::DELETED_AT)->count();
     }
@@ -180,7 +184,7 @@ class UserItem extends Model
      * @param string $token
      * @return int
      */
-    private static function createUserReceipt(int $id, int $itemId, int $userItemId, string $token)
+    private static function createUserReceipt(int $id, int $itemId, int $userItemId, string $token): int
     {
         $client = $token === 'xsolla' ?: Client::bringNameByToken($token);
         $user = User::scopeGetUser($id);
@@ -218,11 +222,6 @@ class UserItem extends Model
      */
     public static function scopeUpdateUserItem(int $id, int $itemId, array $data, string $token)
     {
-        $items = [
-            User::NAME => User::scopeGetUser($id)->{User::NAME},
-            User::EMAIL => User::scopeGetUser($id)->{User::EMAIL},
-        ];
-
         $userItem = self::find($itemId)->where(self::USER_ID, $id);
 
         if (Item::scopeItemDetail($userItem->{self::ITEM_ID})->{ITEM::CONSUMABLE} === 0) {
@@ -240,16 +239,10 @@ class UserItem extends Model
                     continue;
                 }
                 $userItem->$key = $item;
-
-                array_push($items, [
-                    self::EXPIRED => $userItem->{self::EXPIRED} ? 'true' : 'false',
-                    self::CONSUMED => $userItem->{self::CONSUMED} ? 'true' : 'false',
-                    self::SYNC => $userItem->{self::SYNC} ? 'true' : 'false',
-                ]);
             }
             $userItem->save();
 
-            (new DiscordNotificationController)->xsollaUserAction('User Item Update', $items);
+            (new DiscordNotificationController)->xsollaUserAction('User Item Update', $userItem);
 
             DB::commit();
         } catch (Exception $exception) {
@@ -264,22 +257,18 @@ class UserItem extends Model
     /**
      * @param int $id
      * @param int $itemId
-     * @return array
+     * @return UserItem|Builder|Model|\Illuminate\Database\Query\Builder|object
      */
-    public static function scopeDestroyUserItem(int $id, int $itemId)
+    public static function scopeDestroyUserItem(int $id, int $itemId): UserItem
     {
-        self::where(self::USER_ID, $id)->where(self::ITEM_ID, $itemId)->update([
-            self::DELETED_AT => date('Y-m-d H:m:s'),
-        ]);
-
-        return ['message' => 'Successful Destroy User Item'];
+        return self::withTrashed()->where(self::USER_ID, $id)->where(self::ITEM_ID, $itemId)->first();
     }
 
     /**
      * @param int $itemId
      * @return array
      */
-    public static function scopeUserItemWithdraw(int $itemId)
+    public static function scopeUserItemWithdraw(int $itemId): UserItem
     {
         $xsollaAPI = App::make('App\Services\XsollaAPIService');
         $repetition = false;
@@ -287,9 +276,7 @@ class UserItem extends Model
 
         $user = User::scopeGetUser(Auth::User()->id);
 
-        self::find($itemId)->where(self::USER_ID, $user->id)->update([
-            self::DELETED_AT => date('Y-m-d H:m:s'),
-        ]);
+        self::withTrashed()->find($itemId)->where(self::USER_ID, $user->id)->first();
 
         $item = self::scopeUserItemDetail($user->id, $itemId);
 

@@ -84,7 +84,7 @@ class User extends Authenticatable
      * @param $user
      * @return User|Model
      */
-    public static function scopeCreateUser($user)
+    public static function scopeCreateUser($user): User
     {
         return self::create([
             self::EMAIL => $user->{self::EMAIL},
@@ -107,7 +107,7 @@ class User extends Authenticatable
      * @param int $id
      * @return mixed
      */
-    public static function scopeGetUser(int $id)
+    public static function scopeGetUser(int $id): User
     {
         try {
             return self::findOrFail($id);
@@ -120,7 +120,7 @@ class User extends Authenticatable
      * @param string $id
      * @return User|Builder|Model|object|null
      */
-    public static function scopeGetUserByDiscordId(string $id)
+    public static function scopeGetUserByDiscordId(string $id): User
     {
         return self::where(self::DISCORD_ID, $id)->first();
     }
@@ -167,15 +167,11 @@ class User extends Authenticatable
 
     /**
      * @param int $id
-     * @return array
+     * @return User|\Illuminate\Database\Query\Builder
      */
-    public static function scopeDestoryUser(int $id)
+    public static function scopeDestoryUser(int $id): User
     {
         $xsollaAPI = App::make('App\Services\XsollaAPIService');
-
-        self::find($id)->update([
-            self::DELETED_AT => date('Y-m-d'),
-        ]);
 
         $datas = [
             'enabled' => false,
@@ -183,13 +179,13 @@ class User extends Authenticatable
 
         $xsollaAPI->requestAPI('PUT', 'projects/:projectId/users/'.$id, $datas);
 
-        return ['message' => 'success'];
+        return self::withTrashed()->find($id);
     }
 
     /**
      * @return mixed
      */
-    public static function scopeAllStaffs()
+    public static function scopeAllStaffs(): Collection
     {
         return self::where(self::IS_MEMBER, '=', 2)->whereNull('deleted_at')->get();
     }
