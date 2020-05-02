@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -12,18 +14,18 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $stack
  * @property mixed $stacked_at
  * @property string|null $created_at
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance attendanceRanks()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance attendances()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance existAttendance()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance query()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance whereDiscordId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance whereStack($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance whereStackedAt($value)
- * @mixin \Eloquent
+ * @method static Builder|Attendance attendanceRanks()
+ * @method static Builder|Attendance attendances()
+ * @method static Builder|Attendance existAttendance()
+ * @method static Builder|Attendance newModelQuery()
+ * @method static Builder|Attendance newQuery()
+ * @method static Builder|Attendance query()
+ * @method static Builder|Attendance whereCreatedAt($value)
+ * @method static Builder|Attendance whereDiscordId($value)
+ * @method static Builder|Attendance whereId($value)
+ * @method static Builder|Attendance whereStack($value)
+ * @method static Builder|Attendance whereStackedAt($value)
+ * @mixin Eloquent
  */
 class Attendance extends Model
 {

@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * App\Models\XsollaUrl
@@ -13,20 +16,20 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $hit
  * @property int $expired
  * @property int $user_id
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XsollaUrl newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XsollaUrl newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XsollaUrl query()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XsollaUrl whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XsollaUrl whereExpired($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XsollaUrl whereHit($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XsollaUrl whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XsollaUrl whereRedirectUrl($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XsollaUrl whereToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XsollaUrl whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XsollaUrl whereUserId($value)
- * @mixin \Eloquent
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @method static Builder|XsollaUrl newModelQuery()
+ * @method static Builder|XsollaUrl newQuery()
+ * @method static Builder|XsollaUrl query()
+ * @method static Builder|XsollaUrl whereCreatedAt($value)
+ * @method static Builder|XsollaUrl whereExpired($value)
+ * @method static Builder|XsollaUrl whereHit($value)
+ * @method static Builder|XsollaUrl whereId($value)
+ * @method static Builder|XsollaUrl whereRedirectUrl($value)
+ * @method static Builder|XsollaUrl whereToken($value)
+ * @method static Builder|XsollaUrl whereUpdatedAt($value)
+ * @method static Builder|XsollaUrl whereUserId($value)
+ * @mixin Eloquent
  */
 class XsollaUrl extends Model
 {

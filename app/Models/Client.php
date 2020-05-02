@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * App\Models\Client
@@ -12,19 +15,19 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $xsolla_selected_group_name xsolla selected_group name
  * @property string $token authentication token
  * @property string $prev_token
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client query()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client wherePrevToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client whereToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client whereXsollaSelectedGroupName($value)
- * @mixin \Eloquent
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @method static Builder|Client newModelQuery()
+ * @method static Builder|Client newQuery()
+ * @method static Builder|Client query()
+ * @method static Builder|Client whereCreatedAt($value)
+ * @method static Builder|Client whereId($value)
+ * @method static Builder|Client whereName($value)
+ * @method static Builder|Client wherePrevToken($value)
+ * @method static Builder|Client whereToken($value)
+ * @method static Builder|Client whereUpdatedAt($value)
+ * @method static Builder|Client whereXsollaSelectedGroupName($value)
+ * @mixin Eloquent
  */
 class Client extends Model
 {

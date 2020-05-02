@@ -2,7 +2,12 @@
 
 namespace App\Models;
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * App\Models\Item
@@ -17,29 +22,29 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $consumable
  * @property int|null $expiration_time expiration time in seconds (NULL means permanent)
  * @property int|null $purchase_limit max purchase count per user (NULL means infinity)
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserItem[] $userItems
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Collection|UserItem[] $userItems
  * @property-read int|null $user_items_count
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item allItemLists()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item itemDetail()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item query()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item skuParseId()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item whereClientId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item whereConsumable($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item whereEnabled($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item whereExpirationTime($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item whereImageUrl($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item wherePrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item wherePurchaseLimit($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item whereSku($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @method static Builder|Item allItemLists()
+ * @method static Builder|Item itemDetail()
+ * @method static Builder|Item newModelQuery()
+ * @method static Builder|Item newQuery()
+ * @method static Builder|Item query()
+ * @method static Builder|Item skuParseId()
+ * @method static Builder|Item whereClientId($value)
+ * @method static Builder|Item whereConsumable($value)
+ * @method static Builder|Item whereCreatedAt($value)
+ * @method static Builder|Item whereEnabled($value)
+ * @method static Builder|Item whereExpirationTime($value)
+ * @method static Builder|Item whereId($value)
+ * @method static Builder|Item whereImageUrl($value)
+ * @method static Builder|Item whereName($value)
+ * @method static Builder|Item wherePrice($value)
+ * @method static Builder|Item wherePurchaseLimit($value)
+ * @method static Builder|Item whereSku($value)
+ * @method static Builder|Item whereUpdatedAt($value)
+ * @mixin Eloquent
  */
 class Item extends Model
 {
@@ -76,7 +81,7 @@ class Item extends Model
 
     /**
      * @brief 1:n relationship
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function userItems()
     {

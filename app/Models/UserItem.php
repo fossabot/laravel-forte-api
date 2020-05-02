@@ -2,7 +2,15 @@
 
 namespace App\Models;
 
+use App;
+use App\Http\Controllers\DiscordNotificationController;
+use Auth;
+use Eloquent;
+use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -14,30 +22,30 @@ use Illuminate\Support\Facades\DB;
  * @property int $expired whether expiration time has passed or the cash was refunded
  * @property int $consumed
  * @property int $sync whether bot(items.client_id) is notified of the change in this item
- * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Item $item
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem countUserPurchaseDuplicateItem($itemId)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem destroyUserItem($itemId)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem purchaseUserItem($itemId, $token)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem query()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem updateUserItem($itemId, $data, $token)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem userItemDetail($itemId)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem userItemLists()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem userItemWithdraw()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem whereConsumed($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem whereExpired($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem whereItemId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem whereSync($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem whereUserId($value)
- * @mixin \Eloquent
+ * @property Carbon|null $deleted_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Item $item
+ * @method static Builder|UserItem countUserPurchaseDuplicateItem($itemId)
+ * @method static Builder|UserItem destroyUserItem($itemId)
+ * @method static Builder|UserItem newModelQuery()
+ * @method static Builder|UserItem newQuery()
+ * @method static Builder|UserItem purchaseUserItem($itemId, $token)
+ * @method static Builder|UserItem query()
+ * @method static Builder|UserItem updateUserItem($itemId, $data, $token)
+ * @method static Builder|UserItem userItemDetail($itemId)
+ * @method static Builder|UserItem userItemLists()
+ * @method static Builder|UserItem userItemWithdraw()
+ * @method static Builder|UserItem whereConsumed($value)
+ * @method static Builder|UserItem whereCreatedAt($value)
+ * @method static Builder|UserItem whereDeletedAt($value)
+ * @method static Builder|UserItem whereExpired($value)
+ * @method static Builder|UserItem whereId($value)
+ * @method static Builder|UserItem whereItemId($value)
+ * @method static Builder|UserItem whereSync($value)
+ * @method static Builder|UserItem whereUpdatedAt($value)
+ * @method static Builder|UserItem whereUserId($value)
+ * @mixin Eloquent
  */
 class UserItem extends Model
 {
@@ -75,7 +83,7 @@ class UserItem extends Model
 
     /**
      * @brief 1:n relationship
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function item()
     {
@@ -117,7 +125,7 @@ class UserItem extends Model
      * @param int $itemId
      * @param string $token
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public static function scopePurchaseUserItem(int $id, int $itemId, string $token)
     {
@@ -153,7 +161,7 @@ class UserItem extends Model
             $createUserReceipt = self::createUserReceipt($id, $itemId, $userItemId, $token);
 
             DB::commit();
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             DB::rollback();
 
             return ['error' => $exception->getMessage()];
@@ -206,7 +214,7 @@ class UserItem extends Model
      * @param array $data
      * @param string $token
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public static function scopeUpdateUserItem(int $id, int $itemId, array $data, string $token)
     {
@@ -241,10 +249,10 @@ class UserItem extends Model
             }
             $userItem->save();
 
-            (new \App\Http\Controllers\DiscordNotificationController)->xsollaUserAction('User Item Update', $items);
+            (new DiscordNotificationController)->xsollaUserAction('User Item Update', $items);
 
             DB::commit();
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             DB::rollback();
 
             return ['error' => $exception->getMessage()];
@@ -273,11 +281,11 @@ class UserItem extends Model
      */
     public static function scopeUserItemWithdraw(int $itemId)
     {
-        $xsollaAPI = \App::make('App\Services\XsollaAPIService');
+        $xsollaAPI = App::make('App\Services\XsollaAPIService');
         $repetition = false;
         $needPoint = 0;
 
-        $user = User::scopeGetUser(\Auth::User()->id);
+        $user = User::scopeGetUser(Auth::User()->id);
 
         self::find($itemId)->where(self::USER_ID, $user->id)->update([
             self::DELETED_AT => date('Y-m-d H:m:s'),
@@ -311,7 +319,7 @@ class UserItem extends Model
         unset($datas['project_id']);
         $datas['email'] = $user->{User::EMAIL};
         array_push($datas, $item);
-        (new \App\Http\Controllers\DiscordNotificationController)->xsollaUserAction('User Item Withdraw', $datas);
+        (new DiscordNotificationController)->xsollaUserAction('User Item Withdraw', $datas);
 
         return ['message' => 'Successful Withdraw User Item'];
     }

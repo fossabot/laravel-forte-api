@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * App\Models\Receipt
@@ -16,27 +19,27 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $refund whether the process is refund (not payment)
  * @property int $points_old
  * @property int $points_new
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt createReceipt($clientId, $userItemId, $aboutCash, $refund, $oldPoint, $newPoint, $transactionId)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt observerTransaction()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt query()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt userReceiptDetail($receiptId)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt userReceiptLists()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt whereAboutCash($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt whereClientId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt wherePointsNew($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt wherePointsOld($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt whereRefund($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt whereTransactionId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt whereUserId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt whereUserItemId($value)
- * @mixin \Eloquent
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @method static Builder|Receipt createReceipt($clientId, $userItemId, $aboutCash, $refund, $oldPoint, $newPoint, $transactionId)
+ * @method static Builder|Receipt newModelQuery()
+ * @method static Builder|Receipt newQuery()
+ * @method static Builder|Receipt observerTransaction()
+ * @method static Builder|Receipt query()
+ * @method static Builder|Receipt userReceiptDetail($receiptId)
+ * @method static Builder|Receipt userReceiptLists()
+ * @method static Builder|Receipt whereAboutCash($value)
+ * @method static Builder|Receipt whereClientId($value)
+ * @method static Builder|Receipt whereCreatedAt($value)
+ * @method static Builder|Receipt whereId($value)
+ * @method static Builder|Receipt wherePointsNew($value)
+ * @method static Builder|Receipt wherePointsOld($value)
+ * @method static Builder|Receipt whereRefund($value)
+ * @method static Builder|Receipt whereTransactionId($value)
+ * @method static Builder|Receipt whereUpdatedAt($value)
+ * @method static Builder|Receipt whereUserId($value)
+ * @method static Builder|Receipt whereUserItemId($value)
+ * @mixin Eloquent
  */
 class Receipt extends Model
 {

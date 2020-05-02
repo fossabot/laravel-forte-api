@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * App\Models\RequestLog
@@ -14,22 +17,22 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $ip
  * @property string $request
  * @property string $response
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RequestLog clearRequestLogs()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RequestLog newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RequestLog newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RequestLog query()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RequestLog whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RequestLog whereDuration($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RequestLog whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RequestLog whereIp($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RequestLog whereMethod($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RequestLog whereRequest($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RequestLog whereResponse($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RequestLog whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RequestLog whereUrl($value)
- * @mixin \Eloquent
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @method static Builder|RequestLog clearRequestLogs()
+ * @method static Builder|RequestLog newModelQuery()
+ * @method static Builder|RequestLog newQuery()
+ * @method static Builder|RequestLog query()
+ * @method static Builder|RequestLog whereCreatedAt($value)
+ * @method static Builder|RequestLog whereDuration($value)
+ * @method static Builder|RequestLog whereId($value)
+ * @method static Builder|RequestLog whereIp($value)
+ * @method static Builder|RequestLog whereMethod($value)
+ * @method static Builder|RequestLog whereRequest($value)
+ * @method static Builder|RequestLog whereResponse($value)
+ * @method static Builder|RequestLog whereUpdatedAt($value)
+ * @method static Builder|RequestLog whereUrl($value)
+ * @mixin Eloquent
  */
 class RequestLog extends Model
 {

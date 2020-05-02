@@ -2,10 +2,19 @@
 
 namespace App\Models;
 
+use App;
+use App\Http\Controllers\DiscordNotificationController;
+use Eloquent;
+use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -17,36 +26,36 @@ use Illuminate\Support\Facades\DB;
  * @property string|null $email
  * @property int $points virtual currency balance
  * @property int $is_member 0: default, 1: support, 2: staff
- * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
+ * @property Carbon|null $deleted_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read DatabaseNotificationCollection|DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User allStaffs()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User allUsers()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User createUser()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User destoryUser()
+ * @method static Builder|User allStaffs()
+ * @method static Builder|User allUsers()
+ * @method static Builder|User createUser()
+ * @method static Builder|User destoryUser()
  * @method static bool|null forceDelete()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User getUser()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User getUserByDiscordId()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User newQuery()
- * @method static \Illuminate\Database\Query\Builder|\App\Models\User onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User query()
+ * @method static Builder|User getUser()
+ * @method static Builder|User getUserByDiscordId()
+ * @method static Builder|User newModelQuery()
+ * @method static Builder|User newQuery()
+ * @method static \Illuminate\Database\Query\Builder|User onlyTrashed()
+ * @method static Builder|User query()
  * @method static bool|null restore()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User updateUser($datas = [])
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereDiscordId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereEmail($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereIsMember($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User wherePoints($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\User withTrashed()
- * @method static \Illuminate\Database\Query\Builder|\App\Models\User withoutTrashed()
- * @mixin \Eloquent
+ * @method static Builder|User updateUser($datas = [])
+ * @method static Builder|User whereCreatedAt($value)
+ * @method static Builder|User whereDeletedAt($value)
+ * @method static Builder|User whereDiscordId($value)
+ * @method static Builder|User whereEmail($value)
+ * @method static Builder|User whereId($value)
+ * @method static Builder|User whereIsMember($value)
+ * @method static Builder|User whereName($value)
+ * @method static Builder|User wherePoints($value)
+ * @method static Builder|User whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|User withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|User withoutTrashed()
+ * @mixin Eloquent
  */
 class User extends Authenticatable
 {
@@ -73,7 +82,7 @@ class User extends Authenticatable
 
     /**
      * @param $user
-     * @return User|\Illuminate\Database\Eloquent\Model
+     * @return User|Model
      */
     public static function scopeCreateUser($user)
     {
@@ -102,14 +111,14 @@ class User extends Authenticatable
     {
         try {
             return self::findOrFail($id);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return $exception->getMessage();
         }
     }
 
     /**
      * @param string $id
-     * @return User|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|object|null
+     * @return User|Builder|Model|object|null
      */
     public static function scopeGetUserByDiscordId(string $id)
     {
@@ -120,11 +129,11 @@ class User extends Authenticatable
      * @param int $id
      * @param array $datas
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public static function scopeUpdateUser(int $id, array $datas = [])
     {
-        $xsollaAPI = \App::make('App\Services\XsollaAPIService');
+        $xsollaAPI = App::make('App\Services\XsollaAPIService');
         $user = self::find($id);
         try {
             DB::beginTransaction();
@@ -146,9 +155,9 @@ class User extends Authenticatable
             $xsollaAPI->requestAPI('PUT', 'projects/:projectId/users/'.$id, $datas);
 
             DB::commit();
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             DB::rollback();
-            (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $datas);
+            (new DiscordNotificationController)->exception($exception, $datas);
 
             return ['error' => $exception->getMessage()];
         }
@@ -162,7 +171,7 @@ class User extends Authenticatable
      */
     public static function scopeDestoryUser(int $id)
     {
-        $xsollaAPI = \App::make('App\Services\XsollaAPIService');
+        $xsollaAPI = App::make('App\Services\XsollaAPIService');
 
         self::find($id)->update([
             self::DELETED_AT => date('Y-m-d'),
