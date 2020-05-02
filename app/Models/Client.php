@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 /**
- * App\Models\Client
+ * App\Models\Client.
  *
  * @property int $id
  * @property string $name skilebot and xsolla
@@ -52,14 +52,14 @@ class Client extends Model
      * @var array
      */
     protected $fillable = [
-        self::NAME, self::XSOLLA_SELECTED_GROUP_NAME, self::TOKEN, self::PREV_TOKEN
+        self::NAME, self::XSOLLA_SELECTED_GROUP_NAME, self::TOKEN, self::PREV_TOKEN,
     ];
 
     /**
      * @param string $token
      * @return Client|Builder|Model|object
      */
-    public static function bringNameByToken(string $token): Client
+    public static function bringNameByToken(string $token): self
     {
         return self::where(self::TOKEN, $token)->first();
     }

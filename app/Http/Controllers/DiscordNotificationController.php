@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Client;
 use App\Models\ErrorLog;
 use Exception;
 use NotificationChannels\Discord\Discord;
@@ -78,7 +77,7 @@ class DiscordNotificationController extends Controller
             'tts' => false,
             'embed' => [
                 'title' => 'Deploy Information',
-                'description' => "Deploy ..",
+                'description' => 'Deploy ..',
             ],
         ]);
     }

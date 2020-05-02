@@ -10,7 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 /**
- * App\Models\RequestLog
+ * App\Models\RequestLog.
  *
  * @property int $id
  * @property float $duration microtime start - end
@@ -50,7 +50,7 @@ class RequestLog extends Model
     const UPDATED_AT = 'updated_at';
 
     protected $fillable = [
-        self::DURATION, self::URL, self::METHOD, self::IP, self::REQUEST, self::RESPONSE
+        self::DURATION, self::URL, self::METHOD, self::IP, self::REQUEST, self::RESPONSE,
     ];
 
     /**
