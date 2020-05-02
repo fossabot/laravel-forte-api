@@ -62,7 +62,7 @@ class PointController extends Controller
                 }
             }
 
-            (new DiscordNotificationController)->point($staff->email, $staff->discord_id, MAX_POINT, $staff->points);
+            (new DiscordNotificationController)->point($staff->email, $staff->discord_id, self::MAX_POINT, $staff->points);
         }
     }
 
