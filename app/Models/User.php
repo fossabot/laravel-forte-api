@@ -191,6 +191,6 @@ class User extends Authenticatable
      */
     public static function scopeAllStaffs()
     {
-        self::where(self::IS_MEMBER, '=', 2)->whereNull('deleted_at')->get();
+        return self::where(self::IS_MEMBER, '=', 2)->whereNull('deleted_at')->get();
     }
 }
