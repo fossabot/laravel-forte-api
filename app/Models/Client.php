@@ -57,9 +57,9 @@ class Client extends Model
 
     /**
      * @param string $token
-     * @return mixed
+     * @return Client|Builder|Model|object
      */
-    public static function bringNameByToken(string $token)
+    public static function bringNameByToken(string $token): Client
     {
         return self::where(self::TOKEN, $token)->first();
     }

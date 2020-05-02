@@ -96,7 +96,7 @@ class UserItem extends Model
 
     /**
      * @param int $id
-     * @return mixed
+     * @return Collection
      */
     public static function scopeUserItemLists(int $id): Collection
     {
@@ -106,9 +106,9 @@ class UserItem extends Model
     /**
      * @param int $id
      * @param int $itemId
-     * @return mixed
+     * @return UserItem|Model|\Illuminate\Database\Query\Builder|object
      */
-    public static function scopeUserItemDetail(int $id, int $itemId): UserItem
+    public static function scopeUserItemDetail(int $id, int $itemId)
     {
         return self::join('items', 'items.id', '=', 'user_items.item_id')->where('user_items.user_id', $id)
             ->where('user_items.id', $itemId)->first();
@@ -117,7 +117,7 @@ class UserItem extends Model
     /**
      * @param int $id
      * @param int $itemId
-     * @return mixed
+     * @return int
      */
     public static function scopeCountUserPurchaseDuplicateItem(int $id, int $itemId): int
     {
@@ -128,27 +128,21 @@ class UserItem extends Model
      * @param int $id
      * @param int $itemId
      * @param string $token
-     * @return mixed
+     * @return Array|array
      * @throws Exception
      */
-    public static function scopePurchaseUserItem(int $id, int $itemId, string $token)
+    public static function scopePurchaseUserItem(int $id, int $itemId, string $token): Array
     {
         $user = User::scopeGetUser($id);
         $item = Item::scopeItemDetail($itemId);
         if ($user->{User::POINTS} < $item->{Item::PRICE}) {
-            return response()->json([
-                'message' => 'Insufficient points',
-            ], 400);
+            return ['message' => 'Insufficient points'];
         } elseif ($item->enabled == false) {
-            return response()->json([
-                'message' => 'Item is disable',
-            ], 400);
+            return ['message' => 'Item is disable'];
         }
 
         if (self::scopeCountUserPurchaseDuplicateItem($id, $itemId) < Item::scopeItemDetail($itemId)->{ITEM::PURCHASE_LIMIT}) {
-            return response()->json([
-                'message' => 'over user purchase limit !',
-            ], 400);
+            return ['message' => 'over user purchase limit !'];
         }
 
         try {
@@ -171,10 +165,7 @@ class UserItem extends Model
             return ['error' => $exception->getMessage()];
         }
 
-        return response()->json([
-            Receipt::USER_ITEM_ID => $userItemId,
-            Receipt::RECEIPT_ID => $createUserReceipt,
-        ], 201);
+        return [Receipt::USER_ITEM_ID => $userItemId, Receipt::RECEIPT_ID => $createUserReceipt];
     }
 
     /**
@@ -268,7 +259,7 @@ class UserItem extends Model
      * @param int $itemId
      * @return array
      */
-    public static function scopeUserItemWithdraw(int $itemId): UserItem
+    public static function scopeUserItemWithdraw(int $itemId): array
     {
         $xsollaAPI = App::make('App\Services\XsollaAPIService');
         $repetition = false;
@@ -305,7 +296,7 @@ class UserItem extends Model
 
         unset($datas['project_id']);
         $datas['email'] = $user->{User::EMAIL};
-        array_push($datas, $item);
+        $datas[] = $item;
         (new DiscordNotificationController)->xsollaUserAction('User Item Withdraw', $datas);
 
         return ['message' => 'Successful Withdraw User Item'];

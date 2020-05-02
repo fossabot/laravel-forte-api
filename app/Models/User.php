@@ -184,7 +184,7 @@ class User extends Authenticatable
     }
 
     /**
-     * @return mixed
+     * @return Collection
      */
     public static function scopeAllStaffs(): Collection
     {

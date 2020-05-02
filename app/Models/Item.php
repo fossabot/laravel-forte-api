@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
+use Exception;
 
 /**
  * App\Models\Item
@@ -83,33 +84,33 @@ class Item extends Model
      * @brief 1:n relationship
      * @return HasMany
      */
-    public function userItems()
+    public function userItems(): hasMany
     {
         return $this->hasMany(UserItem::class);
     }
 
     /**
-     * @return mixed
+     * @return Collection
      */
-    public static function scopeAllItemLists()
+    public static function scopeAllItemLists(): Collection
     {
         return self::get();
     }
 
     /**
      * @param int $id
-     * @return mixed
+     * @return Item
      */
-    public static function scopeItemDetail(int $id)
+    public static function scopeItemDetail(int $id): Item
     {
-        return self::find($id)->first();
+        return self::find($id);
     }
 
     /**
      * @param string $sku
-     * @return mixed
+     * @return int
      */
-    public static function scopeSkuParseId(string $sku)
+    public static function scopeSkuParseId(string $sku): int
     {
         return self::where(self::SKU, $sku)->first()->id;
     }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
@@ -75,7 +76,7 @@ class Receipt extends Model
 
     /**
      * @param int $id
-     * @return mixed
+     * @return Receipt
      */
     public static function scopeUserReceiptLists(int $id): Receipt
     {
@@ -85,7 +86,7 @@ class Receipt extends Model
     /**
      * @param int $id
      * @param int $receiptId
-     * @return mixed
+     * @return Receipt
      */
     public static function scopeUserReceiptDetail(int $id, int $receiptId): Receipt
     {
@@ -94,7 +95,7 @@ class Receipt extends Model
 
     /**
      * @param int $id
-     * @return mixed
+     * @return int
      */
     public static function scopeObserverTransaction(int $id): int
     {

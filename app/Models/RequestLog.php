@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 /**
  * App\Models\RequestLog
@@ -54,7 +55,7 @@ class RequestLog extends Model
 
     /**
      * @param string $date
-     * @return RequestLog|Builder|\Illuminate\Database\Query\Builder
+     * @return RequestLog[]|Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|Collection
      */
     public static function scopeClearRequestLogs(string $date)
     {
