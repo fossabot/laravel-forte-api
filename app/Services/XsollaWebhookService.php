@@ -2,10 +2,15 @@
 
 namespace App\Services;
 
+use App\Http\Controllers\DiscordNotificationController;
 use App\Models\Item;
 use App\Models\Receipt;
 use App\Models\User;
 use App\Models\UserItem;
+use Exception;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -63,7 +68,7 @@ class XsollaWebhookService
      * it identifies the presence of users in the game system.
      *
      * @param array $data
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     * @return ResponseFactory|Response
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_validation
      */
     public function userValidation(array $data)
@@ -101,7 +106,7 @@ class XsollaWebhookService
      *
      * @param array $data
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_payment
      */
     public function payment(array $data)
@@ -141,7 +146,7 @@ class XsollaWebhookService
                     'purchase' => $purchaseData,
                 ];
 
-                (new \App\Http\Controllers\DiscordNotificationController)->xsollaUserAction('Payment', $userAction);
+                (new DiscordNotificationController)->xsollaUserAction('Payment', $userAction);
 
                 $datas = [
                     'amount' => $quantity,
@@ -160,7 +165,7 @@ class XsollaWebhookService
                     'message' => 'The payment has been completed successfully.',
                 ],
             ], HTTP_OK);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             DB::rollback();
 
             return response([
@@ -188,7 +193,7 @@ class XsollaWebhookService
      * @param array $data
      * @return mixed
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_payment
-     * @throws \Exception
+     * @throws Exception
      */
     public function userBalanceOperation(array $data)
     {
@@ -229,7 +234,7 @@ class XsollaWebhookService
      * @param array $data
      * @return string
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_purchase
-     * @throws \Exception
+     * @throws Exception
      */
     private function operationPurchase(array $data)
     {
@@ -250,9 +255,9 @@ class XsollaWebhookService
             $user->{USER::POINTS} = $data['virtual_currency_balance']['new_value'];
             $user->save();
             DB::commit();
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             DB::rollback();
-            (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $data);
+            (new DiscordNotificationController)->exception($exception, $data);
 
             return $exception->getMessage();
         }
@@ -263,9 +268,9 @@ class XsollaWebhookService
             'balance' => $data['virtual_currency_balance'],
         ];
 
-        (new \App\Http\Controllers\DiscordNotificationController)->xsollaUserAction('Item Purchase', $userAction);
+        (new DiscordNotificationController)->xsollaUserAction('Item Purchase', $userAction);
 
-        return response()->json([
+        return new JsonResponse([
             'message' => 'Success',
         ], 200);
     }

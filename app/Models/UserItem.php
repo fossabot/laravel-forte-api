@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -208,7 +209,7 @@ class UserItem extends Model
      * @param int $itemId
      * @param array $data
      * @param string $token
-     * @return array
+     * @return UserItem|UserItem[]|array|Builder|Collection|Model|null
      * @throws Exception
      */
     public static function scopeUpdateUserItem(int $id, int $itemId, array $data, string $token)
@@ -216,9 +217,7 @@ class UserItem extends Model
         $userItem = self::find($itemId)->where(self::USER_ID, $id);
 
         if (Item::scopeItemDetail($userItem->{self::ITEM_ID})->{ITEM::CONSUMABLE} === 0) {
-            return response()->json([
-                'message' => 'Bad Request Consumed value is true',
-            ], 400);
+            return ['message' => 'Bad Request Consumed value is true'];
         }
 
         try {

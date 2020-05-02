@@ -254,8 +254,8 @@ class UserController extends Controller
     /**
      * 이용자를 탈퇴처리합니다.
      *
-     * @param  int $id
-     * @return Response
+     * @param int $id
+     * @return JsonResponse
      *
      * @SWG\Delete(
      *     path="/users/{userId}",
@@ -282,9 +282,9 @@ class UserController extends Controller
      *     ),
      * )
      */
-    public function destroy(int $id)
+    public function destroy(int $id): JsonResponse
     {
-        return response()->json(User::scopeDestoryUser($id));
+        return new JsonResponse(User::scopeDestoryUser($id));
     }
 
     /**
@@ -296,7 +296,7 @@ class UserController extends Controller
         try {
             $user = User::scopeGetUser($id);
             if (! $user) {
-                return response()->json([
+                return new JsonResponse([
                     'message' => 'User '.$id.' not found.',
                 ], 404);
             }
@@ -450,7 +450,7 @@ class UserController extends Controller
                 Attendance::CREATED_AT => now(),
             ]);
 
-            return response()->json([
+            return new JsonResponse([
                 'status' => 'success',
                 'stack' => 1,
             ]);
@@ -461,7 +461,7 @@ class UserController extends Controller
             if ($lastedAt && Carbon::parse($lastedAt)->isToday()) {
                 $diff = Carbon::now()->diff(Carbon::tomorrow())->format('%hh %im %ss');
 
-                return response()->json([
+                return new JsonResponse([
                     'status' => 'exist_attendance',
                     'message' => 'exist today attend',
                     'diff' => $diff,
@@ -476,7 +476,7 @@ class UserController extends Controller
                     Attendance::STACKED_AT => json_encode($stackedAt),
                 ]);
 
-                return response()->json([
+                return new JsonResponse([
                     'status' => 'success',
                     Attendance::STACK => $attendance->{Attendance::STACK},
                 ]);
