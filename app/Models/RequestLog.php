@@ -5,6 +5,7 @@ namespace App\Models;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
 /**
@@ -36,6 +37,8 @@ use Illuminate\Support\Carbon;
  */
 class RequestLog extends Model
 {
+    use SoftDeletes;
+
     const DURATION = 'duration';
     const URL = 'url';
     const METHOD = 'method';
@@ -51,10 +54,10 @@ class RequestLog extends Model
 
     /**
      * @param string $date
-     * @return mixed
+     * @return RequestLog|Builder|\Illuminate\Database\Query\Builder
      */
     public static function scopeClearRequestLogs(string $date)
     {
-        return self::where(self::CREATED_AT, '<', $date)->delete();
+        return self::withTrashed()->where(self::CREATED_AT, '<', $date)->get();
     }
 }
