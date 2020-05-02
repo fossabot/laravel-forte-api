@@ -7,26 +7,10 @@ use App\Models\Item;
 use App\Models\Receipt;
 use App\Models\User;
 use App\Models\UserItem;
-use Exception;
-use Illuminate\Contracts\Routing\ResponseFactory;
+use Exception as ExceptionAlias;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-
-/**
- * RESPONSE CODE.
- * @see https://gist.github.com/jeffochoa/a162fc4381d69a2d862dafa61cda0798
- */
-const HTTP_OK = 200;
-const HTTP_CREATED = 201;
-const HTTP_ACCEPTED = 202;
-const HTTP_BAD_REQUEST = 400;
-const HTTP_UNAUTHORIZED = 401;
-const HTTP_PAYMENT_REQUIRED = 402;
-const HTTP_FORBIDDEN = 403;
-const HTTP_NOT_FOUND = 404;
-const HTTP_INTERNAL_SERVER_ERROR = 500;
-const HTTP_NOT_IMPLEMENTED = 501;
 
 /**
  * Class XsollaWebhookService.
@@ -68,48 +52,37 @@ class XsollaWebhookService
      * it identifies the presence of users in the game system.
      *
      * @param array $data
-     * @return ResponseFactory|Response
+     * @return Array|JsonResponse
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_validation
      */
-    public function userValidation(array $data)
+    public function userValidation(array $data): JsonResponse
     {
-        if (User::scopeGetUser((int) $data['user']['id'])) {
-            return response([
-                'success' => [
-                    'code' => 'VALID_USER',
-                    'message' => 'The user is valid',
-                ],
-            ], HTTP_OK);
-        } else {
-            return response([
+        if (! User::scopeGetUser((int) $data['user']['id'])) {
+            return new JsonResponse([
                 'error' => [
                     'code' => 'INVALID_USER',
                     'message' => 'The user is invalid',
                 ],
-            ], HTTP_NOT_FOUND);
+            ], Response::HTTP_NOT_FOUND);
         }
-    }
 
-    /**
-     * this method is buying the outside xsolla game store.
-     * @deprecated xsolla webhooks userSearch method is no use
-     * @return string
-     * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_search
-     */
-    public function userSearch()
-    {
-        return 'no use';
+        return new JsonResponse([
+            'success' => [
+                'code' => 'VALID_USER',
+                'message' => 'The user is valid',
+            ],
+        ], Response::HTTP_OK);
     }
 
     /**
      * sends when the user has completed the payment process.
      *
      * @param array $data
-     * @return mixed
-     * @throws Exception
+     * @return JsonResponse
+     * @throws ExceptionAlias
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_payment
      */
-    public function payment(array $data)
+    public function payment(array $data): JsonResponse
     {
         $userData = $data['user'];
         $purchaseData = $data['purchase'];
@@ -117,12 +90,12 @@ class XsollaWebhookService
 
         if (Receipt::scopeObserverTransaction($transactionData['id']) > 0) {
             // This payment is a duplicate payment.
-            return response([
+            return new JsonResponse([
                 'success' => [
                     'code' => 'SUCCESS_PAYMENT',
                     'message' => 'The payment has already handled.',
                 ],
-            ], HTTP_OK);
+            ], Response::HTTP_OK);
         }
 
         try {
@@ -131,7 +104,7 @@ class XsollaWebhookService
 
             if (isset($purchaseData['virtual_items'])) {
                 foreach ($purchaseData['virtual_items']['items'] as $item) {
-                    $purchaseItem = Item::where('sku', $item['sku'])->first();
+                    $purchaseItem = Item::where(Item::SKU, $item['sku'])->first();
                     UserItem::scopePurchaseUserItem($user->id, $purchaseItem->id, 'xsolla');
                 }
             } else {
@@ -147,42 +120,36 @@ class XsollaWebhookService
                 ];
 
                 (new DiscordNotificationController)->xsollaUserAction('Payment', $userAction);
-
-                $datas = [
-                    'amount' => $quantity,
-                    'comment' => '구매 '.$quantity.' points',
-                ];
-                // $this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->user_id.'/recharge', $datas);
             }
 
             $user->save();
 
             DB::commit();
 
-            return response([
+            return new JsonResponse([
                 'success' => [
                     'code' => 'SUCCESS_PAYMENT',
                     'message' => 'The payment has been completed successfully.',
                 ],
-            ], HTTP_OK);
-        } catch (Exception $exception) {
+            ], Response::HTTP_OK);
+        } catch (ExceptionAlias $exception) {
             DB::rollback();
 
-            return response([
+            return new JsonResponse([
                 'error' => [
                     'code' => 'INVALID_PAYMENT',
                     'message' => 'Payment failed.',
                 ],
-            ], HTTP_PAYMENT_REQUIRED);
+            ], Response::HTTP_PAYMENT_REQUIRED);
         }
     }
 
     /**
      * sends when payment is cancelled for unknown reason.
-     * @deprecated xsolla webhooks refund method is no use
      * @param array $data
-     * @return mixed
+     * @return Array|array
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_refund
+     * @deprecated xsolla webhooks refund method is no use
      */
     public function refund(array $data)
     {
@@ -192,8 +159,8 @@ class XsollaWebhookService
     /**
      * @param array $data
      * @return mixed
-     * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_payment
-     * @throws Exception
+     * @throws ExceptionAlias
+     *@see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_payment
      */
     public function userBalanceOperation(array $data)
     {
@@ -208,9 +175,6 @@ class XsollaWebhookService
                 break;
             case 'coupon':
                 $this->operationCoupon($data);
-                break;
-            case 'internal':
-//                $this->operationInternal($data);
                 break;
             case 'refund':
                 $this->operationRefund($data);
@@ -233,8 +197,8 @@ class XsollaWebhookService
      *
      * @param array $data
      * @return string
-     * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_purchase
-     * @throws Exception
+     * @throws ExceptionAlias
+     *@see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_purchase
      */
     private function operationPurchase(array $data)
     {
@@ -248,14 +212,14 @@ class XsollaWebhookService
             DB::beginTransaction();
             if ($data['items_operation_type'] == 'add') {
                 foreach ($items as $item) {
-                    UserItem::scopePurchaseUserItem($userId, Item::scopeSkuParseId($item['sku']), 'xsolla');
+                    UserItem::scopePurchaseUserItem($userId, Item::scopeSkuParseId($item{Item::SKU}), 'xsolla');
                 }
             }
 
             $user->{USER::POINTS} = $data['virtual_currency_balance']['new_value'];
             $user->save();
             DB::commit();
-        } catch (Exception $exception) {
+        } catch (ExceptionAlias $exception) {
             DB::rollback();
             (new DiscordNotificationController)->exception($exception, $data);
 
@@ -277,31 +241,31 @@ class XsollaWebhookService
 
     /**
      * @param array $data
-     * @return array
+     * @return Array
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_redeem_coupon
      */
-    private function operationCoupon(array $data)
+    private function operationCoupon(array $data): Array
     {
         return $this->operationPointRelevant($data);
     }
 
     /**
-     * @deprecated
      * @param array $data
-     * @return array
+     * @return Array
+     * @deprecated
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_manual_update
      */
-    private function operationInternal(array $data)
+    private function operationInternal(array $data): Array
     {
         return $this->operationPointRelevant($data);
     }
 
     /**
      * @param array $data
-     * @return array
+     * @return Array
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_refund
      */
-    private function operationRefund(array $data)
+    private function operationRefund(array $data): Array
     {
         return $this->operationPointRelevant($data);
     }
@@ -309,9 +273,9 @@ class XsollaWebhookService
     /**
      * User Balance Operation Central Point Processing Function.
      * @param array $data
-     * @return array
+     * @return Array|array
      */
-    private function operationPointRelevant(array $data)
+    private function operationPointRelevant(array $data): Array
     {
         // TODO: sync xsolla with crescendo API if points are different
 

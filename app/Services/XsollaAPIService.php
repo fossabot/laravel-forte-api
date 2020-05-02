@@ -2,18 +2,22 @@
 
 namespace App\Services;
 
+use App\Http\Controllers\DiscordNotificationController;
 use App\Models\Item;
-use GuzzleHttp\Client;
+use Exception;
+use App\Models\Client;
 use GuzzleHttp\Exception\GuzzleException;
-
-const SKU_PREFIX = [
-    'baechubotv2' => 'cabv2',
-    'sangchuv2' => 'letv2',
-    'skilebot' => 'skb',
-];
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
 
 class XsollaAPIService
 {
+    const SKU_PREFIX = [
+        'baechubotv2' => 'cabv2',
+        'sangchuv2' => 'letv2',
+        'skilebot' => 'skb',
+    ];
+
     /**
      * @var Client
      */
@@ -66,7 +70,7 @@ class XsollaAPIService
      * @param string $method
      * @param string $uri
      * @param array $datas
-     * @return mixed|\Psr\Http\Message\ResponseInterface
+     * @return Array|StreamInterface|string
      */
     public function requestAPI(string $method, string $uri, array $datas)
     {
@@ -88,7 +92,7 @@ class XsollaAPIService
 
             return $response->getBody();
         } catch (GuzzleException $exception) {
-            (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $datas);
+            (new DiscordNotificationController)->exception($exception, $datas);
 
             return $exception->getMessage();
         }
@@ -110,14 +114,14 @@ class XsollaAPIService
             $xsollaItems = json_decode($this->requestAPI('GET', 'projects/:projectId/virtual_items/items', []), true);
 
             foreach ($xsollaItems as $item) {
-                if (! Item::where('sku', $item['sku'])->first()) {
+                if (! Item::where(Item::SKU, $item['sku'])->first()) {
                     array_push($xsollaDuplicateItemsSku, $item['sku']);
                 }
                 array_push($xsollaItemsSku, $item['sku']);
                 array_push($xsollaItemIds, $item['id']);
             }
 
-            Item::whereNotIn('sku', $xsollaItemsSku)->delete();
+            Item::whereNotIn(Item::SKU, $xsollaItemsSku)->delete();
 
             // 각 아이템 고유 ID에 대해 세부 페이지에 접속해서 동기화시킨다.
             foreach ($xsollaItemIds as $xsollaItemId) {
@@ -125,12 +129,11 @@ class XsollaAPIService
                 $count++;
 
                 // Forte DB 에 아이템이 없을 경우 생성
-                if (! Item::where('sku', $xsollaDetailItem['sku'])->first()) {
-                    $skuParse = explode('_', $xsollaDetailItem['sku']);
-                    $convertSku = array_search($skuParse[0], SKU_PREFIX);
+                if (! Item::where(Item::SKU, $xsollaDetailItem['sku'])->first()) {
+                    $convertSku = array_search(explode('_', $xsollaDetailItem['sku']), self::SKU_PREFIX);
 
                     Item::create([
-                        'client_id' => \App\Models\Client::where('name', $convertSku)->value('id'),
+                        'client_id' => Client::where(Client::NAME, $convertSku)->value('id'),
                         'sku' => $xsollaDetailItem['sku'],
                         'name' => (! empty($xsollaDetailItem['name']['ko'])) ? $xsollaDetailItem['name']['ko'] : $xsollaDetailItem['name']['en'],
                         'image_url' => $xsollaDetailItem['image_url'],
@@ -141,7 +144,7 @@ class XsollaAPIService
                         'purchase_limit' => empty($xsollaDetailItem['purchase_limit']) ? null : $xsollaDetailItem['purchase_limit'],
                     ]);
                 } else {
-                    Item::where('sku', $xsollaDetailItem['sku'])->update([
+                    Item::where(Item::SKU, $xsollaDetailItem['sku'])->update([
                         'name' => (! empty($xsollaDetailItem['name']['ko'])) ? $xsollaDetailItem['name']['ko'] : $xsollaDetailItem['name']['en'],
                         'image_url' => $xsollaDetailItem['image_url'],
                         'price' => empty($xsollaDetailItem['virtual_currency_price']) ? 0 : $xsollaDetailItem['virtual_currency_price'],
@@ -152,13 +155,13 @@ class XsollaAPIService
                     ]);
                 }
             }
-        } catch (\Exception $exception) {
-            (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $xsollaItemsSku);
+        } catch (Exception $exception) {
+            (new DiscordNotificationController)->exception($exception, $xsollaItemsSku);
 
             return $exception->getMessage();
         }
 
-        (new \App\Http\Controllers\DiscordNotificationController)->sync($count, $xsollaDuplicateItemsSku);
+        (new DiscordNotificationController)->sync($count, $xsollaDuplicateItemsSku);
         $this->print('== End Xsolla Sync from Forte Items ==');
     }
 
