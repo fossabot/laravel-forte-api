@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Receipt;
+use Illuminate\Http\JsonResponse;
 
 class ReceiptController extends Controller
 {
@@ -10,7 +11,7 @@ class ReceiptController extends Controller
      * 이용자의 모든 레시피 정보를 조회합니다.
      *
      * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      *
      * @SWG\Get(
      *     path="/users/{userId}/receipts",
@@ -47,7 +48,7 @@ class ReceiptController extends Controller
      *
      * @param int $id
      * @param int $receiptId
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      *
      * @SWG\Get(
      *     path="/users/{userId}/receipts/{receiptId}",

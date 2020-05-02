@@ -10,9 +10,15 @@ use App\Models\UserItem;
 use App\Models\XsollaUrl;
 use App\Services\XsollaAPIService;
 use Carbon\Carbon;
+use Exception;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 use Socialite;
 
 class UserController extends Controller
@@ -34,7 +40,7 @@ class UserController extends Controller
     /**
      * 전체 이용자를 조회합니다.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      *
      * @SWG\Get(
      *     path="/users",
@@ -60,8 +66,8 @@ class UserController extends Controller
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse|string
-     * @throws \Exception
+     * @return JsonResponse|string
+     * @throws Exception
      */
     public function login()
     {
@@ -81,9 +87,9 @@ class UserController extends Controller
     /**
      * 이용자를 추가(회원가입) 합니다.
      *
-     * @param $discord_user
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
-     * @throws \Exception
+     * @param $user
+     * @return ResponseFactory|Response
+     * @throws Exception
      */
     public function store($user)
     {
@@ -105,9 +111,9 @@ class UserController extends Controller
                 'status' => 'success',
                 'data' => $user,
             ], 201);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             DB::rollBack();
-            (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $user);
+            (new DiscordNotificationController)->exception($exception, $user);
 
             return response()->json([
                 'error' => $exception,
@@ -119,7 +125,7 @@ class UserController extends Controller
      * 이용자의 정보를 조회합니다.
      *
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      *
      * @SWG\Get(
      *     path="/users/{userId}",
@@ -155,7 +161,7 @@ class UserController extends Controller
      * 디스코드 아이디로 조회합니다.
      *
      * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      *
      * @SWG\Get(
      *     path="/discords/{discordId}",
@@ -192,8 +198,8 @@ class UserController extends Controller
      *
      * @param UserUpdateFormRequest $request
      * @param  int $id
-     * @return \Illuminate\Http\Response
-     * @throws \Exception
+     * @return Response
+     * @throws Exception
      * @SWG\Put(
      *     path="/users/{userId}",
      *     description="Update User Information",
@@ -249,7 +255,7 @@ class UserController extends Controller
      * 이용자를 탈퇴처리합니다.
      *
      * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      *
      * @SWG\Delete(
      *     path="/users/{userId}",
@@ -283,7 +289,7 @@ class UserController extends Controller
 
     /**
      * @param int $id
-     * @return \Illuminate\Http\JsonResponse|string
+     * @return JsonResponse|string
      */
     public function xsollaToken(int $id)
     {
@@ -340,8 +346,8 @@ class UserController extends Controller
             ]);
 
             return $request['token'];
-        } catch (\Exception $exception) {
-            (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $datas);
+        } catch (Exception $exception) {
+            (new DiscordNotificationController)->exception($exception, $datas);
 
             return $exception->getMessage();
         }
@@ -353,7 +359,7 @@ class UserController extends Controller
      * panel 에서 포르테 상점과 인벤토리를 이용할 수 있도록.
      *
      * @param string $token
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function panel(string $token)
     {
@@ -397,7 +403,7 @@ class UserController extends Controller
      * @param string $id
      * @return void
      *
-     * @throws \Exception
+     * @throws Exception
      * @SWG\POST(
      *     path="/discords/{discordId}/attendances",
      *     description="User Attendance",
@@ -506,7 +512,7 @@ class UserController extends Controller
                     }
                 }
 
-                (new \App\Http\Controllers\DiscordNotificationController)->point($user->{User::EMAIL}, $user->{User::DISCORD_ID}, $deposit, $user->{User::POINTS});
+                (new DiscordNotificationController)->point($user->{User::EMAIL}, $user->{User::DISCORD_ID}, $deposit, $user->{User::POINTS});
 
                 array_push($stackedAt, Carbon::now()->toDateTimeString());
 

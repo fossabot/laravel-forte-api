@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use App\Models\ErrorLog;
+use Exception;
 use NotificationChannels\Discord\Discord;
 
 class DiscordNotificationController extends Controller
@@ -23,11 +24,11 @@ class DiscordNotificationController extends Controller
     ];
 
     /**
-     * @param \Exception $exception
+     * @param Exception $exception
      * @param array $data
      * @return array
      */
-    public function exception(\Exception $exception, array $data = [])
+    public function exception(Exception $exception, array $data = [])
     {
         $params = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
 
@@ -68,7 +69,6 @@ class DiscordNotificationController extends Controller
     }
 
     /**
-     * @param string $status
      * @return array
      */
     public function deploy()

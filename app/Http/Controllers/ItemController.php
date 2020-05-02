@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Item;
+use Illuminate\Http\Response;
 
 class ItemController extends Controller
 {
     /**
      * 전체 아이템을 조회합니다.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      *
      * @SWG\Get(
      *     path="/items",
@@ -38,7 +39,7 @@ class ItemController extends Controller
      * 아이템을 상세 조회합니다.
      *
      * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      *
      * @SWG\Get(
      *     path="/items/{itemId}",

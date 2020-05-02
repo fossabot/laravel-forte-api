@@ -4,7 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\UserItem;
+use Auth;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class UserItemController extends Controller
 {
@@ -12,7 +16,7 @@ class UserItemController extends Controller
      * 이용자의 보유한 아이템 목록을 조회합니다.
      *
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      *
      * @SWG\Get(
      *     path="/users/{userId}/items",
@@ -47,10 +51,10 @@ class UserItemController extends Controller
     /**
      * 아이템을 구매합니다.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param Request $request
      * @param int $id
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      *
      * @SWG\Post(
      *     path="/users/{userId}/items",
@@ -142,11 +146,11 @@ class UserItemController extends Controller
     /**
      * 이용자의 아이템 정보를 갱신합니다.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param Request $request
      * @param  int $id
      * @param int $itemId
-     * @return \Illuminate\Http\Response
-     * @throws \Exception
+     * @return Response
+     * @throws Exception
      *
      * @SWG\Put(
      *     path="/users/{userId}/items/{userItemId}",
@@ -254,11 +258,11 @@ class UserItemController extends Controller
      * 이용자 아이템 청약철회.
      *
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function withdraw(Request $request)
     {
-        $item = UserItem::scopeUserItemDetail(\Auth::User()->id, $request->id);
+        $item = UserItem::scopeUserItemDetail(Auth::User()->id, $request->id);
 
         if (in_array($item->sku, UserItem::DISABLE_WITHDRAW_ITEMS)) {
             return response()->json(['message' => 'Upon purchase is considered to be used this item for withdrawal is not possible.'], 403);

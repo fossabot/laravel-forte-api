@@ -16,8 +16,8 @@ class ClientController extends Controller
         foreach (Client::get() as $client) {
             if (! in_array($client->name, Client::BOT_TOKEN_RENEWAL_EXCEPTION)) {
                 Client::find($client->id)->update([
-                    'token' => 'forte-'.$this->generateToken(),
-                    'prev_token' => $client->token,
+                    Client::TOKEN => 'forte-'.$this->generateToken(),
+                    Client::PREV_TOKEN => $client->{Client::PREV_TOKEN},
                 ]);
             }
         }
@@ -66,8 +66,8 @@ class ClientController extends Controller
         $client = Client::where('prev_token', $_SERVER['HTTP_AUTHORIZATION'])->first() ?: null;
         if (! empty($client)) {
             return response()->json([
-                'token' => $client->token,
-                'updated_at' => $client->updated_at,
+                'token' => $client->{Client::TOKEN},
+                'updated_at' => $client->{Client::UPDATED_AT},
             ]);
         }
     }

@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Services\XsollaWebhookService;
+use Exception;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class XsollaWebhookController extends Controller
 {
@@ -29,8 +32,8 @@ class XsollaWebhookController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
-     * @throws \Exception
+     * @return ResponseFactory|Response|mixed
+     * @throws Exception
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_webhooks_list
      */
     public function index(Request $request)
