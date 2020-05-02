@@ -71,9 +71,7 @@ class UserController extends Controller
         if (! $user) {
             $user = $this->store($socialite);
         } else if ($user && ($user->name !== $socialite->name)) {
-            User::update([
-                'name' => $socialite->name,
-            ]);
+            User::scopeUpdateUser($user->id, ['name' => $socialite->name]);
         }
 
         Auth::login($user);
