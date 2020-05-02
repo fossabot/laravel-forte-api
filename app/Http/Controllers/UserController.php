@@ -393,7 +393,7 @@ class UserController extends Controller
      */
     public function attendances()
     {
-        return Attendance::scopeAttendances();
+        return response()->json(Attendance::scopeAttendances());
     }
 
     /**

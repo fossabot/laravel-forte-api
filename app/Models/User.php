@@ -6,6 +6,7 @@ use App;
 use App\Http\Controllers\DiscordNotificationController;
 use Eloquent;
 use Exception;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -96,9 +97,9 @@ class User extends Authenticatable
     /**
      * @return mixed
      */
-    public static function scopeAllUsers(): Collection
+    public static function scopeAllUsers(): Paginator
     {
-        return self::whereNull(self::DELETED_AT)->get();
+        return self::whereNull(self::DELETED_AT)->paginate();
     }
 
     /**

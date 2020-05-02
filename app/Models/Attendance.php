@@ -54,7 +54,7 @@ class Attendance extends Model
      */
     public static function scopeAttendances()
     {
-        return self::get();
+        return self::paginate();
     }
 
     /**
