@@ -236,7 +236,7 @@ class XsollaWebhookService
 
         return new JsonResponse([
             'message' => 'Success',
-        ], 200);
+        ], Response::HTTP_OK);
     }
 
     /**

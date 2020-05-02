@@ -112,20 +112,20 @@ class UserController extends Controller
 
             return new JsonResponse([
                 'error' => $exception->getMessage(),
-            ], 400);
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         return new JsonResponse([
             'status' => 'success',
             'data' => $user,
-        ], 201);
+        ], Response::HTTP_CREATED);
     }
 
     /**
      * 이용자의 정보를 조회합니다.
      *
      * @param int $id
-     * @return Response
+     * @return JsonResponse
      *
      * @SWG\Get(
      *     path="/users/{userId}",
@@ -298,7 +298,7 @@ class UserController extends Controller
             if (! $user) {
                 return new JsonResponse([
                     'message' => 'User '.$id.' not found.',
-                ], 404);
+                ], Response::HTTP_NOT_FOUND);
             }
 
             if (config('app.env') == 'production') {

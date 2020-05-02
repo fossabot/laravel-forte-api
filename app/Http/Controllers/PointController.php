@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\XsollaAPIService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class PointController extends Controller
 {
@@ -115,13 +116,13 @@ class PointController extends Controller
         if (! $user) {
             return new JsonResponse([
                 'message' => 'User does not exist',
-            ], 404);
+            ], Response::HTTP_NOT_FOUND);
         }
 
         if (! empty($user->{User::DELETED_AT})) {
             return new JsonResponse([
                 'message' => 'Withdraw User Account',
-            ], 400);
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         $oldPoints = $user->{User::POINTS};

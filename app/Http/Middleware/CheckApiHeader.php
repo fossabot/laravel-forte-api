@@ -5,6 +5,8 @@ namespace App\Http\Middleware;
 use App\Http\Controllers\ClientController;
 use App\Models\Client;
 use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class CheckApiHeader
 {
@@ -25,8 +27,8 @@ class CheckApiHeader
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param  Request  $request
+     * @param Closure $next
      * @return mixed
      */
     public function handle($request, Closure $next)
@@ -37,7 +39,7 @@ class CheckApiHeader
                     'code' => 'INVALID_AUTHORIZATION',
                     'message' => 'Please set Authorization Header',
                 ],
-            ], 404);
+            ], Response::HTTP_NOT_FOUND);
         }
 
         if (Client::where('prev_token', $_SERVER['HTTP_AUTHORIZATION'])->first()) {
@@ -50,7 +52,7 @@ class CheckApiHeader
                     'code' => 'INVALID_AUTHORIZATION',
                     'message' => 'The Authorization Header is invalid',
                 ],
-            ], 401);
+            ], Response::HTTP_UNAUTHORIZED);
         }
 
         return $next($request);

@@ -6,6 +6,7 @@ use App\Models\TrustIP;
 use Closure;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class CheckTrustIP
 {
@@ -24,7 +25,7 @@ class CheckTrustIP
                     'code' => 'INVALID_IP_ADDRESS',
                     'message' => 'The IP was not trusted.',
                 ],
-            ], 401);
+            ], Response::HTTP_UNAUTHORIZED);
         }
 
         return $next($request);

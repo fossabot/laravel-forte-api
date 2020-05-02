@@ -96,7 +96,7 @@ class UserItemController extends Controller
 
         return new JsonResponse([
             'message' => 'Not found Item Id or User Id',
-        ], 404);
+        ], Response::HTTP_NOT_FOUND);
     }
 
     /**
@@ -271,6 +271,6 @@ class UserItemController extends Controller
             return new JsonResponse(UserItem::scopeUserItemWithdraw($request->id));
         }
 
-        return new JsonResponse(['message' => 'ERROR'], 400);
+        return new JsonResponse(['message' => 'ERROR'], Response::HTTP_BAD_REQUEST);
     }
 }
