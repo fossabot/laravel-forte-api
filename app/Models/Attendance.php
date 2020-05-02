@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\Attendance
+ * App\Models\Attendance.
  *
  * @property int $id
  * @property string $discord_id
@@ -39,14 +39,14 @@ class Attendance extends Model
     const CREATED_AT = 'created_at';
 
     protected $fillable = [
-        self::DISCORD_ID, self::STACK, self::STACKED_AT
+        self::DISCORD_ID, self::STACK, self::STACKED_AT,
     ];
 
     /**
      * @param int $id
      * @return Attendance|Builder|Model|object
      */
-    public static function scopeExistAttendance(int $id): Attendance
+    public static function scopeExistAttendance(int $id): self
     {
         return self::where(self::DISCORD_ID, $id)->first();
     }
@@ -58,5 +58,4 @@ class Attendance extends Model
     {
         return self::paginate();
     }
-
 }

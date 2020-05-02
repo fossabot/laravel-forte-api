@@ -4,12 +4,11 @@ namespace App\Models;
 
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 /**
- * App\Models\Receipt
+ * App\Models\Receipt.
  *
  * @property int $id
  * @property int $user_id
@@ -78,7 +77,7 @@ class Receipt extends Model
      * @param int $id
      * @return Receipt
      */
-    public static function scopeUserReceiptLists(int $id): Receipt
+    public static function scopeUserReceiptLists(int $id): self
     {
         return self::where(self::USER_ID, $id)->get();
     }
@@ -88,7 +87,7 @@ class Receipt extends Model
      * @param int $receiptId
      * @return Receipt
      */
-    public static function scopeUserReceiptDetail(int $id, int $receiptId): Receipt
+    public static function scopeUserReceiptDetail(int $id, int $receiptId): self
     {
         return self::find($receiptId)->where(self::USER_ID, $id)->get();
     }
@@ -114,7 +113,7 @@ class Receipt extends Model
      * @return Receipt|Model
      */
     public static function scopeCreateReceipt(int $userId, int $clientId, int $userItemId, int $aboutCash,
-                                              int $refund, int $oldPoint, int $newPoint, int $transactionId): Receipt
+                                              int $refund, int $oldPoint, int $newPoint, int $transactionId): self
     {
         return self::create([
             self::USER_ID => $userId,

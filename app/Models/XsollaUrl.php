@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 /**
- * App\Models\XsollaUrl
+ * App\Models\XsollaUrl.
  *
  * @property int $id
  * @property string $token

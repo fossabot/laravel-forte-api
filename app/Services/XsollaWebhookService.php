@@ -52,7 +52,7 @@ class XsollaWebhookService
      * it identifies the presence of users in the game system.
      *
      * @param array $data
-     * @return Array|JsonResponse
+     * @return array|JsonResponse
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_validation
      */
     public function userValidation(array $data): JsonResponse
@@ -147,7 +147,7 @@ class XsollaWebhookService
     /**
      * sends when payment is cancelled for unknown reason.
      * @param array $data
-     * @return Array|array
+     * @return array|array
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_refund
      * @deprecated xsolla webhooks refund method is no use
      */
@@ -212,7 +212,7 @@ class XsollaWebhookService
             DB::beginTransaction();
             if ($data['items_operation_type'] == 'add') {
                 foreach ($items as $item) {
-                    UserItem::scopePurchaseUserItem($userId, Item::scopeSkuParseId($item{Item::SKU}), 'xsolla');
+                    UserItem::scopePurchaseUserItem($userId, Item::scopeSkuParseId($item[Item::SKU]), 'xsolla');
                 }
             }
 
@@ -241,31 +241,31 @@ class XsollaWebhookService
 
     /**
      * @param array $data
-     * @return Array
+     * @return array
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_redeem_coupon
      */
-    private function operationCoupon(array $data): Array
+    private function operationCoupon(array $data): array
     {
         return $this->operationPointRelevant($data);
     }
 
     /**
      * @param array $data
-     * @return Array
+     * @return array
      * @deprecated
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_manual_update
      */
-    private function operationInternal(array $data): Array
+    private function operationInternal(array $data): array
     {
         return $this->operationPointRelevant($data);
     }
 
     /**
      * @param array $data
-     * @return Array
+     * @return array
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_refund
      */
-    private function operationRefund(array $data): Array
+    private function operationRefund(array $data): array
     {
         return $this->operationPointRelevant($data);
     }
@@ -273,9 +273,9 @@ class XsollaWebhookService
     /**
      * User Balance Operation Central Point Processing Function.
      * @param array $data
-     * @return Array|array
+     * @return array|array
      */
-    private function operationPointRelevant(array $data): Array
+    private function operationPointRelevant(array $data): array
     {
         // TODO: sync xsolla with crescendo API if points are different
 

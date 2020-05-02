@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 /**
- * App\Models\ErrorLog
+ * App\Models\ErrorLog.
  *
  * @property int $id
  * @property string $environment 환경
@@ -39,6 +39,6 @@ class ErrorLog extends Model
     const UPDATED_AT = 'updated_at';
 
     protected $fillable = [
-        self::ENVIRONMENT, self::TITLE, self::MESSAGE, self::PARAMETERS
+        self::ENVIRONMENT, self::TITLE, self::MESSAGE, self::PARAMETERS,
     ];
 }

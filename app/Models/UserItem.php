@@ -12,12 +12,11 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 /**
- * App\Models\UserItem
+ * App\Models\UserItem.
  *
  * @property int $id
  * @property int $user_id
@@ -129,10 +128,10 @@ class UserItem extends Model
      * @param int $id
      * @param int $itemId
      * @param string $token
-     * @return Array|array
+     * @return array|array
      * @throws Exception
      */
-    public static function scopePurchaseUserItem(int $id, int $itemId, string $token): Array
+    public static function scopePurchaseUserItem(int $id, int $itemId, string $token): array
     {
         $user = User::scopeGetUser($id);
         $item = Item::scopeItemDetail($itemId);
@@ -249,7 +248,7 @@ class UserItem extends Model
      * @param int $itemId
      * @return UserItem|Builder|Model|\Illuminate\Database\Query\Builder|object
      */
-    public static function scopeDestroyUserItem(int $id, int $itemId): UserItem
+    public static function scopeDestroyUserItem(int $id, int $itemId): self
     {
         return self::withTrashed()->where(self::USER_ID, $id)->where(self::ITEM_ID, $itemId)->first();
     }

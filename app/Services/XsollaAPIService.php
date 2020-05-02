@@ -3,11 +3,10 @@
 namespace App\Services;
 
 use App\Http\Controllers\DiscordNotificationController;
+use App\Models\Client;
 use App\Models\Item;
 use Exception;
-use App\Models\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
 class XsollaAPIService
@@ -70,7 +69,7 @@ class XsollaAPIService
      * @param string $method
      * @param string $uri
      * @param array $datas
-     * @return Array|StreamInterface|string
+     * @return array|StreamInterface|string
      */
     public function requestAPI(string $method, string $uri, array $datas)
     {

@@ -8,10 +8,9 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
-use Exception;
 
 /**
- * App\Models\Item
+ * App\Models\Item.
  *
  * @property int $id
  * @property int $client_id discord bot related to the item
@@ -101,7 +100,7 @@ class Item extends Model
      * @param int $id
      * @return Item
      */
-    public static function scopeItemDetail(int $id): Item
+    public static function scopeItemDetail(int $id): self
     {
         return self::find($id);
     }

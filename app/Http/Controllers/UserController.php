@@ -11,7 +11,6 @@ use App\Models\XsollaUrl;
 use App\Services\XsollaAPIService;
 use Carbon\Carbon;
 use Exception;
-use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -76,11 +75,12 @@ class UserController extends Controller
 
         if (! $user) {
             $user = $this->store($socialite);
-        } else if ($user && ($user->name !== $socialite->name)) {
+        } elseif ($user && ($user->name !== $socialite->name)) {
             User::scopeUpdateUser($user->id, ['name' => $socialite->name]);
         }
 
         Auth::login($user);
+
         return redirect()->route('user.panel', $this->xsollaToken($user->id));
     }
 
