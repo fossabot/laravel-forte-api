@@ -18,7 +18,6 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
-use Socialite;
 
 class UserController extends Controller
 {
@@ -453,7 +452,7 @@ class UserController extends Controller
             return new JsonResponse([
                 'status' => 'success',
                 'stack' => 1,
-            ]);
+            ], Response::HTTP_CREATED);
         } else {
             $stackedAt = json_decode($attendance->{Attendance::STACKED_AT});
             $lastedAt = end($stackedAt);
@@ -465,7 +464,7 @@ class UserController extends Controller
                     'status' => 'exist_attendance',
                     'message' => 'exist today attend',
                     'diff' => $diff,
-                ]);
+                ], Response::HTTP_CONFLICT);
             }
 
             if ($attendance->stack < 6) {
@@ -479,39 +478,17 @@ class UserController extends Controller
                 return new JsonResponse([
                     'status' => 'success',
                     Attendance::STACK => $attendance->{Attendance::STACK},
-                ]);
+                ], Response::HTTP_OK);
             } else {
                 $user = User::scopeGetUserByDiscordId($id);
-                $repetition = false;
-                $needPoint = 0;
-
                 $deposit = ($request->isPremium > 0 ? rand(20, 30) : rand(10, 20));
-
                 $oldPoints = $user->{User::POINTS};
                 $user->{User::POINTS} += $deposit;
                 $user->save();
 
                 $receipt = Receipt::scopeCreateReceipt($user->id, 5, null, 0, 0, $oldPoints, $user->{User::POINTS}, 0);
 
-                while (true) {
-                    $datas = [
-                        'amount' => $repetition ? $needPoint : $deposit,
-                        'comment' => '포르테 출석체크 보상',
-                        'project_id' => config('xsolla.projectKey'),
-                        'user_id' => $receipt->{Receipt::USER_ID},
-                    ];
-
-                    $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->{Receipt::USER_ID}.'/recharge', $datas), true);
-
-                    if ($user->{User::POINTS} !== $response['amount']) {
-                        $repetition = true;
-                        $needPoint = $user->{User::POINTS} - $response['amount'];
-                        continue;
-                    } else {
-                        break;
-                    }
-                }
-
+                (new PointController)->save($deposit, '포르테 출석체크 보상', $receipt->{Receipt::USER_ID});
                 (new DiscordNotificationController)->point($user->{User::EMAIL}, $user->{User::DISCORD_ID}, $deposit, $user->{User::POINTS});
 
                 array_push($stackedAt, Carbon::now()->toDateTimeString());
@@ -524,7 +501,7 @@ class UserController extends Controller
                 return new JsonResponse([
                     'status' => 'regular',
                     'point' => $deposit,
-                ]);
+                ], Response::HTTP_OK);
             }
         }
     }
