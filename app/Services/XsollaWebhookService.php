@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Http\Controllers\DiscordNotificationController;
+use App\Http\Controllers\PointController;
 use App\Models\Item;
 use App\Models\Receipt;
 use App\Models\User;
@@ -277,11 +278,6 @@ class XsollaWebhookService
      */
     private function operationPointRelevant(array $data): array
     {
-        // TODO: sync xsolla with crescendo API if points are different
-
-        $repetition = false;
-        $needPoint = 0;
-
         $userData = $data['user'];
         $transactionData = $data['transaction'];
         if (Receipt::scopeObserverTransaction($transactionData['id']) > 0) {
@@ -297,24 +293,7 @@ class XsollaWebhookService
 
         $receipt = Receipt::scopeCreateReceipt($user->id, 1, null, 1, 0, $oldPoints, $user->{User::POINTS}, $transactionData['id']);
 
-        while (true) {
-            $datas = [
-                'amount' => $repetition ? $needPoint : $virtualCurrencyBalance['new_value'],
-                'comment' => '이용자 포인트 업데이트',
-                'project_id' => config('xsolla.projectKey'),
-                'user_id' => $receipt->{Receipt::USER_ID},
-            ];
-
-            $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->{Receipt::USER_ID}.'/recharge', $datas), true);
-
-            if ($user->points !== $response['amount']) {
-                $repetition = true;
-                $needPoint = $user->{User::POINTS} - $response['amount'];
-                continue;
-            } else {
-                break;
-            }
-        }
+        (new PointController)->save($virtualCurrencyBalance['new_value'], '이용자 포인트 업데이트', $receipt->{Receipt::USER_ID});
 
         return ['receipt_id' => $receipt->id];
     }

@@ -36,35 +36,15 @@ class PointController extends Controller
         $staffs = User::scopeAllStaffs();
 
         foreach ($staffs as $staff) {
-            $repetition = false;
-            $needPoint = 0;
-
             $oldPoints = $staff->points;
-            $staff->points += self::MAX_POINT;
+            $staff->{User::POINTS} += self::MAX_POINT;
             $staff->save();
 
             $receipt = Receipt::scopeCreateReceipt($staff->id, 5, null, 0, 0, $oldPoints, $staff->{User::POINTS}, 0);
 
-            while (true) {
-                $datas = [
-                    'amount' => $repetition ? $needPoint : self::MAX_POINT,
-                    'comment' => '팀 크레센도 STAFF 보상',
-                    'project_id' => config('xsolla.projectKey'),
-                    'user_id' => $receipt->{Receipt::USER_ID},
-                ];
+            $this->save(self::MAX_POINT, '스태프 포인트 지급', $receipt->{Receipt::USER_ID});
 
-                $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->{Receipt::USER_ID}.'/recharge', $datas), true);
-
-                if ($staff->points !== $response['amount']) {
-                    $repetition = true;
-                    $needPoint = $staff->points - $response['amount'];
-                    continue;
-                } else {
-                    break;
-                }
-            }
-
-            (new DiscordNotificationController)->point($staff->email, $staff->discord_id, self::MAX_POINT, $staff->points);
+            (new DiscordNotificationController)->point($staff->{User::EMAIL}, $staff->{User::DISCORD_ID}, self::MAX_POINT, $staff->{User::POINTS});
         }
     }
 
@@ -109,8 +89,6 @@ class PointController extends Controller
      */
     public function store(Request $request, int $id): JsonResponse
     {
-        $repetition = false;
-        $needPoint = 0;
         $user = User::scopeGetUser($id);
 
         if (! $user) {
@@ -133,22 +111,33 @@ class PointController extends Controller
 
         $receipt = Receipt::scopeCreateReceipt($id, $clientId, null, 0, 0, $oldPoints, $user->{User::POINTS}, 0);
 
-        /*
-         * @brief sync Xsolla DB from Crescendo API \n
-         * 응답이 우리 DB와 일치하는 지 확인하고 \n
-         * 일치하지 않는다면 이를 갱신하기 위해 API를 다시 호출 \n
-         * (엑솔라 DB가 우리 DB의 데이터를 따르도록.. 만약 우리 DB는 500인데 엑솔라 DB 응답이 300이었다면 +200 요청을 다시 보내주는 식)
-         * @author GBS-Skile
-         */
+        $this->save($request->points, '이용자 포인트 지급', $receipt->{Receipt::USER_ID});
+
+        (new DiscordNotificationController)->point($user->{User::EMAIL}, $user->{User::DISCORD_ID}, $request->{User::POINTS}, $user->{User::POINTS});
+
+        return new JsonResponse(['receipt_id' => $receipt->id]);
+    }
+
+    /**
+     * @param int $point
+     * @param string $comment
+     * @param int $userId
+     */
+    public function save(int $point, string $comment, int $userId): void
+    {
+        $user = User::find($userId);
+        $needPoint = 0;
+        $repetition = false;
+
         while (true) {
             $datas = [
-                'amount' => $repetition ? $needPoint : $request->points,
-                'comment' => '이용자 포인트 지급',
+                'amount' => $repetition ? $needPoint : $point,
+                'comment' => $comment,
                 'project_id' => config('xsolla.projectKey'),
-                'user_id' => $receipt->{Receipt::USER_ID},
+                'user_id' => $userId,
             ];
 
-            $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->{Receipt::USER_ID}.'/recharge', $datas), true);
+            $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$userId.'/recharge', $datas), true);
 
             if ($user->{User::POINTS} !== $response['amount']) {
                 $repetition = true;
@@ -158,9 +147,5 @@ class PointController extends Controller
                 break;
             }
         }
-
-        (new DiscordNotificationController)->point($user->{User::EMAIL}, $user->{User::DISCORD_ID}, $request->points, $user->{User::POINTS});
-
-        return new JsonResponse(['receipt_id' => $receipt->id]);
     }
 }
