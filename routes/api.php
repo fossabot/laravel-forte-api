@@ -11,30 +11,32 @@
 |
 */
 
-Route::prefix('v1/')->middleware(['api.trust.ip', 'api.headers'])->group(function () {
-    Route::resource('users', 'UserController');
-    Route::get('users/{user_id}/xsolla/token', 'UserController@xsollaToken');
-    Route::get('discords/attendances', 'UserController@attendances');
-    Route::get('discords/{discord_id}', 'UserController@discord');
-    Route::post('discords/{discord_id}/attendances', 'UserController@attendance');
-    Route::get('discords/attendances/ranks', 'UserController@attendanceRanks');
+Route::prefix('v2/')->middleware(['api.trust.ip', 'api.headers'])->group(function () {
+    Route::prefix('users')->group(function () {
+        Route::resource('', 'UserController');
+        Route::get('{user_id}/items', 'UserItemController@index');
+        Route::get('{user_id}/items/{user_item_id}', 'UserItemController@show');
+        Route::post('{user_id}/items', 'UserItemController@store');
+        Route::put('{user_id}/items/{item_id}', 'UserItemController@update');
+        Route::delete('{user_id}/items/{item_id}', 'UserItemController@destroy');
+        Route::post('{user_id}/points', 'PointController@store');
+        Route::get('{user_id}/receipts', 'ReceiptController@index');
+        Route::get('{user_id}/receipts/{receipt_id}', 'ReceiptController@show');
+        Route::get('{user_id}/xsolla/token', 'UserController@xsollaToken');
+    });
 
-    Route::get('items', 'ItemController@index');
-    Route::get('items/{item_id}', 'ItemController@show');
+    Route::prefix('discords')->group(function () {
+        Route::get('attendances', 'UserController@attendances');
+        Route::get('{discord_id}', 'UserController@discord');
+        Route::post('{discord_id}/attendances', 'UserController@attendance');
+    });
 
-    Route::get('users/{user_id}/items', 'UserItemController@index');
-    Route::get('users/{user_id}/items/{user_item_id}', 'UserItemController@show');
-    Route::post('users/{user_id}/items', 'UserItemController@store');
-    Route::put('users/{user_id}/items/{item_id}', 'UserItemController@update');
-    Route::delete('users/{user_id}/items/{item_id}', 'UserItemController@destroy');
-    Route::post('users/{user_id}/points', 'PointController@store');
-    Route::get('users/{user_id}/receipts', 'ReceiptController@index');
-    Route::get('users/{user_id}/receipts/{receipt_id}', 'ReceiptController@show');
+    Route::prefix('items')->group(function () {
+        Route::get('', 'ItemController@index');
+        Route::get('{item_id}', 'ItemController@show');
+    });
 
     Route::get('clients/token', 'ClientController@issue');
 });
 
-Route::post('v1/xsolla', 'XsollaWebhookController@index')->middleware('api.xsolla');
-
-// Xsolla Test Case
-Route::post('v1/test/xsolla', 'XsollaTestCaseController@index');
+Route::post('v2/xsolla', 'XsollaWebhookController@index')->middleware('api.xsolla');
