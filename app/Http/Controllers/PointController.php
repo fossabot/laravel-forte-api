@@ -123,7 +123,7 @@ class PointController extends Controller
      * @param string $comment
      * @param int $userId
      */
-    public function save(int $point, string $comment, int $userId): void
+    public function recharge(int $point, string $comment, int $userId): void
     {
         $user = User::find($userId);
         $needPoint = 0;

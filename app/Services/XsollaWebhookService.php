@@ -293,7 +293,7 @@ class XsollaWebhookService
 
         $receipt = Receipt::scopeCreateReceipt($user->id, 1, null, 1, 0, $oldPoints, $user->{User::POINTS}, $transactionData['id']);
 
-        (new PointController)->save($virtualCurrencyBalance['new_value'], '이용자 포인트 업데이트', $receipt->{Receipt::USER_ID});
+        (new PointController)->recharge($virtualCurrencyBalance['new_value'], '이용자 포인트 업데이트', $receipt->{Receipt::USER_ID});
 
         return ['receipt_id' => $receipt->id];
     }

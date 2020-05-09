@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App;
 use App\Http\Controllers\DiscordNotificationController;
+use App\Http\Controllers\PointController;
 use Auth;
 use Eloquent;
 use Exception;
@@ -259,10 +260,6 @@ class UserItem extends Model
      */
     public static function scopeUserItemWithdraw(int $itemId): array
     {
-        $xsollaAPI = App::make('App\Services\XsollaAPIService');
-        $repetition = false;
-        $needPoint = 0;
-
         $user = User::scopeGetUser(Auth::User()->id);
 
         self::withTrashed()->find($itemId)->where(self::USER_ID, $user->id)->first();
@@ -272,29 +269,10 @@ class UserItem extends Model
         $user->{User::POINTS} = $user->{User::POINTS} + $item->{Item::PRICE};
         $user->save();
 
-        $datas = [];
-        while (true) {
-            $datas = [
-                'amount' => $item->{ITEM::PRICE},
-                'comment' => '포르테 아이템 청약철회',
-                'project_id' => config('xsolla.projectKey'),
-                'user_id' => $user->id,
-            ];
+        (new PointController)->recharge($item->{ITEM::PRICE}, '포르테 아이템 청약철회', $user->id);
 
-            $response = json_decode($xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$user->id.'/recharge', $datas), true);
-
-            if ($user->points !== $response['amount']) {
-                $repetition = true;
-                $needPoint = $user->{User::POINTS} - $response['amount'];
-                continue;
-            } else {
-                break;
-            }
-        }
-
-        unset($datas['project_id']);
+        $datas = $item;
         $datas['email'] = $user->{User::EMAIL};
-        $datas[] = $item;
         (new DiscordNotificationController)->xsollaUserAction('User Item Withdraw', $datas);
 
         return ['message' => 'Successful Withdraw User Item'];

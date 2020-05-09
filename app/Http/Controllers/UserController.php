@@ -487,7 +487,7 @@ class UserController extends Controller
 
                 $receipt = Receipt::scopeCreateReceipt($user->id, 5, null, 0, 0, $oldPoints, $user->{User::POINTS}, 0);
 
-                (new PointController)->save($deposit, '포르테 출석체크 보상', $receipt->{Receipt::USER_ID});
+                (new PointController)->recharge($deposit, '포르테 출석체크 보상', $receipt->{Receipt::USER_ID});
                 (new DiscordNotificationController)->point($user->{User::EMAIL}, $user->{User::DISCORD_ID}, $deposit, $user->{User::POINTS});
 
                 array_push($stackedAt, Carbon::now()->toDateTimeString());
