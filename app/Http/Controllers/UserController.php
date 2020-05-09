@@ -75,12 +75,12 @@ class UserController extends Controller
         if (! $user) {
             $user = $this->store($socialite);
         } elseif ($user && ($user->name !== $socialite->name)) {
-            User::scopeUpdateUser($user->id, ['name' => $socialite->name]);
+            User::scopeUpdateUser($user->{User::ID}, ['name' => $socialite->name]);
         }
 
         Auth::login($user);
 
-        return redirect()->route('user.panel', $this->xsollaToken($user->id));
+        return redirect()->route('user.panel', $this->xsollaToken($user->{User::ID}));
     }
 
     /**
@@ -97,7 +97,7 @@ class UserController extends Controller
             $user = User::scopeCreateUser($user);
 
             $datas = [
-                'user_id' => $user->id,
+                'user_id' => $user->{User::ID},
                 'user_name' => $user->{User::NAME},
                 'email' => $user->{User::EMAIL},
             ];
@@ -339,7 +339,7 @@ class UserController extends Controller
 
             XsollaUrl::create([
                 XsollaUrl::TOKEN => $request['token'],
-                XsollaUrl::USER_ID => $user->id,
+                XsollaUrl::USER_ID => $user->{User::ID},
                 XsollaUrl::REDIRECT_URL => $url.$request['token'],
             ]);
 
@@ -485,7 +485,7 @@ class UserController extends Controller
                 $user->{User::POINTS} += $deposit;
                 $user->save();
 
-                $receipt = Receipt::scopeCreateReceipt($user->id, 5, null, 0, 0, $oldPoints, $user->{User::POINTS}, 0);
+                $receipt = Receipt::scopeCreateReceipt($user->{User::ID}, 5, null, 0, 0, $oldPoints, $user->{User::POINTS}, 0);
 
                 (new PointController)->recharge($deposit, '포르테 출석체크 보상', $receipt->{Receipt::USER_ID});
                 (new DiscordNotificationController)->point($user->{User::EMAIL}, $user->{User::DISCORD_ID}, $deposit, $user->{User::POINTS});

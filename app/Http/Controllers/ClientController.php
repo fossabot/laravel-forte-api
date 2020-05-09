@@ -15,7 +15,7 @@ class ClientController extends Controller
     {
         foreach (Client::get() as $client) {
             if (! in_array($client->name, Client::BOT_TOKEN_RENEWAL_EXCEPTION)) {
-                Client::find($client->id)->update([
+                Client::find($client->{Client::ID})->update([
                     Client::TOKEN => 'forte-'.$this->generateToken(),
                     Client::PREV_TOKEN => $client->{Client::PREV_TOKEN},
                 ]);

@@ -64,6 +64,7 @@ class UserItem extends Model
         self::SKB_12,
     ];
 
+    const ID = 'id';
     const USER_ID = 'user_id';
     const ITEM_ID = 'item_id';
     const EXPIRED = 'expired';
@@ -190,7 +191,7 @@ class UserItem extends Model
 
         $receiptId = Receipt::insertGetId([
             Receipt::USER_ID => $id,
-            Receipt::CLIENT_ID => $token == 'xsolla' ? 1 : $client->id,
+            Receipt::CLIENT_ID => $token == 'xsolla' ? 1 : $client->{Client::ID},
             Receipt::USER_ITEM_ID => $userItemId,
             Receipt::ABOUT_CASH => 1,
             Receipt::REFUND => 0,
@@ -260,16 +261,16 @@ class UserItem extends Model
      */
     public static function scopeUserItemWithdraw(int $itemId): array
     {
-        $user = User::scopeGetUser(Auth::User()->id);
+        $user = User::scopeGetUser(Auth::User()->{User::ID});
 
-        self::withTrashed()->find($itemId)->where(self::USER_ID, $user->id)->first();
+        self::withTrashed()->find($itemId)->where(self::USER_ID, $user->{User::ID})->first();
 
-        $item = self::scopeUserItemDetail($user->id, $itemId);
+        $item = self::scopeUserItemDetail($user->{User::ID}, $itemId);
 
         $user->{User::POINTS} = $user->{User::POINTS} + $item->{Item::PRICE};
         $user->save();
 
-        (new PointController)->recharge($item->{ITEM::PRICE}, '포르테 아이템 청약철회', $user->id);
+        (new PointController)->recharge($item->{ITEM::PRICE}, '포르테 아이템 청약철회', $user->{User::ID});
 
         $datas = $item;
         $datas['email'] = $user->{User::EMAIL};

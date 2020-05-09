@@ -63,6 +63,7 @@ class User extends Authenticatable
     use Notifiable;
     use SoftDeletes;
 
+    const ID = 'id';
     const NAME = 'name';
     const EMAIL = 'email';
     const POINTS = 'points';
@@ -90,7 +91,7 @@ class User extends Authenticatable
         return self::create([
             self::EMAIL => $user->{self::EMAIL},
             self::NAME => $user->{self::NAME},
-            self::DISCORD_ID => $user->id,
+            self::DISCORD_ID => $user->{self::ID},
         ]);
     }
 

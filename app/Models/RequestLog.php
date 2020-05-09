@@ -40,6 +40,7 @@ class RequestLog extends Model
 {
     use SoftDeletes;
 
+    const ID = 'id';
     const DURATION = 'duration';
     const URL = 'url';
     const METHOD = 'method';

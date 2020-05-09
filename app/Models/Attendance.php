@@ -33,6 +33,7 @@ class Attendance extends Model
 {
     public $timestamps = false;
 
+    const ID = 'id';
     const DISCORD_ID = 'discord_id';
     const STACK = 'stack';
     const STACKED_AT = 'stacked_at';

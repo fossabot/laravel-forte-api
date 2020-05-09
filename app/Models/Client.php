@@ -31,6 +31,7 @@ use Illuminate\Support\Carbon;
  */
 class Client extends Model
 {
+    const ID = 'id';
     const NAME = 'name';
     const XSOLLA_SELECTED_GROUP_NAME = 'xsolla_selected_group_name';
     const TOKEN = 'token';

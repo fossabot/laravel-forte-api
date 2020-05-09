@@ -43,6 +43,7 @@ use Illuminate\Support\Carbon;
  */
 class Receipt extends Model
 {
+    const ID = 'id';
     const RECEIPT_ID = 'receipt_id';
     const USER_ID = 'user_id';
     const CLIENT_ID = 'client_id';

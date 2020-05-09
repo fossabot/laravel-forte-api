@@ -33,6 +33,7 @@ use Illuminate\Support\Carbon;
  */
 class XsollaUrl extends Model
 {
+    const ID = 'id';
     const TOKEN = 'token';
     const REDIRECT_URL = 'redirect_url';
     const USER_ID = 'user_id';

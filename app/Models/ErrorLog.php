@@ -31,6 +31,7 @@ use Illuminate\Support\Carbon;
  */
 class ErrorLog extends Model
 {
+    const ID = 'id';
     const ENVIRONMENT = 'environment';
     const TITLE = 'title';
     const MESSAGE = 'message';

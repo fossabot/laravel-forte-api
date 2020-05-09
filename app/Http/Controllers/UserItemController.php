@@ -261,7 +261,7 @@ class UserItemController extends Controller
      */
     public function withdraw(Request $request): JsonResponse
     {
-        $item = UserItem::scopeUserItemDetail(Auth::User()->id, $request->id);
+        $item = UserItem::scopeUserItemDetail(Auth::User()->{User::ID}, $request->id);
 
         if (in_array($item->sku, UserItem::DISABLE_WITHDRAW_ITEMS)) {
             return new JsonResponse(['message' => 'Upon purchase is considered to be used this item for withdrawal is not possible.'], 403);

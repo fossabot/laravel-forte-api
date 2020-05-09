@@ -33,18 +33,18 @@ class PointController extends Controller
      */
     public function schedule()
     {
-        $staffs = User::scopeAllStaffs();
+        $users = User::scopeAllStaffs();
 
-        foreach ($staffs as $staff) {
-            $oldPoints = $staff->points;
-            $staff->{User::POINTS} += self::MAX_POINT;
-            $staff->save();
+        foreach ($users as $user) {
+            $oldPoints = $user->{User::POINTS};
+            $user->{User::POINTS} += self::MAX_POINT;
+            $user->save();
 
-            $receipt = Receipt::scopeCreateReceipt($staff->id, 5, null, 0, 0, $oldPoints, $staff->{User::POINTS}, 0);
+            $receipt = Receipt::scopeCreateReceipt($user->{User::ID}, 5, null, 0, 0, $oldPoints, $user->{User::POINTS}, 0);
 
-            $this->save(self::MAX_POINT, '스태프 포인트 지급', $receipt->{Receipt::USER_ID});
+            $this->recharge(self::MAX_POINT, '스태프 포인트 지급', $receipt->{Receipt::USER_ID});
 
-            (new DiscordNotificationController)->point($staff->{User::EMAIL}, $staff->{User::DISCORD_ID}, self::MAX_POINT, $staff->{User::POINTS});
+            (new DiscordNotificationController)->point($user->{User::EMAIL}, $user->{User::DISCORD_ID}, self::MAX_POINT, $user->{User::POINTS});
         }
     }
 
@@ -115,7 +115,7 @@ class PointController extends Controller
 
         (new DiscordNotificationController)->point($user->{User::EMAIL}, $user->{User::DISCORD_ID}, $request->{User::POINTS}, $user->{User::POINTS});
 
-        return new JsonResponse(['receipt_id' => $receipt->id]);
+        return new JsonResponse(['receipt_id' => $receipt->{Receipt::ID}]);
     }
 
     /**

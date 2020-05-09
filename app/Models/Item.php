@@ -48,6 +48,7 @@ use Illuminate\Support\Carbon;
  */
 class Item extends Model
 {
+    const ID = 'id';
     const CLIENT_ID = 'client_id';
     const SKU = 'sku';
     const NAME = 'name';
@@ -111,6 +112,6 @@ class Item extends Model
      */
     public static function scopeSkuParseId(string $sku): int
     {
-        return self::where(self::SKU, $sku)->first()->id;
+        return self::where(self::SKU, $sku)->first()->{self::ID};
     }
 }
