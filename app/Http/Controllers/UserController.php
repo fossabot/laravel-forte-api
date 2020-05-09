@@ -300,9 +300,8 @@ class UserController extends Controller
                 ], Response::HTTP_NOT_FOUND);
             }
 
-            if (config('app.env') == 'production') {
-                $mode = '';
-            } else {
+            $mode = '';
+            if (config('app.env') !== 'production') {
                 $mode = 'sandbox-';
             }
 
