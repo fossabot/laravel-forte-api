@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 /**
- * App\Models\Client.
+ * App\Models\Client
  *
  * @property int $id
  * @property string $name skilebot and xsolla

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 /**
- * App\Models\Receipt.
+ * App\Models\Receipt
  *
  * @property int $id
  * @property int $user_id

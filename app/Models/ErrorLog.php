@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 /**
- * App\Models\ErrorLog.
+ * App\Models\ErrorLog
  *
  * @property int $id
  * @property string $environment 환경

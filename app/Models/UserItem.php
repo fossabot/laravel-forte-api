@@ -13,11 +13,12 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Query\Builder as BuilderAlias;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 /**
- * App\Models\UserItem.
+ * App\Models\UserItem
  *
  * @property int $id
  * @property int $user_id
@@ -31,10 +32,13 @@ use Illuminate\Support\Facades\DB;
  * @property-read Item $item
  * @method static Builder|UserItem countUserPurchaseDuplicateItem($itemId)
  * @method static Builder|UserItem destroyUserItem($itemId)
+ * @method static bool|null forceDelete()
  * @method static Builder|UserItem newModelQuery()
  * @method static Builder|UserItem newQuery()
+ * @method static BuilderAlias|UserItem onlyTrashed()
  * @method static Builder|UserItem purchaseUserItem($itemId, $token)
  * @method static Builder|UserItem query()
+ * @method static bool|null restore()
  * @method static Builder|UserItem updateUserItem($itemId, $data, $token)
  * @method static Builder|UserItem userItemDetail($itemId)
  * @method static Builder|UserItem userItemLists()
@@ -48,6 +52,8 @@ use Illuminate\Support\Facades\DB;
  * @method static Builder|UserItem whereSync($value)
  * @method static Builder|UserItem whereUpdatedAt($value)
  * @method static Builder|UserItem whereUserId($value)
+ * @method static BuilderAlias|UserItem withTrashed()
+ * @method static BuilderAlias|UserItem withoutTrashed()
  * @mixin Eloquent
  */
 class UserItem extends Model
@@ -108,7 +114,7 @@ class UserItem extends Model
     /**
      * @param int $id
      * @param int $itemId
-     * @return UserItem|Model|\Illuminate\Database\Query\Builder|object
+     * @return UserItem|Model|BuilderAlias|object
      */
     public static function scopeUserItemDetail(int $id, int $itemId)
     {
@@ -248,7 +254,7 @@ class UserItem extends Model
     /**
      * @param int $id
      * @param int $itemId
-     * @return UserItem|Builder|Model|\Illuminate\Database\Query\Builder|object
+     * @return UserItem|Builder|Model|BuilderAlias|object
      */
     public static function scopeDestroyUserItem(int $id, int $itemId): self
     {

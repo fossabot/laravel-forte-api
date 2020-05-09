@@ -10,7 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 /**
- * App\Models\RequestLog.
+ * App\Models\RequestLog
  *
  * @property int $id
  * @property float $duration microtime start - end
@@ -22,9 +22,12 @@ use Illuminate\Support\Collection;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @method static Builder|RequestLog clearRequestLogs()
+ * @method static bool|null forceDelete()
  * @method static Builder|RequestLog newModelQuery()
  * @method static Builder|RequestLog newQuery()
+ * @method static \Illuminate\Database\Query\Builder|RequestLog onlyTrashed()
  * @method static Builder|RequestLog query()
+ * @method static bool|null restore()
  * @method static Builder|RequestLog whereCreatedAt($value)
  * @method static Builder|RequestLog whereDuration($value)
  * @method static Builder|RequestLog whereId($value)
@@ -34,6 +37,8 @@ use Illuminate\Support\Collection;
  * @method static Builder|RequestLog whereResponse($value)
  * @method static Builder|RequestLog whereUpdatedAt($value)
  * @method static Builder|RequestLog whereUrl($value)
+ * @method static \Illuminate\Database\Query\Builder|RequestLog withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|RequestLog withoutTrashed()
  * @mixin Eloquent
  */
 class RequestLog extends Model

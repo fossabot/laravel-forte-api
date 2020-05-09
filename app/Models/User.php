@@ -19,7 +19,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 /**
- * App\Models\User.
+ * App\Models\User
  *
  * @property int $id
  * @property string $discord_id

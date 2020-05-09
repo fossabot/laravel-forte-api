@@ -9,14 +9,13 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\Attendance.
+ * App\Models\Attendance
  *
  * @property int $id
  * @property string $discord_id
  * @property int $stack
  * @property mixed $stacked_at
  * @property string|null $created_at
- * @method static Builder|Attendance attendanceRanks()
  * @method static Builder|Attendance attendances()
  * @method static Builder|Attendance existAttendance()
  * @method static Builder|Attendance newModelQuery()

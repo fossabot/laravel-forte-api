@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
- * App\Models\Item.
+ * App\Models\Item
  *
  * @property int $id
  * @property int $client_id discord bot related to the item
