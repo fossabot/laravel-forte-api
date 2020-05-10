@@ -111,7 +111,7 @@ class PointController extends Controller
 
         $receipt = Receipt::scopeCreateReceipt($id, $clientId, null, 0, 0, $oldPoints, $user->{User::POINTS}, 0);
 
-        $this->save($request->points, '이용자 포인트 지급', $receipt->{Receipt::USER_ID});
+        $this->recharge($request->points, '이용자 포인트 지급', $receipt->{Receipt::USER_ID});
 
         (new DiscordNotificationController)->point($user->{User::EMAIL}, $user->{User::DISCORD_ID}, $request->{User::POINTS}, $user->{User::POINTS});
 
