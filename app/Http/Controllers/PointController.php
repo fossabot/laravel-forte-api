@@ -97,7 +97,7 @@ class PointController extends Controller
             ], Response::HTTP_NOT_FOUND);
         }
 
-        if (! empty($user->{User::DELETED_AT})) {
+        if ($user->trashed()) {
             return new JsonResponse([
                 'message' => 'Withdraw User Account',
             ], Response::HTTP_BAD_REQUEST);
