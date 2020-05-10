@@ -67,8 +67,8 @@ class ClientController extends Controller
 
         if (! empty($client)) {
             return new JsonResponse([
-                'token' => $client->{Client::TOKEN},
-                'updated_at' => $client->{Client::UPDATED_AT},
+                Client::TOKEN => $client->{Client::TOKEN},
+                Client::UPDATED_AT => $client->{Client::UPDATED_AT},
             ]);
         }
     }
