@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Http\Controllers\ClientController;
 use App\Models\Client;
 use Closure;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -34,7 +35,7 @@ class CheckApiHeader
     public function handle($request, Closure $next)
     {
         if (! isset($_SERVER['HTTP_AUTHORIZATION'])) {
-            return response([
+            return new JsonResponse([
                 'error' => [
                     'code' => 'INVALID_AUTHORIZATION',
                     'message' => 'Please set Authorization Header',
@@ -42,12 +43,12 @@ class CheckApiHeader
             ], Response::HTTP_NOT_FOUND);
         }
 
-        if (Client::where('prev_token', $_SERVER['HTTP_AUTHORIZATION'])->first()) {
+        if (Client::where(Client::PREV_TOKEN, $_SERVER['HTTP_AUTHORIZATION'])->first()) {
             return $this->cc->issue();
         }
 
-        if (! Client::where('token', $_SERVER['HTTP_AUTHORIZATION'])->first()) {
-            return response([
+        if (! Client::where(Client::TOKEN, $_SERVER['HTTP_AUTHORIZATION'])->first()) {
+            return new JsonResponse([
                 'error' => [
                     'code' => 'INVALID_AUTHORIZATION',
                     'message' => 'The Authorization Header is invalid',
