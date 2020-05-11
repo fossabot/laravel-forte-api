@@ -79,8 +79,10 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        self::NAME, self::DISCORD_ID, self::EMAIL, self::POINTS,
+        self::NAME, self::DISCORD_ID, self::EMAIL, self::POINTS, self::DELETED_AT,
     ];
+
+    protected $dates = [self::DELETED_AT];
 
     /**
      * @param $user
@@ -130,7 +132,7 @@ class User extends Authenticatable
     /**
      * @param int $id
      * @param array $datas
-     * @return array
+     * @return User|array
      * @throws Exception
      */
     public static function scopeUpdateUser(int $id, array $datas = [])
@@ -169,10 +171,13 @@ class User extends Authenticatable
 
     /**
      * @param int $id
-     * @return User|\Illuminate\Database\Query\Builder
+     * @return User
+     * @throws Exception
      */
     public static function scopeDestoryUser(int $id): self
     {
+        if (self::withTrashed()->find($id)->trashed()) return self::find($id);
+
         $xsollaAPI = App::make('App\Services\XsollaAPIService');
 
         $datas = [
@@ -181,7 +186,9 @@ class User extends Authenticatable
 
         $xsollaAPI->requestAPI('PUT', 'projects/:projectId/users/'.$id, $datas);
 
-        return self::withTrashed()->find($id);
+        $user = self::find($id);
+        $user->delete();
+        return $user;
     }
 
     /**
@@ -189,6 +196,6 @@ class User extends Authenticatable
      */
     public static function scopeAllStaffs(): Collection
     {
-        return self::where(self::IS_MEMBER, '=', 2)->whereNull('deleted_at')->get();
+        return self::where(self::IS_MEMBER, '=', 2)->whereNull(self::DELETED_AT)->get();
     }
 }

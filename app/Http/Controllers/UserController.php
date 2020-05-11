@@ -199,7 +199,7 @@ class UserController extends Controller
      * @param int $id
      * @return JsonResponse
      * @throws Exception
-     * @SWG\Put(
+     * @SWG\Patch(
      *     path="/users/{userId}",
      *     description="Update User Information",
      *     produces={"application/json"},
@@ -256,6 +256,7 @@ class UserController extends Controller
      * @param int $id
      * @return JsonResponse
      *
+     * @throws Exception
      * @SWG\Delete(
      *     path="/users/{userId}",
      *     description="Destroy User",

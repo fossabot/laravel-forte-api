@@ -15,6 +15,9 @@ Route::prefix('v2/')->middleware(['api.trust.ip', 'api.headers'])->group(functio
     Route::prefix('users')->group(function () {
         Route::resource('', 'UserController');
         Route::prefix('{user_id}')->group(function () {
+            Route::get('', 'UserController@show');
+            Route::patch('', 'UserController@update');
+            Route::delete('', 'UserController@destroy');
             Route::prefix('items')->group(function () {
                 Route::get('', 'UserItemController@index');
                 Route::post('', 'UserItemController@store');
