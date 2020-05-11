@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
@@ -76,9 +77,9 @@ class Receipt extends Model
 
     /**
      * @param int $id
-     * @return Receipt
+     * @return Collection
      */
-    public static function scopeUserReceiptLists(int $id): self
+    public static function scopeUserReceiptLists(int $id): Collection
     {
         return self::where(self::USER_ID, $id)->get();
     }
@@ -90,7 +91,7 @@ class Receipt extends Model
      */
     public static function scopeUserReceiptDetail(int $id, int $receiptId): self
     {
-        return self::find($receiptId)->where(self::USER_ID, $id)->get();
+        return self::findOrFail($receiptId)->where(self::USER_ID, $id)->first();
     }
 
     /**
