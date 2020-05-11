@@ -34,6 +34,10 @@ class CheckApiHeader
      */
     public function handle($request, Closure $next)
     {
+        if (config('app.env') !== 'production') {
+            return $next($request);
+        }
+
         if (! isset($_SERVER['HTTP_AUTHORIZATION'])) {
             return new JsonResponse([
                 'error' => [
