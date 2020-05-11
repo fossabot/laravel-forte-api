@@ -11,7 +11,7 @@ use Illuminate\Routing\Controller as BaseController;
  * Class Controller.
  *
  * @SWG\Swagger(
- *     basePath="/api/v1",
+ *     basePath="/api/v2",
  *     host="localhost:8000",
  *     schemes={"http", "https"},
  *     @SWG\Info(
