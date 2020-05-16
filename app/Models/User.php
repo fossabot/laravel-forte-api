@@ -114,4 +114,14 @@ class User extends Authenticatable
     {
         return $this->hasOne(Attendance::class, self::DISCORD_ID);
     }
+
+    /**
+     * @param Builder $query
+     * @param int $type
+     * @return Builder
+     */
+    public function scopeOfType(Builder $query, int $type): Builder
+    {
+        return $query->where(self::IS_MEMBER, $type);
+    }
 }

@@ -50,11 +50,12 @@ class UserService extends BaseService {
     }
 
     /**
+     * @param int $type
      * @return Collection
      */
-    public function staffs(): Collection
+    public function types(int $type): Collection
     {
-        return $this->user->where($this->user::IS_MEMBER, 2)->whereNull($this->user::DELETED_AT)->get();
+        return $this->user->ofType($type)->whereNull(User::DELETED_AT)->get();
     }
 
     /**
