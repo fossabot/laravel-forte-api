@@ -169,6 +169,7 @@ return [
         L5Swagger\L5SwaggerServiceProvider::class,
         NotificationChannels\Discord\DiscordServiceProvider::class,
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
+        getsolaris\LaravelCreateService\CreateServiceProvider::class,
 
         /*
          * Application Service Providers...
