@@ -7,6 +7,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * App\Models\Attendance
@@ -27,6 +28,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static Builder|Attendance whereStack($value)
  * @method static Builder|Attendance whereStackedAt($value)
  * @mixin Eloquent
+ * @property-read User $user
  */
 class Attendance extends Model
 {
@@ -41,6 +43,14 @@ class Attendance extends Model
     protected $fillable = [
         self::DISCORD_ID, self::STACK, self::STACKED_AT,
     ];
+
+    /**
+     * @return BelongsTo
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, self::DISCORD_ID);
+    }
 
     /**
      * @param int $id

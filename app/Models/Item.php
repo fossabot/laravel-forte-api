@@ -45,6 +45,8 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Item whereSku($value)
  * @method static Builder|Item whereUpdatedAt($value)
  * @mixin Eloquent
+ * @property-read Collection|UserItem[] $users
+ * @property-read int|null $users_count
  */
 class Item extends Model
 {
@@ -81,10 +83,9 @@ class Item extends Model
     ];
 
     /**
-     * @brief 1:n relationship
      * @return HasMany
      */
-    public function userItems(): hasMany
+    public function users(): HasMany
     {
         return $this->hasMany(UserItem::class);
     }

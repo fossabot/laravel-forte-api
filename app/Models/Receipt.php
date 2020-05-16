@@ -6,6 +6,7 @@ use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
@@ -41,6 +42,9 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Receipt whereUserId($value)
  * @method static Builder|Receipt whereUserItemId($value)
  * @mixin Eloquent
+ * @property-read Client $client
+ * @property-read UserItem $item
+ * @property-read User $user
  */
 class Receipt extends Model
 {
@@ -58,6 +62,30 @@ class Receipt extends Model
     const UPDATED_AT = 'updated_at';
 
     public $timestamps = true;
+
+    /**
+     * @return belongsTo
+     */
+    public function user(): belongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return belongsTo
+     */
+    public function item(): belongsTo
+    {
+        return $this->belongsTo(UserItem::class);
+    }
+
+    /**
+     * @return belongsTo
+     */
+    public function client(): belongsTo
+    {
+        return $this->belongsTo(Client::class);
+    }
 
     /**
      * The attributes that are mass assignable.

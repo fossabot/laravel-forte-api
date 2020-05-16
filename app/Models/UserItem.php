@@ -55,6 +55,7 @@ use Illuminate\Support\Facades\DB;
  * @method static BuilderAlias|UserItem withTrashed()
  * @method static BuilderAlias|UserItem withoutTrashed()
  * @mixin Eloquent
+ * @property-read User $user
  */
 class UserItem extends Model
 {
@@ -94,10 +95,17 @@ class UserItem extends Model
     ];
 
     /**
-     * @brief 1:n relationship
      * @return BelongsTo
      */
-    public function item()
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class);
     }
@@ -108,7 +116,7 @@ class UserItem extends Model
      */
     public static function scopeUserItemLists(int $id): Collection
     {
-        return self::with('item')->where(self::USER_ID, $id)->orderBy('desc')->get();
+        return self::with('item')->where(self::USER_ID, $id)->orderBy(self::ID)->get();
     }
 
     /**

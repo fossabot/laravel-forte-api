@@ -4,7 +4,9 @@ namespace App\Models;
 
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -28,6 +30,8 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Client whereUpdatedAt($value)
  * @method static Builder|Client whereXsollaSelectedGroupName($value)
  * @mixin Eloquent
+ * @property-read Collection|UserItem[] $items
+ * @property-read int|null $items_count
  */
 class Client extends Model
 {
@@ -55,6 +59,14 @@ class Client extends Model
     protected $fillable = [
         self::NAME, self::XSOLLA_SELECTED_GROUP_NAME, self::TOKEN, self::PREV_TOKEN,
     ];
+
+    /**
+     * @return HasMany
+     */
+    public function items(): HasMany
+    {
+        return $this->hasMany(UserItem::class);
+    }
 
     /**
      * @param string $token

@@ -10,6 +10,8 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
@@ -57,6 +59,11 @@ use Illuminate\Support\Facades\DB;
  * @method static \Illuminate\Database\Query\Builder|User withTrashed()
  * @method static \Illuminate\Database\Query\Builder|User withoutTrashed()
  * @mixin Eloquent
+ * @property-read Attendance $attendance
+ * @property-read Collection|UserItem[] $items
+ * @property-read int|null $items_count
+ * @property-read Collection|Receipt[] $receipts
+ * @property-read int|null $receipts_count
  */
 class User extends Authenticatable
 {
@@ -85,110 +92,27 @@ class User extends Authenticatable
     protected $dates = [self::DELETED_AT];
 
     /**
-     * @param $user
-     * @return User|Model
+     * @return HasMany
      */
-    public static function scopeCreateUser($user): self
+    public function items(): HasMany
     {
-        return self::create([
-            self::EMAIL => $user->{self::EMAIL},
-            self::NAME => $user->{self::NAME},
-            self::DISCORD_ID => $user->{self::ID},
-        ]);
+        return $this->hasMany(UserItem::class);
     }
 
     /**
-     * @return mixed
+     * @return HasMany
      */
-    public static function scopeAllUsers(): Paginator
+    public function receipts(): HasMany
     {
-        return self::whereNull(self::DELETED_AT)->paginate();
+        return $this->hasMany(Receipt::class);
     }
 
     /**
-     * see a user who been withdraw.
-     *
-     * @param int $id
-     * @return mixed
+     * @return HasOne
      */
-    public static function scopeGetUser(int $id): self
+    public function attendance(): HasOne
     {
-        try {
-            return self::findOrFail($id);
-        } catch (Exception $exception) {
-            return $exception->getMessage();
-        }
-    }
-
-    /**
-     * @param string $id
-     * @return User|Builder|Model|object|null
-     */
-    public static function scopeGetUserByDiscordId(string $id): self
-    {
-        return self::where(self::DISCORD_ID, $id)->first();
-    }
-
-    /**
-     * @param int $id
-     * @param array $datas
-     * @return User|array
-     * @throws Exception
-     */
-    public static function scopeUpdateUser(int $id, array $datas = [])
-    {
-        $xsollaAPI = App::make('App\Services\XsollaAPIService');
-        $user = self::find($id);
-        try {
-            DB::beginTransaction();
-
-            foreach ($datas as $key => $data) {
-                if (self::where($key, $data)->first()) {
-                    continue;
-                }
-                $user->$key = $data;
-            }
-            $user->save();
-
-            $datas = [
-                'enabled' => true,
-                'user_name' => $user->{self::NAME},
-                'email' => $user->{self::EMAIL},
-            ];
-
-            $xsollaAPI->requestAPI('PUT', 'projects/:projectId/users/'.$id, $datas);
-
-            DB::commit();
-        } catch (Exception $exception) {
-            DB::rollback();
-            (new DiscordNotificationController)->exception($exception, $datas);
-
-            return ['error' => $exception->getMessage()];
-        }
-
-        return $user;
-    }
-
-    /**
-     * @param int $id
-     * @return User
-     * @throws Exception
-     */
-    public static function scopeDestoryUser(int $id): self
-    {
-        if (self::withTrashed()->find($id)->trashed()) return self::find($id);
-
-        $xsollaAPI = App::make('App\Services\XsollaAPIService');
-
-        $datas = [
-            'enabled' => false,
-        ];
-
-        $xsollaAPI->requestAPI('PUT', 'projects/:projectId/users/'.$id, $datas);
-
-        $user = self::find($id);
-        $user->delete();
-        return $user;
+        return $this->hasOne(Attendance::class, self::DISCORD_ID);
     }
 
     /**
