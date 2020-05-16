@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Models\UserItem;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UserRegisterFormRequest extends FormRequest
+class StoreUserItemRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +25,7 @@ class UserRegisterFormRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string',
-            'email' => 'required|email|unique:users',
-            'discord' => 'required|numeric',
+            UserItem::ITEM_ID => 'required|numeric|exists:items,id'
         ];
     }
 }
