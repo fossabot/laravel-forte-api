@@ -114,12 +114,4 @@ class User extends Authenticatable
     {
         return $this->hasOne(Attendance::class, self::DISCORD_ID);
     }
-
-    /**
-     * @return Collection
-     */
-    public static function scopeAllStaffs(): Collection
-    {
-        return self::where(self::IS_MEMBER, '=', 2)->whereNull(self::DELETED_AT)->get();
-    }
 }

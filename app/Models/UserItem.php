@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder as BuilderAlias;
 use Illuminate\Support\Carbon;
@@ -56,6 +57,11 @@ use Illuminate\Support\Facades\DB;
  * @method static BuilderAlias|UserItem withoutTrashed()
  * @mixin Eloquent
  * @property-read User $user
+ * @method static Builder|UserItem item($id)
+ * @method static Builder|UserItem ofUser($id)
+ * @method static Builder|UserItem ofItem($id)
+ * @property-read \App\Models\Item|null $items
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem ofId($id)
  */
 class UserItem extends Model
 {
@@ -103,193 +109,40 @@ class UserItem extends Model
     }
 
     /**
-     * @return BelongsTo
+     * @return HasOne
      */
-    public function item(): BelongsTo
+    public function items(): HasOne
     {
-        return $this->belongsTo(Item::class);
+        return $this->hasOne(Item::class, Item::ID, UserItem::ITEM_ID);
     }
 
     /**
+     * @param Builder $query
      * @param int $id
-     * @return Collection
+     * @return Builder
      */
-    public static function scopeUserItemLists(int $id): Collection
+    public function scopeOfItem(Builder $query, int $id): Builder
     {
-        return self::with('item')->where(self::USER_ID, $id)->orderBy(self::ID)->get();
+        return $query->where(self::ITEM_ID, $id);
     }
 
     /**
+     * @param Builder $query
      * @param int $id
-     * @param int $itemId
-     * @return UserItem|Model|BuilderAlias|object
+     * @return Builder
      */
-    public static function scopeUserItemDetail(int $id, int $itemId)
+    public function scopeOfId(Builder $query, int $id): Builder
     {
-        return self::join('items', 'items.id', '=', 'user_items.item_id')->where('user_items.user_id', $id)
-            ->where('user_items.id', $itemId)->first();
+        return $query->where(self::ID, $id);
     }
 
     /**
+     * @param Builder $query
      * @param int $id
-     * @param int $itemId
-     * @return int
+     * @return Builder
      */
-    public static function scopeCountUserPurchaseDuplicateItem(int $id, int $itemId): int
+    public function scopeOfUser(Builder $query, int $id): Builder
     {
-        return self::where(self::USER_ID, $id)->where(self::ITEM_ID, $itemId)->whereNull(self::DELETED_AT)->count();
-    }
-
-    /**
-     * @param int $id
-     * @param int $itemId
-     * @param string $token
-     * @return array|array
-     * @throws Exception
-     */
-    public static function scopePurchaseUserItem(int $id, int $itemId, string $token): array
-    {
-        $user = User::scopeGetUser($id);
-        $item = Item::scopeItemDetail($itemId);
-        if ($user->{User::POINTS} < $item->{Item::PRICE}) {
-            return ['message' => 'Insufficient points'];
-        } elseif ($item->enabled == false) {
-            return ['message' => 'Item is disable'];
-        }
-
-        if (self::scopeCountUserPurchaseDuplicateItem($id, $itemId) < Item::scopeItemDetail($itemId)->{ITEM::PURCHASE_LIMIT}) {
-            return ['message' => 'over user purchase limit !'];
-        }
-
-        try {
-            DB::beginTransaction();
-
-            $userItemId = self::insertGetId([
-                self::USER_ID => $id,
-                self::ITEM_ID => $itemId,
-                self::EXPIRED => 0,
-                self::CONSUMED => 0,
-                self::SYNC => 0,
-            ]);
-
-            $createUserReceipt = self::createUserReceipt($id, $itemId, $userItemId, $token);
-
-            DB::commit();
-        } catch (Exception $exception) {
-            DB::rollback();
-
-            return ['error' => $exception->getMessage()];
-        }
-
-        return [Receipt::USER_ITEM_ID => $userItemId, Receipt::RECEIPT_ID => $createUserReceipt];
-    }
-
-    /**
-     * @param int $id
-     * @param int $itemId
-     * @param int $userItemId
-     * @param string $token
-     * @return int
-     */
-    private static function createUserReceipt(int $id, int $itemId, int $userItemId, string $token): int
-    {
-        $client = $token === 'xsolla' ?: Client::bringNameByToken($token);
-        $user = User::scopeGetUser($id);
-        $item = Item::scopeItemDetail($itemId);
-
-        if ($token != 'xsolla') {
-            $currentPoints = $user->{User::POINTS} - $item->{Item::PRICE};
-        } else {
-            $currentPoints = $user->{User::POINTS};
-        }
-
-        $receiptId = Receipt::insertGetId([
-            Receipt::USER_ID => $id,
-            Receipt::CLIENT_ID => $token == 'xsolla' ? 1 : $client->{Client::ID},
-            Receipt::USER_ITEM_ID => $userItemId,
-            Receipt::ABOUT_CASH => 1,
-            Receipt::REFUND => 0,
-            Receipt::POINTS_OLD => $user->{User::POINTS},
-            Receipt::POINTS_NEW => $currentPoints,
-        ]);
-
-        $user->{User::POINTS} = $currentPoints;
-        $user->save();
-
-        return $receiptId;
-    }
-
-    /**
-     * @param int $id
-     * @param int $itemId
-     * @param array $data
-     * @param string $token
-     * @return UserItem|UserItem[]|array|Builder|Collection|Model|null
-     * @throws Exception
-     */
-    public static function scopeUpdateUserItem(int $id, int $itemId, array $data, string $token)
-    {
-        $userItem = self::find($itemId)->where(self::USER_ID, $id);
-
-        if (Item::scopeItemDetail($userItem->{self::ITEM_ID})->{ITEM::CONSUMABLE} === 0) {
-            return ['message' => 'Bad Request Consumed value is true'];
-        }
-
-        try {
-            DB::beginTransaction();
-
-            foreach ($data as $key => $item) {
-                if ($key === self::SYNC) {
-                    $userItem->$key = in_array(Client::bringNameByToken($token)->name, Client::BOT_CLIENT) ? 1 : 0;
-                    continue;
-                }
-                $userItem->$key = $item;
-            }
-            $userItem->save();
-
-            (new DiscordNotificationController)->xsollaUserAction('User Item Update', $userItem);
-
-            DB::commit();
-        } catch (Exception $exception) {
-            DB::rollback();
-
-            return ['error' => $exception->getMessage()];
-        }
-
-        return $userItem;
-    }
-
-    /**
-     * @param int $id
-     * @param int $itemId
-     * @return UserItem|Builder|Model|BuilderAlias|object
-     */
-    public static function scopeDestroyUserItem(int $id, int $itemId): self
-    {
-        return self::withTrashed()->where(self::USER_ID, $id)->where(self::ITEM_ID, $itemId)->first();
-    }
-
-    /**
-     * @param int $itemId
-     * @return array
-     */
-    public static function scopeUserItemWithdraw(int $itemId): array
-    {
-        $user = User::scopeGetUser(Auth::User()->{User::ID});
-
-        self::withTrashed()->find($itemId)->where(self::USER_ID, $user->{User::ID})->first();
-
-        $item = self::scopeUserItemDetail($user->{User::ID}, $itemId);
-
-        $user->{User::POINTS} = $user->{User::POINTS} + $item->{Item::PRICE};
-        $user->save();
-
-        (new PointController)->recharge($item->{ITEM::PRICE}, '포르테 아이템 청약철회', $user->{User::ID});
-
-        $datas = $item;
-        $datas['email'] = $user->{User::EMAIL};
-        (new DiscordNotificationController)->xsollaUserAction('User Item Withdraw', $datas);
-
-        return ['message' => 'Successful Withdraw User Item'];
+        return $query->where(self::USER_ID, $id);
     }
 }
