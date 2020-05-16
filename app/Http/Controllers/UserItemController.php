@@ -2,16 +2,38 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Http\Requests\StoreUserItemRequest;
+use App\Services\UserService;
 use App\Models\UserItem;
-use Auth;
+use App\Services\UserItemService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class UserItemController extends Controller
 {
+    /**
+     * @var UserService
+     */
+    protected $userSerivce;
+
+    /**
+     * @var UserItemService
+     */
+    protected $userItemService;
+
+    /**
+     * UserItemController constructor.
+     * @param UserService $userService
+     * @param UserItemService $userItemService
+     */
+    public function __construct(UserService $userService,
+                                UserItemService $userItemService)
+    {
+        $this->userSerivce = $userService;
+        $this->userItemService = $userItemService;
+    }
+
     /**
      * 이용자의 보유한 아이템 목록을 조회합니다.
      *
@@ -45,17 +67,16 @@ class UserItemController extends Controller
      */
     public function index(int $id): JsonResponse
     {
-        return new JsonResponse(UserItem::scopeUserItemLists($id));
+        return new JsonResponse($this->userSerivce->items($id));
     }
 
     /**
      * 아이템을 구매합니다.
      *
-     * @param Request $request
+     * @param StoreUserItemRequest $request
      * @param int $id
      * @return mixed
      * @throws Exception
-     *
      * @SWG\Post(
      *     path="/users/{userId}/items",
      *     description="Store(save) the User buying Item",
@@ -88,15 +109,11 @@ class UserItemController extends Controller
      *     ),
      * )
      */
-    public function store(Request $request, int $id): JsonResponse
+    public function store(StoreUserItemRequest $request, int $id): JsonResponse
     {
-        if (isset($request->item_id) && User::scopeGetUser($id)) {
-            return new JsonResponse(UserItem::scopePurchaseUserItem($id, $request->item_id, $request->header('Authorization')));
-        }
-
-        return new JsonResponse([
-            'message' => 'Not found Item Id or User Id',
-        ], Response::HTTP_NOT_FOUND);
+        $user = $this->userSerivce->show($id);
+        return new JsonResponse($this->userItemService
+            ->save($user, $request->{UserItem::ITEM_ID}, $request->header('Authorization')));
     }
 
     /**
@@ -140,7 +157,7 @@ class UserItemController extends Controller
      */
     public function show(int $id, int $itemId): JsonResponse
     {
-        return new JsonResponse(UserItem::scopeUserItemDetail($id, $itemId));
+        return new JsonResponse($this->userItemService->show($id, $itemId));
     }
 
     /**
@@ -206,7 +223,8 @@ class UserItemController extends Controller
      */
     public function update(Request $request, int $id, int $itemId): JsonResponse
     {
-        return new JsonResponse(UserItem::scopeUpdateUserItem($id, $itemId, $request->all(), $request->header('Authorization')));
+        return new JsonResponse($this->userItemService
+            ->update($id, $itemId, $request->all(), $request->header('Authorization')));
     }
 
     /**
@@ -250,27 +268,6 @@ class UserItemController extends Controller
      */
     public function destroy(int $id, int $itemId): JsonResponse
     {
-        return new JsonResponse(UserItem::scopeDestroyUserItem($id, $itemId));
-    }
-
-    /**
-     * 이용자 아이템 청약철회.
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function withdraw(Request $request): JsonResponse
-    {
-        $item = UserItem::scopeUserItemDetail(Auth::User()->{User::ID}, $request->id);
-
-        if (in_array($item->sku, UserItem::DISABLE_WITHDRAW_ITEMS)) {
-            return new JsonResponse(['message' => 'Upon purchase is considered to be used this item for withdrawal is not possible.'], 403);
-        }
-
-        if ($item) {
-            return new JsonResponse(UserItem::scopeUserItemWithdraw($request->id));
-        }
-
-        return new JsonResponse(['message' => 'ERROR'], Response::HTTP_BAD_REQUEST);
+        return new JsonResponse($this->userItemService->destroy($id, $itemId));
     }
 }

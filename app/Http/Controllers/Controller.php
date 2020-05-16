@@ -12,7 +12,7 @@ use Illuminate\Routing\Controller as BaseController;
  *
  * @SWG\Swagger(
  *     basePath="/api/v2",
- *     host="localhost:8000",
+ *     host="localhost:8001",
  *     schemes={"http", "https"},
  *     @SWG\Info(
  *         version="1.0",

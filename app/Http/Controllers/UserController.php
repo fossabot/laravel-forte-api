@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UserRegisterFormRequest;
 use App\Http\Requests\UserUpdateFormRequest;
+use App\Services\UserService;
 use App\Models\Attendance;
 use App\Models\Receipt;
 use App\Models\User;
@@ -27,12 +29,20 @@ class UserController extends Controller
     protected $xsollaAPI;
 
     /**
+     * @var UserService
+     */
+    protected $userService;
+
+    /**
      * UserController constructor.
      * @param XsollaAPIService $xsollaAPI
+     * @param UserService $userService
      */
-    public function __construct(XsollaAPIService $xsollaAPI)
+    public function __construct(XsollaAPIService $xsollaAPI,
+                                UserService $userService)
     {
         $this->xsollaAPI = $xsollaAPI;
+        $this->userService = $userService;
     }
 
     /**
@@ -60,7 +70,7 @@ class UserController extends Controller
      */
     public function index(): JsonResponse
     {
-        return new JsonResponse(User::scopeAllUsers());
+        return new JsonResponse($this->userService->index());
     }
 
     /**
@@ -70,12 +80,12 @@ class UserController extends Controller
     public function login()
     {
         $socialite = Socialite::driver('discord')->user();
-        $user = User::scopeGetUserByDiscordId($socialite->id);
+        $user = $this->userService->discord($socialite->id);
 
         if (! $user) {
             $user = $this->store($socialite);
         } elseif ($user && ($user->name !== $socialite->name)) {
-            User::scopeUpdateUser($user->{User::ID}, ['name' => $socialite->name]);
+           $this->userService->update($user->{User::ID}, ['name' => $socialite->name]);
         }
 
         Auth::login($user);
@@ -86,15 +96,16 @@ class UserController extends Controller
     /**
      * 이용자를 추가(회원가입) 합니다.
      *
-     * @param $user
+     * @param UserRegisterFormRequest $user
+     * @param UserService $userService
      * @return JsonResponse
      * @throws Exception
      */
-    public function store($user): JsonResponse
+    public function store(UserRegisterFormRequest $user, UserService $userService): JsonResponse
     {
         DB::beginTransaction();
         try {
-            $user = User::scopeCreateUser($user);
+            $user = $userService->save((array) $user);
 
             $datas = [
                 'user_id' => $user->{User::ID},
@@ -107,7 +118,7 @@ class UserController extends Controller
             DB::commit();
         } catch (Exception $exception) {
             DB::rollBack();
-            (new DiscordNotificationController)->exception($exception, $user);
+            (new DiscordNotificationController)->exception($exception, (array) $user);
 
             return new JsonResponse([
                 'error' => $exception->getMessage(),
@@ -153,7 +164,7 @@ class UserController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        return new JsonResponse(User::scopeGetUser($id));
+        return new JsonResponse($this->userService->show($id));
     }
 
     /**
@@ -189,16 +200,15 @@ class UserController extends Controller
      */
     public function discord(int $id): JsonResponse
     {
-        return new JsonResponse(User::scopeGetUserByDiscordId($id));
+        return new JsonResponse($this->userService->discord($id));
     }
 
     /**
      * 이용자의 정보를 갱신합니다.
      *
-     * @param UserUpdateFormRequest $request
+     * @param Request $request
      * @param int $id
      * @return JsonResponse
-     * @throws Exception
      * @SWG\Patch(
      *     path="/users/{userId}",
      *     description="Update User Information",
@@ -245,9 +255,9 @@ class UserController extends Controller
      *     ),
      * )
      */
-    public function update(UserUpdateFormRequest $request, int $id): JsonResponse
+    public function update(Request $request, int $id): JsonResponse
     {
-        return new JsonResponse(User::scopeUpdateUser($id, $request->all()));
+        return new JsonResponse($this->userService->update($id, $request->all()));
     }
 
     /**
@@ -284,7 +294,7 @@ class UserController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
-        return new JsonResponse(User::scopeDestoryUser($id));
+        return new JsonResponse($this->userService->destroy($id));
     }
 
     /**
@@ -294,7 +304,7 @@ class UserController extends Controller
     public function xsollaToken(int $id)
     {
         try {
-            $user = User::scopeGetUser($id);
+            $user = $this->userService->show($id);
             if (! $user) {
                 return new JsonResponse([
                     'message' => 'User '.$id.' not found.',
@@ -346,6 +356,7 @@ class UserController extends Controller
 
             return $request['token'];
         } catch (Exception $exception) {
+            /** @var array $datas */
             (new DiscordNotificationController)->exception($exception, $datas);
 
             return $exception->getMessage();
@@ -363,39 +374,13 @@ class UserController extends Controller
     public function panel(string $token)
     {
         $url = XsollaUrl::where(XsollaUrl::TOKEN, $token)->first();
-        $items = UserItem::scopeUserItemLists($url->{XsollaUrl::USER_ID});
+        $items = $this->userService->items($url->{XsollaUrl::USER_ID});
 
         return view('panel', ['items' => $items, 'token' => $url->{XsollaUrl::TOKEN}, 'redirect_url' => $url->{XsollaUrl::REDIRECT_URL}]);
     }
 
     /**
-     * 팀 크레센도 출석체크를 불러옵니다.
-     * @return mixed
-     *
-     * @SWG\GET(
-     *     path="/discords/attendances",
-     *     description="User Attendances",
-     *     produces={"application/json"},
-     *     tags={"Discord"},
-     *     @SWG\Parameter(
-     *         name="Authorization",
-     *         in="header",
-     *         description="Authorization Token",
-     *         required=true,
-     *         type="string"
-     *     ),
-     *     @SWG\Response(
-     *         response=200,
-     *         description="Successful User Attendances"
-     *     ),
-     * )
-     */
-    public function attendances(): JsonResponse
-    {
-        return new JsonResponse(Attendance::scopeAttendances());
-    }
-
-    /**
+     * TODO: 분리 하기
      * 팀 크레센도 디스코드 이용자가 출석체크를 합니다.
      *
      * @param Request $request
@@ -480,7 +465,7 @@ class UserController extends Controller
                     Attendance::STACK => $attendance->{Attendance::STACK},
                 ], Response::HTTP_OK);
             } else {
-                $user = User::scopeGetUserByDiscordId($id);
+                $user = $this->userService->discord($id);
                 $deposit = ($request->isPremium > 0 ? rand(20, 30) : rand(10, 20));
                 $oldPoints = $user->{User::POINTS};
                 $user->{User::POINTS} += $deposit;
