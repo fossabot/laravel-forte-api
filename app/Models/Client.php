@@ -44,6 +44,8 @@ class Client extends Model
     const SKILEBOT = 'skilebot';
     const BAECHUBOT = 'baechubotv2';
 
+    const XSOLLA = 'xsolla';
+
     const BOT_CLIENT = [
         self::SKILEBOT,
         self::BAECHUBOT,
