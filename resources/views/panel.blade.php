@@ -118,24 +118,24 @@
                                                 이벤트 지급
                                             @endif
                                         </p>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <small class="text-muted">
-                                                {{ isset($item->deleted_at) ? '철회: ' . $item->deleted_at->format('y년 m월 d일 H시 m분') : '구매: ' . $item->created_at->format('y년 m월 d일 H시 m분') }}
-                                            </small>
-                                            <div class="btn-group">
-                                                @if($item->consumed > 0)
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary" disabled>사용됨</button>
-                                                @elseif (date_diff(new \DateTime($item->created_at), new \DateTime())->format("%R%a") > 7)
-                                                    <button type="button" class="btn btn-sm btn-outline-warning" disabled>
-                                                        {{ date_diff(new \DateTime($item->created_at), new \DateTime())->format("%R%a")}} 일 지남
-                                                    </button>
-                                                @elseif ($item->deleted_at)
-                                                    <button type="button" class="btn btn-sm btn-outline-danger" disabled>청약철회 완료</button>
-                                                @else
-                                                    <button id="btn-{{ $item->id }}" type="button" class="btn btn-sm btn-outline-success" onclick="withdraw({{ $item->id }})">청약철회</button>
-                                                @endif
-                                            </div>
-                                        </div>
+                                        {{--                                        <div class="d-flex justify-content-between align-items-center">--}}
+                                        {{--                                            <small class="text-muted">--}}
+                                        {{--                                            {{ isset($item->deleted_at) ? '철회: ' . $item->deleted_at->format('y년 m월 d일 H시 m분') : '구매: ' . $item->created_at->format('y년 m월 d일 H시 m분') }}--}}
+                                        {{--                                            </small>--}}
+                                        {{--                                            <div class="btn-group">--}}
+                                        {{--                                                @if($item->consumed > 0)--}}
+                                        {{--                                                    <button type="button" class="btn btn-sm btn-outline-secondary" disabled>사용됨</button>--}}
+                                        {{--                                                @elseif (date_diff(new \DateTime($item->created_at), new \DateTime())->format("%R%a") > 7)--}}
+                                        {{--                                                    <button type="button" class="btn btn-sm btn-outline-warning" disabled>--}}
+                                        {{--                                                        {{ date_diff(new \DateTime($item->created_at), new \DateTime())->format("%R%a")}} 일 지남--}}
+                                        {{--                                                    </button>--}}
+                                        {{--                                                @elseif ($item->deleted_at)--}}
+                                        {{--                                                    <button type="button" class="btn btn-sm btn-outline-danger" disabled>청약철회 완료</button>--}}
+                                        {{--                                                @else--}}
+                                        {{--                                                    <button id="btn-{{ $item->id }}" type="button" class="btn btn-sm btn-outline-success" onclick="withdraw({{ $item->id }})">청약철회</button>--}}
+                                        {{--                                                @endif--}}
+                                        {{--                                            </div>--}}
+                                        {{--                                        </div>--}}
                                     </div>
                                 </div>
                             </div>
@@ -166,37 +166,5 @@
 
 <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-
-<script>
-    $('.nav-link').click(function (e) {
-        window.location.href = e.currentTarget.href;
-    });
-
-    function withdraw(id) {
-        $.ajax({
-            type:'POST',
-            url:'/withdraw',
-            dataType: 'json',
-            data: {
-                'id': id,
-            },
-            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-            success:function(data){
-                console.log(data);
-                $('#btn-' + id).text('청약철회 완료');
-                $('#btn-' + id).removeClass('btn-outline-success');
-                $('#btn-' + id).addClass('btn-outline-danger');
-                $('#btn-' + id).prop('disabled', true);
-                $('#btn-' + id).attr('onclick', '');
-            }, error: function(data) {
-                if (data.status === 403) {
-                    alert('해당 아이템은 구매 즉시 사용되는 것으로 간주되어 청약철회가 불가능합니다.');
-                } else {
-                    alert('다시 시도해주세요.');
-                }
-            }
-        });
-    }
-</script>
 </body>
 </html>
