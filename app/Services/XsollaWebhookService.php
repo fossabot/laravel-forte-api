@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Controllers\DiscordNotificationController;
 use App\Http\Controllers\PointController;
+use App\Models\Client;
 use App\Models\Item;
 use App\Models\Receipt;
 use App\Models\User;
@@ -12,6 +13,8 @@ use Exception as ExceptionAlias;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use App\Services\UserService;
+use App\Services\ReceiptService;
 
 /**
  * Class XsollaWebhookService.
@@ -19,34 +22,48 @@ use Illuminate\Support\Facades\DB;
  */
 class XsollaWebhookService
 {
-    /**
-     * @var
-     */
     protected $merchantId;
-    /**
-     * @var
-     */
     protected $projectId;
-    /**
-     * @var
-     */
     protected $projectKey;
-    /**
-     * @var
-     */
     protected $apiKey;
     /**
      * @var XsollaAPIService
      */
     protected $xsollaAPI;
+    /**
+     * @var UserService
+     */
+    protected $userService;
+    /**
+     * @var ReceiptService
+     */
+    protected $receiptService;
+    /**
+     * @var UserItemService
+     */
+    protected $userItemService;
 
-    public function __construct(XsollaAPIService $xsollaAPI)
+    /**
+     * XsollaWebhookService constructor.
+     * @param XsollaAPIService $xsollaAPI
+     * @param UserService $userService
+     * @param ReceiptService $receiptService
+     * @param UserItemService $userItemService
+     */
+    public function __construct(XsollaAPIService $xsollaAPI,
+                                UserService $userService,
+                                ReceiptService $receiptService,
+                                UserItemService $userItemService)
     {
         $this->xsollaAPI = $xsollaAPI;
         $this->merchantId = config('xsolla.merchantId');
         $this->projectId = config('xsolla.projectId');
         $this->projectKey = config('xsolla.projectKey');
         $this->apiKey = config('xsolla.apiKey');
+
+        $this->userService = $userService;
+        $this->receiptService = $receiptService;
+        $this->userItemService = $userItemService;
     }
 
     /**
@@ -58,7 +75,7 @@ class XsollaWebhookService
      */
     public function userValidation(array $data): JsonResponse
     {
-        if (! User::scopeGetUser((int) $data['user']['id'])) {
+        if (! $this->userService->show((int) $data['user']['id'])) {
             return new JsonResponse([
                 'error' => [
                     'code' => 'INVALID_USER',
@@ -101,12 +118,11 @@ class XsollaWebhookService
 
         try {
             DB::beginTransaction();
-            $user = User::scopeGetUser((int) $userData['id']);
+            $user = $this->userService->show((int) $userData['id']);
 
             if (isset($purchaseData['virtual_items'])) {
                 foreach ($purchaseData['virtual_items']['items'] as $item) {
-                    $purchaseItem = Item::where(Item::SKU, $item['sku'])->first();
-                    UserItem::scopePurchaseUserItem($user->{User::ID}, $purchaseItem->{Item::ID}, 'xsolla');
+                    $this->userItemService->save($user, Item::convertSkuToId($item[Item::SKU]), Client::XSOLLA);
                 }
             } else {
                 $oldPoint = $user->{User::POINTS};
@@ -205,15 +221,15 @@ class XsollaWebhookService
     {
         $userData = $data['user'];
         $userId = (int) $userData['id'];
-        $user = User::scopeGetUser($userId);
+        $user = $this->userService->show($userId);
 
         $items = $data['items'];
 
         try {
             DB::beginTransaction();
-            if ($data['items_operation_type'] == 'add') {
+            if ($data['items_operation_type'] === 'add') {
                 foreach ($items as $item) {
-                    UserItem::scopePurchaseUserItem($userId, Item::scopeSkuParseId($item[Item::SKU]), 'xsolla');
+                    $this->userItemService->save($user, Item::convertSkuToId($item[Item::SKU]), Client::XSOLLA);
                 }
             }
 
@@ -285,7 +301,7 @@ class XsollaWebhookService
         }
 
         $virtualCurrencyBalance = $data['virtual_currency_balance'];
-        $user = User::scopeGetUser($userData['id']);
+        $user = $this->userService->show($userData['id']);
 
         $oldPoints = $user->{User::POINTS};
         $user->{User::POINTS} += $virtualCurrencyBalance['new_value'] - $virtualCurrencyBalance['old_value'];

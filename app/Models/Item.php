@@ -111,7 +111,7 @@ class Item extends Model
      * @param string $sku
      * @return int
      */
-    public static function scopeSkuParseId(string $sku): int
+    public static function convertSkuToId(string $sku): int
     {
         return self::where(self::SKU, $sku)->first()->{self::ID};
     }

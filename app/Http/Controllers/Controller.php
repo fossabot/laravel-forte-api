@@ -12,12 +12,12 @@ use Illuminate\Routing\Controller as BaseController;
  *
  * @SWG\Swagger(
  *     basePath="/api/v2",
- *     host="localhost:8001",
+ *     host="localhost:8000",
  *     schemes={"http", "https"},
  *     @SWG\Info(
- *         version="1.0",
+ *         version="2.0",
  *         title="Forte API",
- *         @SWG\Contact(name="Mingeun Kim (Kevin)", url="https://mingeun.com"),
+ *         @SWG\Contact(name="Kevin", url="https://mingeun.com"),
  *     ),
  * )
  */

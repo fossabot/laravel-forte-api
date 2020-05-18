@@ -64,6 +64,7 @@ use Illuminate\Support\Facades\DB;
  * @property-read int|null $items_count
  * @property-read Collection|Receipt[] $receipts
  * @property-read int|null $receipts_count
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User ofType($type)
  */
 class User extends Authenticatable
 {
