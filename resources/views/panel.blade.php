@@ -90,7 +90,7 @@
                     <a class="nav-link" id="pills-inventory-tab" data-toggle="pill" href="#inventory" role="tab" aria-controls="inventory" aria-selected="true">인벤토리</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="pills-item-detail-tab" data-toggle="pill" href="https://cafe.naver.com/teamcrescendocafe/book5101938/1396" role="tab" aria-controls="item-detail" aria-selected="true">아이템 상세 안내</a>
+                    <a class="nav-link" id="pills-item-detail-tab" href="https://cafe.naver.com/teamcrescendocafe/book5101938/1396" role="tab" aria-controls="item-detail" aria-selected="true">아이템 상세 안내</a>
                 </li>
             </ul>
         </div>
