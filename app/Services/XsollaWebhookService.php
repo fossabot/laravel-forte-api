@@ -267,7 +267,7 @@ class XsollaWebhookService
         }
 
         $userAction = [
-            'name' => $userData['name'],
+            'name' => $userData['name'] ?? $ $userData['email'],
             'items' => $items,
             'balance' => $data['virtual_currency_balance'],
         ];
