@@ -113,11 +113,11 @@ class XsollaAPIService
             $xsollaItems = json_decode($this->requestAPI('GET', 'projects/:projectId/virtual_items/items', []), true);
 
             foreach ($xsollaItems as $item) {
-                if (! Item::where(Item::SKU, $item['sku'])->first()) {
-                    array_push($xsollaDuplicateItemsSku, $item['sku']);
+                if (! Item::ofSku($item['sku'])->first()) {
+                    $xsollaDuplicateItemsSku[] = $item['sku'];
                 }
-                array_push($xsollaItemsSku, $item['sku']);
-                array_push($xsollaItemIds, $item['id']);
+                $xsollaItemsSku[] = $item['sku'];
+                $xsollaItemIds[] = $item['id'];
             }
 
             Item::whereNotIn(Item::SKU, $xsollaItemsSku)->delete();
@@ -127,24 +127,30 @@ class XsollaAPIService
                 $count++;
                 $xsollaDetailItem = json_decode($this->requestAPI('GET', 'projects/:projectId/virtual_items/items/'.$xsollaItemId, []), true);
                 $items = [
-                    Item::NAME => (! empty($xsollaDetailItem['name']['ko'])) ? $xsollaDetailItem['name']['ko'] : $xsollaDetailItem['name']['en'],
+                    Item::NAME => $xsollaDetailItem['name']['ko'] ?? $xsollaDetailItem['name']['en'],
                     Item::IMAGE_URL => $xsollaDetailItem['image_url'],
-                    Item::PRICE => empty($xsollaDetailItem['virtual_currency_price']) ? 0 : $xsollaDetailItem['virtual_currency_price'],
+                    Item::PRICE => $xsollaDetailItem['virtual_currency_price'] ?? 0,
                     Item::ENABLED => $xsollaDetailItem['enabled'] == true ? 1 : 0,
                     Item::CONSUMABLE => $xsollaDetailItem['permanent'] == true ? 0 : 1,
-                    Item::EXPIRATION_TIME => empty($xsollaDetailItem['expiration']) ? null : $xsollaDetailItem['expiration'],
-                    Item::PURCHASE_LIMIT => empty($xsollaDetailItem['purchase_limit']) ? null : $xsollaDetailItem['purchase_limit'],
+                    Item::EXPIRATION_TIME => $xsollaDetailItem['expiration'] ?? null,
+                    Item::PURCHASE_LIMIT => $xsollaDetailItem['purchase_limit'] ?? null,
                 ];
 
                 // Forte DB 에 아이템이 없을 경우 생성
-                if (! Item::where(Item::SKU, $xsollaDetailItem['sku'])->first()) {
+                if (! Item::ofSku($xsollaDetailItem['sku'])->first()) {
                     $convertSku = array_search(explode('_', $xsollaDetailItem['sku']), self::SKU_PREFIX);
-                    $items[] = [Item::CLIENT_ID => Client::where(Client::NAME, $convertSku)->value('id')];
-                    $items[] = [Item::SKU => $xsollaDetailItem['sku']];
+                    $items = array_merge($items,
+                        [
+                            Item::CLIENT_ID => Client::where(Client::NAME, $convertSku)->value('id'),
+                        ],
+                        [
+                            Item::SKU => $xsollaDetailItem['sku'],
+                        ],
+                    );
 
                     Item::create($items);
                 } else {
-                    Item::where(Item::SKU, $xsollaDetailItem['sku'])->update($items);
+                    Item::ofSku($xsollaDetailItem['sku'])->update($items);
                 }
             }
         } catch (Exception $exception) {
