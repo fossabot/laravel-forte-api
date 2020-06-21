@@ -12,7 +12,8 @@ use Illuminate\Http\Response;
 
 class PointController extends Controller
 {
-    const MAX_POINT = 2000;
+    private const STAFF_TYPE = 2;
+    private const MAX_POINT = 2000;
 
     /**
      * @var XsollaAPIService
@@ -33,10 +34,10 @@ class PointController extends Controller
      */
     public function schedule()
     {
-        $users = User::scopeAllStaffs();
+        $users = User::ofType(self::STAFF_TYPE);
 
         foreach ($users as $user) {
-            $oldPoints = $user->{User::POINTS};
+            $oldPoints = $user->points;
             $user->{User::POINTS} += self::MAX_POINT;
             $user->save();
 
