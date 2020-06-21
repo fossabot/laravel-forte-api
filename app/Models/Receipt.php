@@ -142,7 +142,7 @@ class Receipt extends Model
      * @param int $transactionId
      * @return Receipt|Model
      */
-    public static function scopeCreateReceipt(int $userId, int $clientId, int $userItemId, int $aboutCash,
+    public static function store(int $userId, int $clientId, int $userItemId, int $aboutCash,
                                               int $refund, int $oldPoint, int $newPoint, int $transactionId): self
     {
         return self::create([

@@ -40,7 +40,7 @@ class PointController extends Controller
             $user->{User::POINTS} += self::MAX_POINT;
             $user->save();
 
-            $receipt = Receipt::scopeCreateReceipt($user->{User::ID}, 5, null, 0, 0, $oldPoints, $user->{User::POINTS}, 0);
+            $receipt = Receipt::store($user->{User::ID}, 5, null, 0, 0, $oldPoints, $user->{User::POINTS}, 0);
 
             $this->recharge(self::MAX_POINT, '스태프 포인트 지급', $receipt->{Receipt::USER_ID});
 
@@ -109,7 +109,7 @@ class PointController extends Controller
 
         $clientId = Client::bringNameByToken($request->header('Authorization'))->id;
 
-        $receipt = Receipt::scopeCreateReceipt($id, $clientId, null, 0, 0, $oldPoints, $user->{User::POINTS}, 0);
+        $receipt = Receipt::store($id, $clientId, null, 0, 0, $oldPoints, $user->{User::POINTS}, 0);
 
         $this->recharge($request->points, '이용자 포인트 지급', $receipt->{Receipt::USER_ID});
 

@@ -471,7 +471,7 @@ class UserController extends Controller
                 $user->{User::POINTS} += $deposit;
                 $user->save();
 
-                $receipt = Receipt::scopeCreateReceipt($user->{User::ID}, 5, null, 0, 0, $oldPoints, $user->{User::POINTS}, 0);
+                $receipt = Receipt::store($user->{User::ID}, 5, null, 0, 0, $oldPoints, $user->{User::POINTS}, 0);
 
                 (new PointController)->recharge($deposit, '포르테 출석체크 보상', $receipt->{Receipt::USER_ID});
                 (new DiscordNotificationController)->point($user->{User::EMAIL}, $user->{User::DISCORD_ID}, $deposit, $user->{User::POINTS});
