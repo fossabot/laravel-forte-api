@@ -47,6 +47,7 @@ use Illuminate\Support\Carbon;
  * @mixin Eloquent
  * @property-read Collection|UserItem[] $users
  * @property-read int|null $users_count
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Item ofSku($sku)
  */
 class Item extends Model
 {
@@ -114,5 +115,15 @@ class Item extends Model
     public static function convertSkuToId(string $sku): int
     {
         return self::where(self::SKU, $sku)->first()->{self::ID};
+    }
+
+    /**
+     * @param Builder $query
+     * @param string $sku
+     * @return Builder
+     */
+    public function scopeOfSku(Builder $query, string $sku): Builder
+    {
+        return $query->where(self::SKU, $sku);
     }
 }
