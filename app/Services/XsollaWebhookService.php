@@ -56,10 +56,10 @@ class XsollaWebhookService
                                 UserItemService $userItemService)
     {
         $this->xsollaAPI = $xsollaAPI;
-        $this->merchantId = config('xsolla.merchantId');
-        $this->projectId = config('xsolla.projectId');
-        $this->projectKey = config('xsolla.projectKey');
-        $this->apiKey = config('xsolla.apiKey');
+        $this->merchantId = config('xsolla.merchant_id');
+        $this->projectId = config('xsolla.project_id');
+        $this->projectKey = config('xsolla.project_key');
+        $this->apiKey = config('xsolla.api_key');
 
         $this->userService = $userService;
         $this->receiptService = $receiptService;
