@@ -4,6 +4,26 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\AttendanceV2
+ *
+ * @property int $id
+ * @property string $discord_id
+ * @property int $key_count 키 획득 count
+ * @property mixed $key_acquired_at 키 획득 일
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AttendanceV2 newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AttendanceV2 newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AttendanceV2 query()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AttendanceV2 whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AttendanceV2 whereDiscordId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AttendanceV2 whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AttendanceV2 whereKeyAcquiredAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AttendanceV2 whereKeyCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AttendanceV2 whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class AttendanceV2 extends Model
 {
     const ID = 'id';
