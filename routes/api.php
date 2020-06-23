@@ -36,7 +36,7 @@ Route::prefix('v1/')->middleware(['api.trust.ip', 'api.headers'])->group(functio
 
 Route::prefix('v2/')->middleware(['api.trust.ip', 'api.headers'])->group(function () {
     Route::post('discords/{discord_id}/attendances', 'AttendanceController@store');
-    Route::get('discords/attendances/ranks', 'AttendanceController@rank');
+    Route::post('discords/{discord_id}/attendances/unpack', 'AttendanceController@unpack');
 });
 
 Route::post('v1/xsolla', 'XsollaWebhookController@index')->middleware('api.xsolla');
