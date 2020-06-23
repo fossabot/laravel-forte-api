@@ -38,4 +38,8 @@ class AttendanceV2 extends Model
     protected $fillable = [
         self::ID, self::DISCORD_ID, self::KEY_COUNT, self::KEY_ACQUIRED_AT,
     ];
+
+    protected $casts = [
+        self::KEY_ACQUIRED_AT => 'array',
+    ];
 }

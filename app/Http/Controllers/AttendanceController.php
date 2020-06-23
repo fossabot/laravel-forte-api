@@ -83,7 +83,7 @@ class AttendanceController extends Controller
                 AttendanceV2::KEY_COUNT => $attendance->{AttendanceV2::KEY_COUNT},
             ], Response::HTTP_CREATED);
         } else {
-            $keyAcquiredAt = $this->convertJsonToCollection($attendance->key_acquired_at);
+            $keyAcquiredAt = $attendance->key_acquired_at;
 
             if ($keyAcquiredAt->last() && Carbon::parse($keyAcquiredAt->last())->isToday()) {
                 $timeDiff = Carbon::now()
@@ -118,14 +118,5 @@ class AttendanceController extends Controller
     public function unpack(Request $request, string $id)
     {
 
-    }
-
-    /**
-     * @param string $json
-     * @return Collection
-     */
-    private function convertJsonToCollection(string $json): Collection
-    {
-        return collect(json_decode($json, true));
     }
 }
