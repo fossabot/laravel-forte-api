@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\AttendanceV2;
+use App\Models\User;
 use App\Services\AttendanceService;
 use Carbon\Carbon;
+use phpDocumentor\Reflection\Types\Boolean;
+use UnexpectedValueException;
 use Illuminate\Support\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,7 +16,11 @@ use Illuminate\Http\Response;
 class AttendanceController extends Controller
 {
     private const KEY_MAX_COUNT = 10;
-    /**
+    private const BOX_UNPACKED_BRONZE = 'bronze';
+    private const BOX_UNPACKED_SILVER = 'silver';
+    private const BOX_UNPACKED_GOLD = 'gold';
+
+        /**
      * @var AttendanceService $attendanceSerivce
      */
     private AttendanceService $attendanceSerivce;
@@ -115,8 +122,159 @@ class AttendanceController extends Controller
         }
     }
 
+    /**
+     * 출석체크 박스를 개봉합니다.
+     *
+     * @param Request $request
+     * @param string $id
+     * @return void
+     *
+     * @SWG\POST(
+     *     path="/discords/{discordId}/attendances/unpack",
+     *     description="User Attendance Box unpack v2",
+     *     produces={"application/json"},
+     *     tags={"Discord"},
+     *     @SWG\Parameter(
+     *         name="Authorization",
+     *         in="header",
+     *         description="Authorization Token",
+     *         required=true,
+     *         type="string"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="discordId",
+     *         in="path",
+     *         description="Discord Id",
+     *         required=true,
+     *         type="string"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="box",
+     *         in="query",
+     *         description="Box Name",
+     *         required=true,
+     *         type="string"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="isPremium",
+     *         in="query",
+     *         description="User Premium Role Check",
+     *         required=true,
+     *         type="integer"
+     *     ),
+     *     @SWG\Response(
+     *         response=201,
+     *         description="Successful User Attendance Box unpack v2"
+     *     ),
+     * )
+     */
     public function unpack(Request $request, string $id)
     {
+        $attendance = AttendanceV2::query()
+            ->whereDiscordId($id)
+            ->firstOrFail();
+        $user = User::scopeGetUserByDiscordId($id);
+        $key = $attendance->key_count;
+        $isPremium = $request->isPremium ?? false;
 
+        $this->checkValidateBoxFromKeyCount($request->box, $key, $isPremium);
+        $package = $this->buildProbabilityBoxPackage($request->box);
+
+        $unpackFromPoint = $this->buildProbability($package);
+
+        $oldPoints = $user->point;
+        $user->point += $unpackFromPoint;
+        $user->save();
+
+        $boxUnpackedAt = $attendance->box_unpacked_at;
+        $attendance->key_count -= $attendance->key_count;
+        $attendance->box_unpacked_at = $boxUnpackedAt->push(Carbon::now()->toDateTimeString());
+        $attendance->save();
+
+        // TODO: receipt 생성
+
+    }
+
+    /**
+     * @param array $package
+     * @return int
+     */
+    private function buildProbability(array $package): int
+    {
+        $package = collect($package);
+        $probabilities = collect($package->keys()->all());
+        $points = collect($package->values()->all());
+
+        $RAND = mt_rand(1, 1e6);
+
+        if ($RAND % 100 < $probabilities->min()) {
+            return $points->max();
+        } else if ($RAND % 100 < $probabilities->last()) {
+            return $points->last();
+        }
+
+        return $points->min();
+    }
+
+    /**
+     * @param string $box
+     * @param int $key
+     * @param bool $isPremium
+     * @return void
+     */
+    private function checkValidateBoxFromKeyCount(string $box, int $key, bool $isPremium): void
+    {
+        switch ($box) {
+            case self::BOX_UNPACKED_BRONZE:
+                $passed = $key === 3 ?? false;
+                break;
+            case self::BOX_UNPACKED_SILVER:
+                $passed = $key === (6 - ($isPremium && -1)) ?? false;
+                break;
+            case self::BOX_UNPACKED_GOLD:
+                $passed = $key === (10 - ($isPremium && -2)) ?? false;
+                break;
+            default:
+                throw new UnexpectedValueException();
+        }
+
+        if (! $passed) {
+            throw new UnexpectedValueException('오픈하려는 상자의 Key가 부족합니다.');
+        }
+    }
+
+    /**
+     * @param string $box
+     * @return array
+     */
+    private function buildProbabilityBoxPackage(string $box): array
+    {
+        switch ($box) {
+            case self::BOX_UNPACKED_BRONZE:
+                $package = [
+                    69 => 1,
+                    7 => 10,
+                    24 => 3,
+                ];
+                break;
+            case self::BOX_UNPACKED_SILVER:
+                $package = [
+                    70 => 10,
+                    5 => 50,
+                    25 => 30,
+                ];
+                break;
+            case self::BOX_UNPACKED_GOLD:
+                $package = [
+                    71 => 20,
+                    3 => 100,
+                    26 => 60,
+                ];
+                break;
+            default:
+                throw new UnexpectedValueException();
+        }
+
+        return $package;
     }
 }
