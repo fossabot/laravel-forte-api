@@ -18,6 +18,7 @@ class CreateV2AttendancesTable extends Migration
             $table->string('discord_id')->unique();
             $table->integer('key_count')->default(1)->comment('키 획득 count');
             $table->json('key_acquired_at')->comment('키 획득 일');
+            $table->json('box_unpacked_at')->comment('상자 개봉 일');
             $table->timestamps();
 
             $table->foreign('discord_id')
