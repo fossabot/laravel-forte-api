@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Item;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
 class ItemController extends Controller
 {
     /**
      * 전체 아이템을 조회합니다.
      *
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      *
      * @SWG\Get(
      *     path="/items",
@@ -29,16 +31,16 @@ class ItemController extends Controller
      *     ),
      * )
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        return response()->json(Item::scopeAllItemLists());
+        return new JsonResponse(Item::scopeAllItemLists());
     }
 
     /**
      * 아이템을 상세 조회합니다.
      *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return JsonResponse
      *
      * @SWG\Get(
      *     path="/items/{itemId}",
@@ -65,8 +67,8 @@ class ItemController extends Controller
      *     ),
      * )
      */
-    public function show(int $id)
+    public function show(int $id): JsonResponse
     {
-        return response()->json(Item::scopeItemDetail($id));
+        return new JsonResponse(Item::scopeItemDetail($id));
     }
 }

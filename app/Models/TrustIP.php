@@ -2,15 +2,28 @@
 
 namespace App\Models;
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
- * App\Models\TrustIP.
+ * App\Models\TrustIP
  *
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TrustIP newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TrustIP newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TrustIP query()
- * @mixin \Eloquent
+ * @property int $id
+ * @property string $ip
+ * @property string $description
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @method static Builder|TrustIP newModelQuery()
+ * @method static Builder|TrustIP newQuery()
+ * @method static Builder|TrustIP query()
+ * @method static Builder|TrustIP whereCreatedAt($value)
+ * @method static Builder|TrustIP whereDescription($value)
+ * @method static Builder|TrustIP whereId($value)
+ * @method static Builder|TrustIP whereIp($value)
+ * @method static Builder|TrustIP whereUpdatedAt($value)
+ * @mixin Eloquent
  */
 class TrustIP extends Model
 {

@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'merchantId' => env('XSOLLA_MERCHANT_ID', ''),
-    'apiKey' => env('XSOLLA_API_KEY', ''),
-    'projectId' => env('XSOLLA_PROJECT_ID', ''),
-    'projectKey' => env('XSOLLA_PROJECT_KEY', ''),
+    'merchant_id' => env('XSOLLA_MERCHANT_ID', ''),
+    'api_key' => env('XSOLLA_API_KEY', ''),
+    'project_id' => env('XSOLLA_PROJECT_ID', ''),
+    'project_key' => env('XSOLLA_PROJECT_KEY', ''),
 ];

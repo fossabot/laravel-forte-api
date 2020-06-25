@@ -4,7 +4,9 @@ namespace App\Http\Middleware;
 
 use App\Models\TrustIP;
 use Closure;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class CheckTrustIP
 {
@@ -18,12 +20,12 @@ class CheckTrustIP
     public function handle($request, Closure $next)
     {
         if (! TrustIP::where('ip', request()->ip())->first()) {
-            return response()->json([
+            return new JsonResponse([
                 'error' => [
                     'code' => 'INVALID_IP_ADDRESS',
                     'message' => 'The IP was not trusted.',
                 ],
-            ], 401);
+            ], Response::HTTP_UNAUTHORIZED);
         }
 
         return $next($request);

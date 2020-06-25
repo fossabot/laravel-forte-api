@@ -2,18 +2,21 @@
 
 namespace App\Services;
 
+use App\Http\Controllers\DiscordNotificationController;
+use App\Models\Client;
 use App\Models\Item;
-use GuzzleHttp\Client;
+use Exception;
 use GuzzleHttp\Exception\GuzzleException;
-
-const SKU_PREFIX = [
-    'baechubotv2' => 'cabv2',
-    'sangchuv2' => 'letv2',
-    'skilebot' => 'skb',
-];
+use Psr\Http\Message\StreamInterface;
 
 class XsollaAPIService
 {
+    const SKU_PREFIX = [
+        'baechubotv2' => 'cabv2',
+        'sangchuv2' => 'letv2',
+        'skilebot' => 'skb',
+    ];
+
     /**
      * @var Client
      */
@@ -54,10 +57,10 @@ class XsollaAPIService
     public function __construct(Client $client)
     {
         $this->client = $client;
-        $this->merchantId = config('xsolla.merchantId');
-        $this->projectId = config('xsolla.projectId');
-        $this->projectKey = config('xsolla.projectKey');
-        $this->apiKey = config('xsolla.apiKey');
+        $this->merchantId = config('xsolla.merchant_id');
+        $this->projectId = config('xsolla.project_id');
+        $this->projectKey = config('xsolla.project_key');
+        $this->apiKey = config('xsolla.api_key');
         $this->authKey = base64_encode($this->merchantId.':'.$this->apiKey);
         $this->endpoint = 'https://api.xsolla.com/merchant/v2/';
     }
@@ -66,7 +69,7 @@ class XsollaAPIService
      * @param string $method
      * @param string $uri
      * @param array $datas
-     * @return mixed|\Psr\Http\Message\ResponseInterface
+     * @return array|StreamInterface|string
      */
     public function requestAPI(string $method, string $uri, array $datas)
     {
@@ -88,7 +91,7 @@ class XsollaAPIService
 
             return $response->getBody();
         } catch (GuzzleException $exception) {
-            (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $datas);
+            (new DiscordNotificationController)->exception($exception, $datas);
 
             return $exception->getMessage();
         }
@@ -110,55 +113,53 @@ class XsollaAPIService
             $xsollaItems = json_decode($this->requestAPI('GET', 'projects/:projectId/virtual_items/items', []), true);
 
             foreach ($xsollaItems as $item) {
-                if (! Item::where('sku', $item['sku'])->first()) {
-                    array_push($xsollaDuplicateItemsSku, $item['sku']);
+                if (! Item::ofSku($item['sku'])->first()) {
+                    $xsollaDuplicateItemsSku[] = $item['sku'];
                 }
-                array_push($xsollaItemsSku, $item['sku']);
-                array_push($xsollaItemIds, $item['id']);
+                $xsollaItemsSku[] = $item['sku'];
+                $xsollaItemIds[] = $item['id'];
             }
 
-            Item::whereNotIn('sku', $xsollaItemsSku)->delete();
+            Item::whereNotIn(Item::SKU, $xsollaItemsSku)->delete();
 
             // 각 아이템 고유 ID에 대해 세부 페이지에 접속해서 동기화시킨다.
             foreach ($xsollaItemIds as $xsollaItemId) {
-                $xsollaDetailItem = json_decode($this->requestAPI('GET', 'projects/:projectId/virtual_items/items/'.$xsollaItemId, []), true);
                 $count++;
+                $xsollaDetailItem = json_decode($this->requestAPI('GET', 'projects/:projectId/virtual_items/items/'.$xsollaItemId, []), true);
+                $items = [
+                    Item::NAME => $xsollaDetailItem['name']['ko'] ?? $xsollaDetailItem['name']['en'],
+                    Item::IMAGE_URL => $xsollaDetailItem['image_url'],
+                    Item::PRICE => $xsollaDetailItem['virtual_currency_price'] ?? 0,
+                    Item::ENABLED => $xsollaDetailItem['enabled'] == true ? 1 : 0,
+                    Item::CONSUMABLE => $xsollaDetailItem['permanent'] == true ? 0 : 1,
+                    Item::EXPIRATION_TIME => $xsollaDetailItem['expiration'] ?? null,
+                    Item::PURCHASE_LIMIT => $xsollaDetailItem['purchase_limit'] ?? null,
+                ];
 
                 // Forte DB 에 아이템이 없을 경우 생성
-                if (! Item::where('sku', $xsollaDetailItem['sku'])->first()) {
-                    $skuParse = explode('_', $xsollaDetailItem['sku']);
-                    $convertSku = array_search($skuParse[0], SKU_PREFIX);
+                if (! Item::ofSku($xsollaDetailItem['sku'])->first()) {
+                    $convertSku = array_search(explode('_', $xsollaDetailItem['sku']), self::SKU_PREFIX);
+                    $items = array_merge($items,
+                        [
+                            Item::CLIENT_ID => Client::where(Client::NAME, $convertSku)->value('id'),
+                        ],
+                        [
+                            Item::SKU => $xsollaDetailItem['sku'],
+                        ],
+                    );
 
-                    Item::create([
-                        'client_id' => \App\Models\Client::where('name', $convertSku)->value('id'),
-                        'sku' => $xsollaDetailItem['sku'],
-                        'name' => (! empty($xsollaDetailItem['name']['ko'])) ? $xsollaDetailItem['name']['ko'] : $xsollaDetailItem['name']['en'],
-                        'image_url' => $xsollaDetailItem['image_url'],
-                        'price' => empty($xsollaDetailItem['virtual_currency_price']) ? 0 : $xsollaDetailItem['virtual_currency_price'],
-                        'enabled' => $xsollaDetailItem['enabled'] == true ? 1 : 0,
-                        'consumable' => $xsollaDetailItem['permanent'] == true ? 0 : 1,
-                        'expiration_time' => empty($xsollaDetailItem['expiration']) ? null : $xsollaDetailItem['expiration'],
-                        'purchase_limit' => empty($xsollaDetailItem['purchase_limit']) ? null : $xsollaDetailItem['purchase_limit'],
-                    ]);
+                    Item::create($items);
                 } else {
-                    Item::where('sku', $xsollaDetailItem['sku'])->update([
-                        'name' => (! empty($xsollaDetailItem['name']['ko'])) ? $xsollaDetailItem['name']['ko'] : $xsollaDetailItem['name']['en'],
-                        'image_url' => $xsollaDetailItem['image_url'],
-                        'price' => empty($xsollaDetailItem['virtual_currency_price']) ? 0 : $xsollaDetailItem['virtual_currency_price'],
-                        'enabled' => $xsollaDetailItem['enabled'] == true ? 1 : 0,
-                        'consumable' => $xsollaDetailItem['permanent'] == true ? 0 : 1,
-                        'expiration_time' => empty($xsollaDetailItem['expiration']) ? null : $xsollaDetailItem['expiration'],
-                        'purchase_limit' => empty($xsollaDetailItem['purchase_limit']) ? null : $xsollaDetailItem['purchase_limit'],
-                    ]);
+                    Item::ofSku($xsollaDetailItem['sku'])->update($items);
                 }
             }
-        } catch (\Exception $exception) {
-            (new \App\Http\Controllers\DiscordNotificationController)->exception($exception, $xsollaItemsSku);
+        } catch (Exception $exception) {
+            (new DiscordNotificationController)->exception($exception, $xsollaItemsSku);
 
             return $exception->getMessage();
         }
 
-        (new \App\Http\Controllers\DiscordNotificationController)->sync($count, $xsollaDuplicateItemsSku);
+        (new DiscordNotificationController)->sync($count, $xsollaDuplicateItemsSku);
         $this->print('== End Xsolla Sync from Forte Items ==');
     }
 

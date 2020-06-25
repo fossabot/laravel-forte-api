@@ -11,35 +11,51 @@
 |
 */
 
-Route::prefix('v1/')->middleware(['api.trust.ip', 'api.headers'])->group(function () {
-    Route::resource('users', 'UserController');
-    Route::get('users/{user_id}/xsolla/token', 'UserController@xsollaToken');
-    Route::get('discords/attendances', 'UserController@attendances');
-    Route::get('discords/{discord_id}', 'UserController@discord');
-    Route::post('discords/{discord_id}/attendances', 'UserController@attendance');
-    Route::get('discords/attendances/ranks', 'UserController@attendanceRanks');
+Route::prefix('v2/')->middleware(['api.trust.ip', 'api.headers'])->group(function () {
+    Route::prefix('users')->group(function () {
+        Route::resource('', 'UserController');
+        Route::prefix('{user_id}')->group(function () {
+            Route::get('', 'UserController@show');
+            Route::patch('', 'UserController@update');
+            Route::delete('', 'UserController@destroy');
+            Route::prefix('items')->group(function () {
+                Route::get('', 'UserItemController@index');
+                Route::post('', 'UserItemController@store');
+                Route::get('{user_item_id}', 'UserItemController@show');
+                Route::prefix('{item_id}')->group(function () {
+                    Route::put('', 'UserItemController@update');
+                    Route::delete('', 'UserItemController@destroy');
+                });
+            });
+            Route::prefix('receipts')->group(function () {
+                Route::get('', 'ReceiptController@index');
+                Route::get('{receipt_id}', 'ReceiptController@show');
+            });
+            Route::post('points', 'PointController@store');
+            Route::get('xsolla/token', 'UserController@xsollaToken');
+        });
+    });
 
-    Route::get('items', 'ItemController@index');
-    Route::get('items/{item_id}', 'ItemController@show');
+    Route::prefix('discords')->group(function () {
+        Route::get('attendances', 'UserController@attendances');
+        Route::prefix('{discord_id}')->group(function () {
+            Route::get('', 'UserController@discord');
+            Route::post('attendances', 'UserController@attendance');
+        });
+    });
 
-    Route::get('users/{user_id}/items', 'UserItemController@index');
-    Route::get('users/{user_id}/items/{user_item_id}', 'UserItemController@show');
-    Route::post('users/{user_id}/items', 'UserItemController@store');
-    Route::put('users/{user_id}/items/{item_id}', 'UserItemController@update');
-    Route::delete('users/{user_id}/items/{item_id}', 'UserItemController@destroy');
-    Route::post('users/{user_id}/points', 'PointController@store');
-    Route::get('users/{user_id}/receipts', 'ReceiptController@index');
-    Route::get('users/{user_id}/receipts/{receipt_id}', 'ReceiptController@show');
+    Route::prefix('items')->group(function () {
+        Route::get('', 'ItemController@index');
+        Route::get('{item_id}', 'ItemController@show');
+    });
 
     Route::get('clients/token', 'ClientController@issue');
 });
+
 
 Route::prefix('v2/')->middleware(['api.trust.ip', 'api.headers'])->group(function () {
     Route::post('discords/{discord_id}/attendances', 'AttendanceController@store');
     Route::post('discords/{discord_id}/attendances/unpack', 'AttendanceController@unpack');
 });
 
-Route::post('v1/xsolla', 'XsollaWebhookController@index')->middleware('api.xsolla');
-
-// Xsolla Test Case
-Route::post('v1/test/xsolla', 'XsollaTestCaseController@index');
+Route::post('v2/xsolla', 'XsollaWebhookController@index')->middleware('api.xsolla');

@@ -9,20 +9,18 @@ use Illuminate\Support\Facades\Hash;
 class ClientController extends Controller
 {
     /**
-     * @return array
+     * @return void
      */
     public function renewal()
     {
         foreach (Client::get() as $client) {
             if (! in_array($client->name, Client::BOT_TOKEN_RENEWAL_EXCEPTION)) {
-                Client::find($client->id)->update([
-                    'token' => 'forte-'.$this->generateToken(),
-                    'prev_token' => $client->token,
+                Client::find($client->{Client::ID})->update([
+                    Client::TOKEN => 'forte-'.$this->generateToken(),
+                    Client::PREV_TOKEN => $client->{Client::PREV_TOKEN},
                 ]);
             }
         }
-
-        return (new \App\Http\Controllers\DiscordNotificationController)->clientToken();
     }
 
     /**
@@ -63,13 +61,14 @@ class ClientController extends Controller
      *     ),
      * )
      */
-    public function issue()
+    public function issue(): JsonResponse
     {
-        $client = Client::where('prev_token', $_SERVER['HTTP_AUTHORIZATION'])->first() ?: null;
+        $client = Client::where(Client::PREV_TOKEN, $_SERVER['HTTP_AUTHORIZATION'])->first() ?: null;
+
         if (! empty($client)) {
-            return response()->json([
-                'token' => $client->token,
-                'updated_at' => $client->updated_at,
+            return new JsonResponse([
+                Client::TOKEN => $client->{Client::TOKEN},
+                Client::UPDATED_AT => $client->{Client::UPDATED_AT},
             ]);
         }
     }

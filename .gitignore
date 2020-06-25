@@ -14,3 +14,5 @@ yarn-error.log
 /.idea
 /.idea/*
 /storage/api-docs
+.DS_Store
+/public/.DS_Store

@@ -2,283 +2,147 @@
 
 namespace App\Models;
 
+use App;
+use App\Http\Controllers\DiscordNotificationController;
+use App\Http\Controllers\PointController;
+use Auth;
+use Eloquent;
+use Exception;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Query\Builder as BuilderAlias;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 /**
- * App\Models\UserItem.
+ * App\Models\UserItem
  *
- * @property-read \App\Models\Item $item
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem countUserPurchaseDuplicateItem($itemId)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem destroyUserItem($itemId)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem purchaseUserItem($itemId, $token)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem query()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem updateUserItem($itemId, $data, $token)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem userItemDetail($itemId)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem userItemLists()
- * @mixin \Eloquent
+ * @property int $id
+ * @property int $user_id
+ * @property int $item_id
+ * @property int $expired whether expiration time has passed or the cash was refunded
+ * @property int $consumed
+ * @property int $sync whether bot(items.client_id) is notified of the change in this item
+ * @property Carbon|null $deleted_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Item $item
+ * @method static Builder|UserItem countUserPurchaseDuplicateItem($itemId)
+ * @method static Builder|UserItem destroyUserItem($itemId)
+ * @method static bool|null forceDelete()
+ * @method static Builder|UserItem newModelQuery()
+ * @method static Builder|UserItem newQuery()
+ * @method static BuilderAlias|UserItem onlyTrashed()
+ * @method static Builder|UserItem purchaseUserItem($itemId, $token)
+ * @method static Builder|UserItem query()
+ * @method static bool|null restore()
+ * @method static Builder|UserItem updateUserItem($itemId, $data, $token)
+ * @method static Builder|UserItem userItemDetail($itemId)
+ * @method static Builder|UserItem userItemLists()
+ * @method static Builder|UserItem userItemWithdraw()
+ * @method static Builder|UserItem whereConsumed($value)
+ * @method static Builder|UserItem whereCreatedAt($value)
+ * @method static Builder|UserItem whereDeletedAt($value)
+ * @method static Builder|UserItem whereExpired($value)
+ * @method static Builder|UserItem whereId($value)
+ * @method static Builder|UserItem whereItemId($value)
+ * @method static Builder|UserItem whereSync($value)
+ * @method static Builder|UserItem whereUpdatedAt($value)
+ * @method static Builder|UserItem whereUserId($value)
+ * @method static BuilderAlias|UserItem withTrashed()
+ * @method static BuilderAlias|UserItem withoutTrashed()
+ * @mixin Eloquent
+ * @property-read User $user
+ * @method static Builder|UserItem item($id)
+ * @method static Builder|UserItem ofUser($id)
+ * @method static Builder|UserItem ofItem($id)
+ * @property-read \App\Models\Item|null $items
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserItem ofId($id)
  */
 class UserItem extends Model
 {
+    use SoftDeletes;
+
+    const SBK_5 = 'skb_5';
+    const SKB_9 = 'skb_9';
+    const SKB_12 = 'skb_12';
+
+    const DISABLE_WITHDRAW_ITEMS = [
+        self::SBK_5,
+        self::SKB_9,
+        self::SKB_12,
+    ];
+
+    const ID = 'id';
+    const USER_ID = 'user_id';
+    const ITEM_ID = 'item_id';
+    const EXPIRED = 'expired';
+    const CONSUMED = 'consumed';
+    const SYNC = 'sync';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
+    const DELETED_AT = 'deleted_at';
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'user_id', 'item_id', 'expired', 'consumed', 'sync',
+        self::USER_ID, self::ITEM_ID, self::EXPIRED, self::CONSUMED, self::SYNC,
     ];
 
     protected $dates = [
-        'deleted_at',
+        self::DELETED_AT,
     ];
 
     /**
-     * @brief 1:n relationship
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function item()
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Item::class);
+        return $this->belongsTo(User::class);
     }
 
     /**
+     * @return HasOne
+     */
+    public function items(): HasOne
+    {
+        return $this->hasOne(Item::class, Item::ID, UserItem::ITEM_ID);
+    }
+
+    /**
+     * @param Builder $query
      * @param int $id
-     * @return mixed
+     * @return Builder
      */
-    public static function scopeUserItemLists(int $id)
+    public function scopeOfItem(Builder $query, int $id): Builder
     {
-        return self::with('item')->where('user_id', $id)->orderBy('created_at', 'desc')->get();
+        return $query->where(self::ITEM_ID, $id);
     }
 
     /**
+     * @param Builder $query
      * @param int $id
-     * @param int $itemId
-     * @return mixed
+     * @return Builder
      */
-    public static function scopeUserItemDetail(int $id, int $itemId)
+    public function scopeOfId(Builder $query, int $id): Builder
     {
-        return self::join('items', 'items.id', '=', 'user_items.item_id')->where('user_items.user_id', $id)
-            ->where('user_items.id', $itemId)->first();
+        return $query->where(self::ID, $id);
     }
 
     /**
+     * @param Builder $query
      * @param int $id
-     * @param int $itemId
-     * @return mixed
+     * @return Builder
      */
-    public static function scopeCountUserPurchaseDuplicateItem(int $id, int $itemId)
+    public function scopeOfUser(Builder $query, int $id): Builder
     {
-        return self::where('user_id', $id)->where('item_id', $itemId)->whereNull('deleted_at')->count();
-    }
-
-    /**
-     * @param int $id
-     * @param int $itemId
-     * @param string $token
-     * @return mixed
-     * @throws \Exception
-     */
-    public static function scopePurchaseUserItem(int $id, int $itemId, string $token)
-    {
-        $user = User::scopeGetUser($id);
-        $item = Item::scopeItemDetail($itemId);
-        if ($user->points < $item->price) {
-            return response()->json([
-                'message' => 'Insufficient points',
-            ], 400);
-        } elseif ($item->enabled == false) {
-            return response()->json([
-                'message' => 'Item is disable',
-            ], 400);
-        }
-
-        if (self::scopeCountUserPurchaseDuplicateItem($id, $itemId) < Item::scopeItemDetail($itemId)->purchase_limit) {
-            return response()->json([
-                'message' => 'over user purchase limit !',
-            ], 400);
-        }
-
-        try {
-            DB::beginTransaction();
-
-            $userItemId = self::insertGetId([
-                'user_id' => $id,
-                'item_id' => $itemId,
-                'expired' => 0,
-                'consumed' => 0,
-                'sync' => 0,
-                'created_at' => date('Y-m-d H:m:s'),
-                'updated_at' => date('Y-m-d H:m:s'),
-            ]);
-
-            $createUserReceipt = self::createUserReceipt($id, $itemId, $userItemId, $token);
-
-            DB::commit();
-        } catch (\Exception $exception) {
-            DB::rollback();
-
-            return ['error' => $exception->getMessage()];
-        }
-
-        return response()->json([
-            'user_item_id' => $userItemId,
-            'receipt_id' => $createUserReceipt,
-        ], 201);
-    }
-
-    /**
-     * @param int $id
-     * @param int $itemId
-     * @param int $userItemId
-     * @param string $token
-     * @return int
-     */
-    private static function createUserReceipt(int $id, int $itemId, int $userItemId, string $token)
-    {
-        $client = $token == 'xsolla' ?: Client::bringNameByToken($token);
-        $user = User::scopeGetUser($id);
-        $item = Item::scopeItemDetail($itemId);
-
-        if ($token != 'xsolla') {
-            $currentPoints = $user->points - $item->price;
-        } else {
-            $currentPoints = $user->points;
-        }
-
-        $receiptId = Receipt::insertGetId([
-            'user_id' => $id,
-            'client_id' => $token == 'xsolla' ? 1 : $client->id,
-            'user_item_id' => $userItemId,
-            'about_cash' => 1,
-            'refund' => 0,
-            'points_old' => $user->points,
-            'points_new' => $currentPoints,
-            'created_at' => date('Y-m-d H:m:s'),
-            'updated_at' => date('Y-m-d H:m:s'),
-        ]);
-
-        $user->points = $currentPoints;
-        $user->save();
-
-        return $receiptId;
-    }
-
-    /**
-     * @param int $id
-     * @param int $itemId
-     * @param array $data
-     * @param string $token
-     * @return array
-     * @throws \Exception
-     */
-    public static function scopeUpdateUserItem(int $id, int $itemId, array $data, string $token)
-    {
-        $items = [
-            'name' => User::scopeGetUser($id)->name,
-            'email' => User::scopeGetUser($id)->email,
-        ];
-
-        $userItem = self::where('user_id', $id)->find($itemId);
-
-        if (Item::scopeItemDetail($userItem->item_id)->consumable == 0 && ! empty($data['consumed']) && $data['consumed']) {
-            return response()->json([
-                'message' => 'Bad Request Consumed value is true',
-            ], 400);
-        }
-
-        try {
-            DB::beginTransaction();
-
-            foreach ($data as $key => $item) {
-                if ($key === 'sync') {
-                    $userItem->$key = in_array(Client::bringNameByToken($token)->name, Client::BOT_CLIENT) ? 1 : 0;
-                    continue;
-                }
-                $userItem->$key = $item;
-
-                array_push($items, [
-                    'expired' => $userItem->expired ? 'true' : 'false',
-                    'consumed' => $userItem->consumed ? 'true' : 'false',
-                    'sync' => $userItem->sync ? 'true' : 'false',
-                ]);
-            }
-            $userItem->save();
-
-            (new \App\Http\Controllers\DiscordNotificationController)->xsollaUserAction('User Item Update', $items);
-
-            DB::commit();
-        } catch (\Exception $exception) {
-            DB::rollback();
-
-            return ['error' => $exception->getMessage()];
-        }
-
-        return $userItem;
-    }
-
-    /**
-     * @param int $id
-     * @param int $itemId
-     * @return array
-     */
-    public static function scopeDestroyUserItem(int $id, int $itemId)
-    {
-        self::where('user_id', $id)->where('item_id', $itemId)->update([
-            'deleted_at' => date('Y-m-d H:m:s'),
-        ]);
-
-        return ['message' => 'Successful Destroy User Item'];
-    }
-
-    /**
-     * @param int $itemId
-     * @return array
-     */
-    public static function scopeUserItemWithdraw(int $itemId)
-    {
-        $xsollaAPI = \App::make('App\Services\XsollaAPIService');
-        $repetition = false;
-        $needPoint = 0;
-
-        $user = User::scopeGetUser(\Auth::User()->id);
-
-        self::where('user_id', $user->id)->where('id', $itemId)->update([
-            'deleted_at' => date('Y-m-d H:m:s'),
-        ]);
-
-        $item = self::scopeUserItemDetail($user->id, $itemId);
-
-        $user->points = $user->points + $item->price;
-        $user->save();
-
-        $datas = [];
-        while (true) {
-            $datas = [
-                'amount' => $item->price,
-                'comment' => '포르테 아이템 청약철회',
-                'project_id' => env('XSOLLA_PROJECT_KEY'),
-                'user_id' => $user->id,
-            ];
-
-            $response = json_decode($xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$user->id.'/recharge', $datas), true);
-
-            if ($user->points !== $response['amount']) {
-                $repetition = true;
-                $needPoint = $user->points - $response['amount'];
-                continue;
-            } else {
-                break;
-            }
-        }
-
-        unset($datas['project_id']);
-        $datas['email'] = $user->email;
-        array_push($datas, $item);
-        (new \App\Http\Controllers\DiscordNotificationController)->xsollaUserAction('User Item Withdraw', $datas);
-
-        return ['message' => 'Successful Withdraw User Item'];
+        return $query->where(self::USER_ID, $id);
     }
 }

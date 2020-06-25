@@ -12,7 +12,7 @@ class DeployNotificationFromAWS extends Command
      *
      * @var string
      */
-    protected $signature = 'aws:codedeploy {status}';
+    protected $signature = 'aws:codedeploy';
 
     /**
      * The console command description.
@@ -39,6 +39,6 @@ class DeployNotificationFromAWS extends Command
      */
     public function handle(DiscordNotificationController $discordNotification)
     {
-        $discordNotification->deploy($this->argument('status'));
+        $discordNotification->deploy();
     }
 }

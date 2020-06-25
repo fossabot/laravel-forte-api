@@ -2,29 +2,69 @@
 
 namespace App\Models;
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 /**
- * App\Models\RequestLog.
+ * App\Models\RequestLog
  *
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RequestLog clearRequestLogs()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RequestLog newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RequestLog newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RequestLog query()
- * @mixin \Eloquent
+ * @property int $id
+ * @property float $duration microtime start - end
+ * @property string $url
+ * @property string $method
+ * @property string $ip
+ * @property string $request
+ * @property string $response
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @method static Builder|RequestLog clearRequestLogs()
+ * @method static bool|null forceDelete()
+ * @method static Builder|RequestLog newModelQuery()
+ * @method static Builder|RequestLog newQuery()
+ * @method static \Illuminate\Database\Query\Builder|RequestLog onlyTrashed()
+ * @method static Builder|RequestLog query()
+ * @method static bool|null restore()
+ * @method static Builder|RequestLog whereCreatedAt($value)
+ * @method static Builder|RequestLog whereDuration($value)
+ * @method static Builder|RequestLog whereId($value)
+ * @method static Builder|RequestLog whereIp($value)
+ * @method static Builder|RequestLog whereMethod($value)
+ * @method static Builder|RequestLog whereRequest($value)
+ * @method static Builder|RequestLog whereResponse($value)
+ * @method static Builder|RequestLog whereUpdatedAt($value)
+ * @method static Builder|RequestLog whereUrl($value)
+ * @method static \Illuminate\Database\Query\Builder|RequestLog withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|RequestLog withoutTrashed()
+ * @mixin Eloquent
  */
 class RequestLog extends Model
 {
+    use SoftDeletes;
+
+    const ID = 'id';
+    const DURATION = 'duration';
+    const URL = 'url';
+    const METHOD = 'method';
+    const IP = 'ip';
+    const REQUEST = 'request';
+    const RESPONSE = 'response';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
+
     protected $fillable = [
-        'duration', 'url', 'method', 'ip', 'request', 'response',
+        self::DURATION, self::URL, self::METHOD, self::IP, self::REQUEST, self::RESPONSE,
     ];
 
     /**
      * @param string $date
-     * @return mixed
+     * @return RequestLog[]|Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|Collection
      */
     public static function scopeClearRequestLogs(string $date)
     {
-        return self::where('created_at', '<', $date)->delete();
+        return self::withTrashed()->where(self::CREATED_AT, '<', $date)->get();
     }
 }

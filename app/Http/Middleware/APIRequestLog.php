@@ -30,12 +30,12 @@ class APIRequestLog
     protected function log($request, $response)
     {
         RequestLog::create([
-            'duration' => $request->end - $request->start,
-            'url' => $request->fullUrl(),
-            'method' => $request->getMethod(),
-            'ip' => $request->getClientIp(),
-            'request' => json_encode($request->all(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
-            'response' => json_encode($response->getContent(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
+            RequestLog::DURATION => $request->end - $request->start,
+            RequestLog::URL => $request->fullUrl(),
+            RequestLog::METHOD => $request->getMethod(),
+            RequestLog::IP => $request->getClientIp(),
+            RequestLog::REQUEST => json_encode($request->all(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
+            RequestLog::RESPONSE => json_encode($response->getContent(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
         ]);
     }
 }

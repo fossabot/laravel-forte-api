@@ -3,14 +3,17 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class VerifyXsollaAuthorization
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param  Request  $request
+     * @param Closure $next
      * @return mixed
      */
     public function handle($request, Closure $next)
@@ -20,21 +23,21 @@ class VerifyXsollaAuthorization
         $hash = sha1($body);
 
         if (! isset($_SERVER['HTTP_AUTHORIZATION'])) {
-            return response([
+            return new JsonResponse([
                 'error' => [
                     'code' => 'INVALID_AUTHORIZATION',
                     'message' => 'Please set Authorization Header',
                 ],
-            ], 404);
+            ], Response::HTTP_NOT_FOUND);
         }
 
         if ($_SERVER['HTTP_AUTHORIZATION'] != 'Signature '.$hash) {
-            return response([
+            return new JsonResponse([
                 'error' => [
                     'code' => 'INVALID_SIGNATURE',
                     'message' => 'The Authorization Signature is invalid',
                 ],
-            ], 401);
+            ], Response::HTTP_UNAUTHORIZED);
         }
 
         return $next($request);

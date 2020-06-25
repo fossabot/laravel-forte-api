@@ -6,12 +6,15 @@ use App\Models\Client;
 use App\Models\Receipt;
 use App\Models\User;
 use App\Services\XsollaAPIService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-
-const MAX_POINT = 2000;
+use Illuminate\Http\Response;
 
 class PointController extends Controller
 {
+    private const STAFF_TYPE = 2;
+    private const MAX_POINT = 2000;
+
     /**
      * @var XsollaAPIService
      */
@@ -31,46 +34,18 @@ class PointController extends Controller
      */
     public function schedule()
     {
-        $staffs = User::where('is_member', '=', 2)->whereNull('deleted_at')->get();
+        $users = User::ofType(self::STAFF_TYPE);
 
-        foreach ($staffs as $staff) {
-            $repetition = false;
-            $needPoint = 0;
+        foreach ($users as $user) {
+            $oldPoints = $user->points;
+            $user->{User::POINTS} += self::MAX_POINT;
+            $user->save();
 
-            $oldPoints = $staff->points;
-            $staff->points += MAX_POINT;
-            $staff->save();
+            $receipt = Receipt::store($user->{User::ID}, 5, null, 0, 0, $oldPoints, $user->{User::POINTS}, 0);
 
-            $receipt = new Receipt;
-            $receipt->user_id = $staff->id;
-            $receipt->client_id = 5; // scheduler
-            $receipt->user_item_id = null;
-            $receipt->about_cash = 0;
-            $receipt->refund = 0;
-            $receipt->points_old = $oldPoints;
-            $receipt->points_new = $staff->points;
-            $receipt->save();
+            $this->recharge(self::MAX_POINT, '스태프 포인트 지급', $receipt->{Receipt::USER_ID});
 
-            while (true) {
-                $datas = [
-                    'amount' => $repetition ? $needPoint : MAX_POINT,
-                    'comment' => '팀 크레센도 STAFF 보상',
-                    'project_id' => env('XSOLLA_PROJECT_KEY'),
-                    'user_id' => $receipt->user_id,
-                ];
-
-                $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->user_id.'/recharge', $datas), true);
-
-                if ($staff->points !== $response['amount']) {
-                    $repetition = true;
-                    $needPoint = $staff->points - $response['amount'];
-                    continue;
-                } else {
-                    break;
-                }
-            }
-
-            (new \App\Http\Controllers\DiscordNotificationController)->point($staff->email, $staff->discord_id, MAX_POINT, $staff->points);
+            (new DiscordNotificationController)->point($user->{User::EMAIL}, $user->{User::DISCORD_ID}, self::MAX_POINT, $user->{User::POINTS});
         }
     }
 
@@ -113,66 +88,65 @@ class PointController extends Controller
      *     ),
      * )
      */
-    public function store(Request $request, int $id)
+    public function store(Request $request, int $id): JsonResponse
     {
-        $repetition = false;
-        $needPoint = 0;
         $user = User::scopeGetUser($id);
 
         if (! $user) {
-            return response([
+            return new JsonResponse([
                 'message' => 'User does not exist',
-            ], 404);
+            ], Response::HTTP_NOT_FOUND);
         }
 
-        if (! empty($user->deleted_at)) {
-            return response([
+        if ($user->trashed()) {
+            return new JsonResponse([
                 'message' => 'Withdraw User Account',
-            ], 400);
+            ], Response::HTTP_BAD_REQUEST);
         }
 
-        $oldPoints = $user->points;
-        $user->points += $request->points;
+        $oldPoints = $user->{User::POINTS};
+        $user->{User::POINTS} += $request->points;
         $user->save();
 
-        $receipt = new Receipt;
-        $receipt->user_id = $id;
-        $receipt->client_id = Client::bringNameByToken($request->header('Authorization'))->id;
-        $receipt->user_item_id = null;
-        $receipt->about_cash = 0;
-        $receipt->refund = 0;
-        $receipt->points_old = $oldPoints;
-        $receipt->points_new = $user->points;
-        $receipt->save();
+        $clientId = Client::bringNameByToken($request->header('Authorization'))->id;
 
-        /*
-         * @brief sync Xsolla DB from Crescendo API \n
-         * 응답이 우리 DB와 일치하는 지 확인하고 \n
-         * 일치하지 않는다면 이를 갱신하기 위해 API를 다시 호출 \n
-         * (엑솔라 DB가 우리 DB의 데이터를 따르도록.. 만약 우리 DB는 500인데 엑솔라 DB 응답이 300이었다면 +200 요청을 다시 보내주는 식)
-         * @author GBS-Skile
-         */
+        $receipt = Receipt::store($id, $clientId, null, 0, 0, $oldPoints, $user->{User::POINTS}, 0);
+
+        $this->recharge($request->points, '이용자 포인트 지급', $receipt->{Receipt::USER_ID});
+
+        (new DiscordNotificationController)->point($user->{User::EMAIL}, $user->{User::DISCORD_ID}, $request->{User::POINTS}, $user->{User::POINTS});
+
+        return new JsonResponse(['receipt_id' => $receipt->{Receipt::ID}]);
+    }
+
+    /**
+     * @param int $point
+     * @param string $comment
+     * @param int $userId
+     */
+    public function recharge(int $point, string $comment, int $userId): void
+    {
+        $user = User::find($userId);
+        $needPoint = 0;
+        $repetition = false;
+
         while (true) {
             $datas = [
-                'amount' => $repetition ? $needPoint : $request->points,
-                'comment' => '이용자 포인트 지급',
-                'project_id' => env('XSOLLA_PROJECT_KEY'),
-                'user_id' => $receipt->user_id,
+                'amount' => $repetition ? $needPoint : $point,
+                'comment' => $comment,
+                'project_id' => config('xsolla.projectKey'),
+                'user_id' => $userId,
             ];
 
-            $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$receipt->user_id.'/recharge', $datas), true);
+            $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$userId.'/recharge', $datas), true);
 
-            if ($user->points !== $response['amount']) {
+            if ($user->{User::POINTS} !== $response['amount']) {
                 $repetition = true;
-                $needPoint = $user->points - $response['amount'];
+                $needPoint = $user->{User::POINTS} - $response['amount'];
                 continue;
             } else {
                 break;
             }
         }
-
-        (new \App\Http\Controllers\DiscordNotificationController)->point($user->email, $user->discord_id, $request->points, $user->points);
-
-        return ['receipt_id' => $receipt->id];
     }
 }

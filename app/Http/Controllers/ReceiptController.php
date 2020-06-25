@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Receipt;
+use Illuminate\Http\JsonResponse;
+use Psy\Util\Json;
 
 class ReceiptController extends Controller
 {
@@ -10,7 +12,7 @@ class ReceiptController extends Controller
      * 이용자의 모든 레시피 정보를 조회합니다.
      *
      * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      *
      * @SWG\Get(
      *     path="/users/{userId}/receipts",
@@ -37,9 +39,9 @@ class ReceiptController extends Controller
      *     ),
      * )
      */
-    public function index(int $id)
+    public function index(int $id): JsonResponse
     {
-        return response()->json(Receipt::scopeUserReceiptLists($id));
+        return new JsonResponse(Receipt::scopeUserReceiptLists($id));
     }
 
     /**
@@ -47,7 +49,7 @@ class ReceiptController extends Controller
      *
      * @param int $id
      * @param int $receiptId
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      *
      * @SWG\Get(
      *     path="/users/{userId}/receipts/{receiptId}",
@@ -81,8 +83,8 @@ class ReceiptController extends Controller
      *     ),
      * )
      */
-    public function show(int $id, int $receiptId)
+    public function show(int $id, int $receiptId): JsonResponse
     {
-        return response()->json(Receipt::scopeUserReceiptDetail($id, $receiptId));
+        return new JsonResponse(Receipt::scopeUserReceiptDetail($id, $receiptId));
     }
 }

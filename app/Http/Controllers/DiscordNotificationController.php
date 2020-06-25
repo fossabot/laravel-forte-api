@@ -2,18 +2,32 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Client;
 use App\Models\ErrorLog;
+use Exception;
 use NotificationChannels\Discord\Discord;
 
 class DiscordNotificationController extends Controller
 {
+    const CHANNEL_ERROR = '555413130872750091';
+    const CHANNEL_XSOLLA_SYNC = '561429015433445376';
+    const CHANNEL_XSOLLA_USER_ACTION = '595192089457983490';
+    const CHANNEL_USER_POINT_TRACKING = '648068498609799168';
+    const CHANNEL_FORTE_DEPLOY = '576091937811988482';
+
+    const DISCORD_CHANNELS = [
+        self::CHANNEL_ERROR,
+        self::CHANNEL_XSOLLA_SYNC,
+        self::CHANNEL_XSOLLA_USER_ACTION,
+        self::CHANNEL_USER_POINT_TRACKING,
+        self::CHANNEL_FORTE_DEPLOY,
+    ];
+
     /**
-     * @param \Exception $exception
+     * @param Exception $exception
      * @param array $data
      * @return array
      */
-    public function exception(\Exception $exception, array $data = [])
+    public function exception(Exception $exception, array $data = [])
     {
         $params = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
 
@@ -24,7 +38,7 @@ class DiscordNotificationController extends Controller
             'parameters' => $params,
         ]);
 
-        return app(Discord::class)->send('555413130872750091', [
+        return app(Discord::class)->send(in_array(self::CHANNEL_ERROR, self::DISCORD_CHANNELS), [
             'content' => '['.config('app.env').'> '.now().'] API ERROR',
             'tts' => false,
             'embed' => [
@@ -43,7 +57,7 @@ class DiscordNotificationController extends Controller
     {
         $params = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
 
-        return app(Discord::class)->send('561429015433445376', [
+        return app(Discord::class)->send(in_array(self::CHANNEL_XSOLLA_SYNC, self::DISCORD_CHANNELS), [
             'content' => '['.config('app.env').'> '.now().'] Xsolla Sync',
             'tts' => false,
             'embed' => [
@@ -54,52 +68,16 @@ class DiscordNotificationController extends Controller
     }
 
     /**
-     * @param string $status
      * @return array
      */
-    public function deploy(string $status)
+    public function deploy()
     {
-        $time = now();
-
-        if ($status == 'starting') {
-            $status = '배포를 시작했습니다.';
-        } elseif ($status == 'finish') {
-            $status = '배포가 종료되었습니다.';
-        } else {
-            $status = '에러가 발생했습니다.';
-        }
-
-        return app(Discord::class)->send('576091937811988482', [
+        return app(Discord::class)->send(in_array(self::CHANNEL_FORTE_DEPLOY, self::DISCORD_CHANNELS), [
             'content' => 'AWS Auto Deploy Notification',
             'tts' => false,
             'embed' => [
                 'title' => 'Deploy Information',
-                'description' => "`TIME` \n {$time} \n `STATUS` \n {$status}",
-            ],
-        ]);
-    }
-
-    /**
-     * @return array
-     */
-    public function clientToken()
-    {
-        $name = [];
-
-        foreach (Client::get() as $client) {
-            if (! in_array($client->name, Client::BOT_TOKEN_RENEWAL_EXCEPTION)) {
-                array_push($name, $client->name);
-            }
-        }
-
-        $name = implode(', ', $name);
-
-        return app(Discord::class)->send('561429015433445376', [
-            'content' => now().'] Client Token Issue ('.date('H').'/24)',
-            'tts' => false,
-            'embed' => [
-                'title' => 'Client Information',
-                'description' => "`Clients` \n {$name}",
+                'description' => 'Deploy ..',
             ],
         ]);
     }
@@ -113,7 +91,7 @@ class DiscordNotificationController extends Controller
     {
         $params = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
 
-        return app(Discord::class)->send('595192089457983490', [
+        return app(Discord::class)->send(in_array(self::CHANNEL_XSOLLA_USER_ACTION, self::DISCORD_CHANNELS), [
             'content' => now().'] Xsolla User Log',
             'tts' => false,
             'embed' => [
@@ -132,29 +110,12 @@ class DiscordNotificationController extends Controller
      */
     public function point(string $email, int $discordId, int $deposit, int $point)
     {
-        return app(Discord::class)->send('648068498609799168', [
+        return app(Discord::class)->send(in_array(self::CHANNEL_USER_POINT_TRACKING, self::DISCORD_CHANNELS), [
             'content' => now().'] User Point Deposit Log',
             'tts' => false,
             'embed' => [
                 'description' => "EMAIL: {$email} \n Discord ID: {$discordId} \n Deposit: {$deposit} \n User Point: {$point}",
             ],
-        ]);
-    }
-
-    /**
-     * I dont know how to discord file upload
-     * change discord to email.
-     * @deprecated
-     * @return mixed
-     */
-    public function backupSQL()
-    {
-        return app(Discord::class)->send('600183416897404946', [
-            'content' => now().'] FORTE DB BACKUP',
-            'embed' => [
-                'description' => '디스코드 파일 업로드 방법을 몰라 이메일로 쏩니당 ,,,,',
-            ],
-            'tts' => false,
         ]);
     }
 }

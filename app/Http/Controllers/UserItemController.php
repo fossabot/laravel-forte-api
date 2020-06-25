@@ -2,21 +2,43 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Http\Requests\StoreUserItemRequest;
+use App\Services\UserService;
 use App\Models\UserItem;
+use App\Services\UserItemService;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-
-const DISABLE_WITHDRAW_ITEMS = [
-    'skb_5', 'skb_9', 'skb_12',
-];
 
 class UserItemController extends Controller
 {
     /**
+     * @var UserService
+     */
+    protected $userSerivce;
+
+    /**
+     * @var UserItemService
+     */
+    protected $userItemService;
+
+    /**
+     * UserItemController constructor.
+     * @param UserService $userService
+     * @param UserItemService $userItemService
+     */
+    public function __construct(UserService $userService,
+                                UserItemService $userItemService)
+    {
+        $this->userSerivce = $userService;
+        $this->userItemService = $userItemService;
+    }
+
+    /**
      * 이용자의 보유한 아이템 목록을 조회합니다.
      *
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      *
      * @SWG\Get(
      *     path="/users/{userId}/items",
@@ -43,19 +65,18 @@ class UserItemController extends Controller
      *     ),
      * )
      */
-    public function index(int $id)
+    public function index(int $id): JsonResponse
     {
-        return response()->json(UserItem::scopeUserItemLists($id));
+        return new JsonResponse($this->userSerivce->items($id));
     }
 
     /**
      * 아이템을 구매합니다.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param StoreUserItemRequest $request
      * @param int $id
      * @return mixed
-     * @throws \Exception
-     *
+     * @throws Exception
      * @SWG\Post(
      *     path="/users/{userId}/items",
      *     description="Store(save) the User buying Item",
@@ -88,23 +109,19 @@ class UserItemController extends Controller
      *     ),
      * )
      */
-    public function store(Request $request, int $id)
+    public function store(StoreUserItemRequest $request, int $id): JsonResponse
     {
-        if (isset($request->item_id) && User::scopeGetUser($id)) {
-            return response()->json(UserItem::scopePurchaseUserItem($id, $request->item_id, $request->header('Authorization')));
-        } else {
-            return response()->json([
-                'message' => 'Not found Item Id or User Id',
-            ], 404);
-        }
+        $user = $this->userSerivce->show($id);
+        return new JsonResponse($this->userItemService
+            ->save($user, $request->{UserItem::ITEM_ID}, $request->header('Authorization')));
     }
 
     /**
      * 이용자가 보유중인 아이템 상세 정보를 조회합니다.
      *
-     * @param  int $id
+     * @param int $id
      * @param int $itemId
-     * @return mixed
+     * @return JsonResponse
      *
      * @SWG\Get(
      *     path="/users/{userId}/items/{userItemId}",
@@ -138,20 +155,19 @@ class UserItemController extends Controller
      *     ),
      * )
      */
-    public function show(int $id, int $itemId)
+    public function show(int $id, int $itemId): JsonResponse
     {
-        return response()->json(UserItem::scopeUserItemDetail($id, $itemId));
+        return new JsonResponse($this->userItemService->show($id, $itemId));
     }
 
     /**
      * 이용자의 아이템 정보를 갱신합니다.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  int $id
+     * @param Request $request
+     * @param int $id
      * @param int $itemId
-     * @return \Illuminate\Http\Response
-     * @throws \Exception
-     *
+     * @return JsonResponse
+     * @throws Exception
      * @SWG\Put(
      *     path="/users/{userId}/items/{userItemId}",
      *     description="Update User Item",
@@ -205,17 +221,18 @@ class UserItemController extends Controller
      *     ),
      * )
      */
-    public function update(Request $request, int $id, int $itemId)
+    public function update(Request $request, int $id, int $itemId): JsonResponse
     {
-        return response()->json(UserItem::scopeUpdateUserItem($id, $itemId, $request->all(), $request->header('Authorization')));
+        return new JsonResponse($this->userItemService
+            ->update($id, $itemId, $request->all(), $request->header('Authorization')));
     }
 
     /**
      * 이용자의 아이템을 제거합니다.
      *
-     * @param  int $id
+     * @param int $id
      * @param int $itemId
-     * @return mixed
+     * @return JsonResponse
      *
      * @SWG\Delete(
      *     path="/users/{userId}/items/{userItemId}",
@@ -249,29 +266,8 @@ class UserItemController extends Controller
      *     ),
      * )
      */
-    public function destroy(int $id, int $itemId)
+    public function destroy(int $id, int $itemId): JsonResponse
     {
-        return response()->json(UserItem::scopeDestroyUserItem($id, $itemId));
-    }
-
-    /**
-     * 이용자 아이템 청약철회.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function withdraw(Request $request)
-    {
-        $item = UserItem::scopeUserItemDetail(\Auth::User()->id, $request->id);
-
-        if (in_array($item->sku, DISABLE_WITHDRAW_ITEMS)) {
-            return response()->json(['message' => 'Upon purchase is considered to be used this item for withdrawal is not possible.'], 403);
-        }
-
-        if ($item) {
-            return response()->json(UserItem::scopeUserItemWithdraw($request->id));
-        } else {
-            return response()->json(['message' => 'ERROR'], 400);
-        }
+        return new JsonResponse($this->userItemService->destroy($id, $itemId));
     }
 }
