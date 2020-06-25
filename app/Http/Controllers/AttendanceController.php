@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\AttendanceV2;
+use App\Models\Receipt;
 use App\Models\User;
 use App\Services\AttendanceService;
+use App\Services\XsollaAPIService;
 use Carbon\Carbon;
 use phpDocumentor\Reflection\Types\Boolean;
 use UnexpectedValueException;
@@ -20,18 +22,25 @@ class AttendanceController extends Controller
     private const BOX_UNPACKED_SILVER = 'silver';
     private const BOX_UNPACKED_GOLD = 'gold';
 
-        /**
+    /**
      * @var AttendanceService $attendanceSerivce
      */
     private AttendanceService $attendanceSerivce;
 
     /**
+     * @var XsollaAPIService
+     */
+    private XsollaAPIService $xsollaAPIService;
+
+    /**
      * AttendanceController constructor.
      * @param AttendanceService $attendanceSerivce
+     * @param XsollaAPIService $xsollaAPIService
      */
-    public function __construct(AttendanceService $attendanceSerivce)
+    public function __construct(AttendanceService $attendanceSerivce, XsollaAPIService $xsollaAPIService)
     {
         $this->attendanceSerivce = $attendanceSerivce;
+        $this->xsollaAPIService = $xsollaAPIService;
     }
 
     /**
@@ -191,8 +200,40 @@ class AttendanceController extends Controller
         $attendance->box_unpacked_at = $boxUnpackedAt->push(Carbon::now()->toDateTimeString());
         $attendance->save();
 
-        // TODO: receipt 생성
+        $repetition = false;
+        $needPoint = 0;
 
+        // TODO: api v2 개발 후 리팩토링
+        $receipt = new Receipt;
+        $receipt->user_id = $user->id;
+        $receipt->client_id = 5; // Lara
+        $receipt->user_item_id = null;
+        $receipt->about_cash = 0;
+        $receipt->refund = 0;
+        $receipt->points_old = $oldPoints;
+        $receipt->points_new = $user->points;
+        $receipt->save();
+
+        while (true) {
+            $datas = [
+                'amount' => $repetition ? $needPoint : $unpackFromPoint,
+                'comment' => '포르테 출석체크 보상',
+                'project_id' => env('XSOLLA_PROJECT_KEY'),
+                'user_id' => $receipt->user_id,
+            ];
+
+            $response = json_decode($this->xsollaAPIService->requestAPI('POST', 'projects/:projectId/users/'.$receipt->user_id.'/recharge', $datas), true);
+
+            if ($user->points !== $response['amount']) {
+                $repetition = true;
+                $needPoint = $user->points - $response['amount'];
+                continue;
+            } else {
+                break;
+            }
+        }
+
+        (new \App\Http\Controllers\DiscordNotificationController)->point($user->email, $user->discord_id, $unpackFromPoint, $user->points);
     }
 
     /**
