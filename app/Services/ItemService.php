@@ -2,13 +2,14 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use App\Models\Item;
+use App\Models\User;
 use App\Models\UserItem;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
-class ItemService extends BaseService {
+class ItemService extends BaseService
+{
     /**
      * @var User
      */
@@ -25,7 +26,6 @@ class ItemService extends BaseService {
      * @var UserService
      */
     protected $userService;
-
 
     public function __construct(User $user,
                                 Item $item,

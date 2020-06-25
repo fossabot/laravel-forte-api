@@ -6,13 +6,13 @@ use App\Http\Controllers\DiscordNotificationController;
 use App\Models\User;
 use App\Models\UserItem;
 use Http\Client\Exception;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use App\Services\XsollaAPIService;
-use Illuminate\Contracts\Pagination\Paginator;
 
-class UserService extends BaseService {
+class UserService extends BaseService
+{
     /**
      * @var User
      */
@@ -103,7 +103,9 @@ class UserService extends BaseService {
      */
     public function destroy(int $id): User
     {
-        if ($this->user->withTrashed()->find($id)->trashed()) return $this->user->find($id);
+        if ($this->user->withTrashed()->find($id)->trashed()) {
+            return $this->user->find($id);
+        }
 
         $this->xsollaAPI->requestAPI('PUT', 'projects/:projectId/users/'.$id, [
             'enabled' => false,

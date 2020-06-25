@@ -3,15 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRegisterFormRequest;
-use App\Http\Requests\UserUpdateFormRequest;
-use App\Services\UserService;
-use App\Models\Attendance;
-use App\Models\Receipt;
 use App\Models\User;
-use App\Models\UserItem;
 use App\Models\XsollaUrl;
+use App\Services\UserService;
 use App\Services\XsollaAPIService;
-use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
@@ -85,7 +80,7 @@ class UserController extends Controller
         if (! $user) {
             $user = $this->store($socialite);
         } elseif ($user && ($user->name !== $socialite->name)) {
-           $this->userService->update($user->{User::ID}, ['name' => $socialite->name]);
+            $this->userService->update($user->{User::ID}, ['name' => $socialite->name]);
         }
 
         Auth::login($user);

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\AttendanceV2
+ * App\Models\AttendanceV2.
  *
  * @property int $id
  * @property string $discord_id

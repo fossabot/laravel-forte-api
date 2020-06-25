@@ -8,13 +8,10 @@ use App\Models\Client;
 use App\Models\Item;
 use App\Models\Receipt;
 use App\Models\User;
-use App\Models\UserItem;
 use Exception as ExceptionAlias;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use App\Services\UserService;
-use App\Services\ReceiptService;
 
 /**
  * Class XsollaWebhookService.
