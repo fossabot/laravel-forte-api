@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AttendanceUnpackRequest;
 use App\Models\AttendanceV2;
 use App\Models\Receipt;
 use App\Models\User;
@@ -10,9 +11,8 @@ use App\Services\XsollaAPIService;
 use Carbon\Carbon;
 use DB;
 use Exception;
-use phpDocumentor\Reflection\Types\Boolean;
+use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use UnexpectedValueException;
-use Illuminate\Support\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -131,7 +131,7 @@ class AttendanceController extends Controller
      *
      * @param Request $request
      * @param string $id
-     * @return void
+     * @return JsonResponse
      *
      * @SWG\POST(
      *     path="/discords/{discordId}/attendances/unpack",
@@ -163,7 +163,7 @@ class AttendanceController extends Controller
      *         name="isPremium",
      *         in="query",
      *         description="User Premium Role Check",
-     *         required=true,
+     *         required=false,
      *         type="integer"
      *     ),
      *     @SWG\Response(
@@ -172,23 +172,23 @@ class AttendanceController extends Controller
      *     ),
      * )
      */
-    public function unpack(Request $request, string $id): AttendanceV2
+    public function unpack(AttendanceUnpackRequest $request, string $id): JsonResponse
     {
         $attendance = AttendanceV2::query()
             ->whereDiscordId($id)
             ->firstOrFail();
-        $user = User::scopeGetUserByDiscordId($id);
+        $user = User::whereDiscordId($id);
         $key = $attendance->key_count;
         $isPremium = $request->isPremium ?? false;
+        $box = $request->box;
 
-        $demandKey = $this->checkValidateBoxFromKeyCount($attendance, $request->box, $key, $isPremium);
-        $package = $this->buildProbabilityBoxPackage($request->box);
+        $demandKey = $this->checkValidateBoxFromKeyCount($box, $key, $isPremium);
+        $package = $this->buildProbabilityBoxPackage($box);
 
         $unpackFromPoint = $this->buildProbability($package);
 
         DB::beginTransaction();
         try {
-            // TODO: 해당 부분 forte v2 에서 전부 개선된 사항, merge 예정: refactoring/master
             $oldPoints = $user->points;
             $user->points += $unpackFromPoint;
             $user->save();
@@ -198,47 +198,20 @@ class AttendanceController extends Controller
             $attendance->box_unpacked_at = $boxUnpackedAt->push(Carbon::now()->toDateTimeString());
             $attendance->save();
 
-            $repetition = false;
-            $needPoint = 0;
-
-            $receipt = new Receipt;
-            $receipt->user_id = $user->id;
-            $receipt->client_id = 5; // Lara
-            $receipt->user_item_id = null;
-            $receipt->about_cash = 0;
-            $receipt->refund = 0;
-            $receipt->points_old = $oldPoints;
-            $receipt->points_new = $user->points;
-            $receipt->save();
+            $receipt = Receipt::store($user->id, 5, null, 0, 0, $oldPoints, $user->points, 0);
 
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();
-            throw new \PDOException($e);
+            app(DiscordNotificationController::class)->exception($e, $request->all());
+
+            throw new AccessDeniedException($e);
         }
 
-        while (true) {
-            $datas = [
-                'amount' => $repetition ? $needPoint : $unpackFromPoint,
-                'comment' => '포르테 출석체크 보상',
-                'project_id' => env('XSOLLA_PROJECT_KEY'),
-                'user_id' => $receipt->user_id,
-            ];
+        app(PointController::class)->recharge($unpackFromPoint, '포르테 출석체크 보상', $receipt->user_id);
+        app(DiscordNotificationController::class)->point($user->email, $user->discord_id, $unpackFromPoint, $user->points);
 
-            $response = json_decode($this->xsollaAPIService->requestAPI('POST', 'projects/:projectId/users/'.$receipt->user_id.'/recharge', $datas), true);
-
-            if ($user->points !== $response['amount']) {
-                $repetition = true;
-                $needPoint = $user->points - $response['amount'];
-                continue;
-            } else {
-                break;
-            }
-        }
-
-        (new \App\Http\Controllers\DiscordNotificationController)->point($user->email, $user->discord_id, $unpackFromPoint, $user->points);
-
-        return $attendance;
+        return new JsonResponse($attendance);
     }
 
     /**
@@ -263,13 +236,12 @@ class AttendanceController extends Controller
     }
 
     /**
-     * @param AttendanceV2 $attendance
      * @param string $box
      * @param int $key
      * @param bool $isPremium
      * @return int
      */
-    private function checkValidateBoxFromKeyCount(AttendanceV2 $attendance, string $box, int $key, bool $isPremium): int
+    private function checkValidateBoxFromKeyCount(string $box, int $key, bool $isPremium): int
     {
         switch ($box) {
             case self::BOX_UNPACKED_BRONZE:
