@@ -11,11 +11,11 @@ use App\Services\XsollaAPIService;
 use Carbon\Carbon;
 use DB;
 use Exception;
-use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
-use UnexpectedValueException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
+use UnexpectedValueException;
 
 class AttendanceController extends Controller
 {
@@ -25,7 +25,7 @@ class AttendanceController extends Controller
     private const BOX_UNPACKED_GOLD = 'gold';
 
     /**
-     * @var AttendanceService $attendanceSerivce
+     * @var AttendanceService
      */
     private AttendanceService $attendanceSerivce;
 
@@ -228,7 +228,7 @@ class AttendanceController extends Controller
 
         if ($RAND % 100 < $probabilities->min()) {
             return $points->max();
-        } else if ($RAND % 100 < $probabilities->last()) {
+        } elseif ($RAND % 100 < $probabilities->last()) {
             return $points->last();
         }
 

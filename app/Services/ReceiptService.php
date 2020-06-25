@@ -8,7 +8,8 @@ use App\Models\Receipt;
 use App\Models\User;
 use App\Models\UserItem;
 
-class ReceiptService extends BaseService {
+class ReceiptService extends BaseService
+{
     /**
      * @var User
      */
@@ -29,7 +30,6 @@ class ReceiptService extends BaseService {
      * @var ItemService
      */
     protected $itemService;
-
 
     public function __construct(User $user,
                                 Item $item,
