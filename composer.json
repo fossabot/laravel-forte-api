@@ -8,7 +8,7 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^7.2",
+        "php": "^7.4",
         "ext-json": "*",
         "darkaonline/l5-swagger": "6.*",
         "zircote/swagger-php": "2.*",
@@ -30,7 +30,8 @@
         "symfony/options-resolver": "^3.0",
         "symfony/psr-http-message-bridge": "^1.2",
         "team-reflex/discord-php": "^4.0",
-        "tymon/jwt-auth": "^1.0.0"
+        "tymon/jwt-auth": "^1.0.0",
+        "ext-pdo": "*"
     },
     "require-dev": {
         "facade/ignition": "^1.4",
