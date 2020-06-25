@@ -8,6 +8,8 @@ use App\Models\User;
 use App\Services\AttendanceService;
 use App\Services\XsollaAPIService;
 use Carbon\Carbon;
+use DB;
+use Exception;
 use phpDocumentor\Reflection\Types\Boolean;
 use UnexpectedValueException;
 use Illuminate\Support\Collection;
@@ -170,7 +172,7 @@ class AttendanceController extends Controller
      *     ),
      * )
      */
-    public function unpack(Request $request, string $id)
+    public function unpack(Request $request, string $id): AttendanceV2
     {
         $attendance = AttendanceV2::query()
             ->whereDiscordId($id)
@@ -179,33 +181,41 @@ class AttendanceController extends Controller
         $key = $attendance->key_count;
         $isPremium = $request->isPremium ?? false;
 
-        $this->checkValidateBoxFromKeyCount($request->box, $key, $isPremium);
+        $demandKey = $this->checkValidateBoxFromKeyCount($attendance, $request->box, $key, $isPremium);
         $package = $this->buildProbabilityBoxPackage($request->box);
 
         $unpackFromPoint = $this->buildProbability($package);
 
-        $oldPoints = $user->point;
-        $user->point += $unpackFromPoint;
-        $user->save();
+        DB::beginTransaction();
+        try {
+            // TODO: 해당 부분 forte v2 에서 전부 개선된 사항, merge 예정: refactoring/master
+            $oldPoints = $user->points;
+            $user->points += $unpackFromPoint;
+            $user->save();
 
-        $boxUnpackedAt = $attendance->box_unpacked_at;
-        $attendance->key_count -= $attendance->key_count;
-        $attendance->box_unpacked_at = $boxUnpackedAt->push(Carbon::now()->toDateTimeString());
-        $attendance->save();
+            $boxUnpackedAt = collect(json_decode($attendance->box_unpacked_at, true));
+            $attendance->key_count = $attendance->key_count - $demandKey;
+            $attendance->box_unpacked_at = $boxUnpackedAt->push(Carbon::now()->toDateTimeString());
+            $attendance->save();
 
-        $repetition = false;
-        $needPoint = 0;
+            $repetition = false;
+            $needPoint = 0;
 
-        // TODO: api v2 개발 후 리팩토링
-        $receipt = new Receipt;
-        $receipt->user_id = $user->id;
-        $receipt->client_id = 5; // Lara
-        $receipt->user_item_id = null;
-        $receipt->about_cash = 0;
-        $receipt->refund = 0;
-        $receipt->points_old = $oldPoints;
-        $receipt->points_new = $user->points;
-        $receipt->save();
+            $receipt = new Receipt;
+            $receipt->user_id = $user->id;
+            $receipt->client_id = 5; // Lara
+            $receipt->user_item_id = null;
+            $receipt->about_cash = 0;
+            $receipt->refund = 0;
+            $receipt->points_old = $oldPoints;
+            $receipt->points_new = $user->points;
+            $receipt->save();
+
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            throw new \PDOException($e);
+        }
 
         while (true) {
             $datas = [
@@ -227,6 +237,8 @@ class AttendanceController extends Controller
         }
 
         (new \App\Http\Controllers\DiscordNotificationController)->point($user->email, $user->discord_id, $unpackFromPoint, $user->points);
+
+        return $attendance;
     }
 
     /**
@@ -251,30 +263,36 @@ class AttendanceController extends Controller
     }
 
     /**
+     * @param AttendanceV2 $attendance
      * @param string $box
      * @param int $key
      * @param bool $isPremium
-     * @return void
+     * @return int
      */
-    private function checkValidateBoxFromKeyCount(string $box, int $key, bool $isPremium): void
+    private function checkValidateBoxFromKeyCount(AttendanceV2 $attendance, string $box, int $key, bool $isPremium): int
     {
         switch ($box) {
             case self::BOX_UNPACKED_BRONZE:
-                $passed = $key === 3 ?? false;
+                $demandKey = 3;
+                $passed = $key >= $demandKey ?? false;
                 break;
             case self::BOX_UNPACKED_SILVER:
-                $passed = $key === (6 - ($isPremium && -1)) ?? false;
+                $demandKey = (6 - ($isPremium && -1));
+                $passed = $key >= $demandKey ?? false;
                 break;
             case self::BOX_UNPACKED_GOLD:
-                $passed = $key === (10 - ($isPremium && -2)) ?? false;
+                $demandKey = (10 - ($isPremium && -2));
+                $passed = $key >= $demandKey ?? false;
                 break;
             default:
-                throw new UnexpectedValueException();
+                throw new UnexpectedValueException('올바르지 않은 상자깡 시도입니다. (box=bronze, silver, gold)');
         }
 
         if (! $passed) {
             throw new UnexpectedValueException('오픈하려는 상자의 Key가 부족합니다.');
         }
+
+        return $demandKey;
     }
 
     /**
