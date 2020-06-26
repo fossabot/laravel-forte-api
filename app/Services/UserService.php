@@ -83,7 +83,7 @@ class UserService extends BaseService {
                 'email' => $user->email,
             ];
 
-            $this->xsollaAPI->requestAPI('PUT', 'projects/:projectId/users/'.$id, $userData);
+            $this->xsollaAPI->request('PUT', 'projects/:projectId/users/'.$id, $userData);
 
             DB::commit();
         } catch (Exception $exception) {
@@ -105,7 +105,7 @@ class UserService extends BaseService {
     {
         if ($this->user->withTrashed()->find($id)->trashed()) return $this->user->find($id);
 
-        $this->xsollaAPI->requestAPI('PUT', 'projects/:projectId/users/'.$id, [
+        $this->xsollaAPI->request('PUT', 'projects/:projectId/users/'.$id, [
             'enabled' => false,
         ]);
 

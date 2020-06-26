@@ -111,7 +111,7 @@ class UserController extends Controller
                 'email' => $user->email,
             ];
 
-            $this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users', $userData);
+            $this->xsollaAPI->request('POST', 'projects/:projectId/users', $userData);
 
             DB::commit();
         } catch (Exception $exception) {
@@ -335,7 +335,7 @@ class UserController extends Controller
                 ],
             ];
 
-            $request = json_decode($this->xsollaAPI->requestAPI('POST', 'merchants/:merchantId/token', $xsollaBuildData), true);
+            $request = json_decode($this->xsollaAPI->request('POST', 'merchants/:merchantId/token', $xsollaBuildData), true);
 
             if (! $request['token']) {
                 return view('xsolla.error');

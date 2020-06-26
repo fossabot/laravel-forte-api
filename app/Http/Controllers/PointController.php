@@ -138,7 +138,7 @@ class PointController extends Controller
                 'user_id' => $userId,
             ];
 
-            $response = json_decode($this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users/'.$userId.'/recharge', $datas), true);
+            $response = json_decode($this->xsollaAPI->request('POST', 'projects/:projectId/users/'.$userId.'/recharge', $datas), true);
 
             if ($user->{User::POINTS} !== $response['amount']) {
                 $repetition = true;
