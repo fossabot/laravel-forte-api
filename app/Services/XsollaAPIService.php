@@ -2,12 +2,13 @@
 
 namespace App\Services;
 
+use GuzzleHttp\Client;
 use App\Http\Controllers\DiscordNotificationController;
-use App\Models\Client;
 use App\Models\Item;
 use Exception;
-use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\ClientException;
 use Psr\Http\Message\StreamInterface;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class XsollaAPIService
 {
@@ -71,7 +72,7 @@ class XsollaAPIService
      * @param array $datas
      * @return array|StreamInterface|string
      */
-    public function requestAPI(string $method, string $uri, array $datas)
+    public function request(string $method, string $uri, array $datas)
     {
         if (strpos($uri, ':projectId') !== false) {
             $uri = str_replace(':projectId', $this->projectId, $uri);
@@ -90,10 +91,10 @@ class XsollaAPIService
             ]);
 
             return $response->getBody();
-        } catch (GuzzleException $exception) {
-            (new DiscordNotificationController)->exception($exception, $datas);
+        } catch (ClientException $exception) {
+            app(DiscordNotificationController::class)->exception($exception, $datas);
 
-            return $exception->getMessage();
+            throw new BadRequestHttpException($exception->getMessage());
         }
     }
 
@@ -110,7 +111,7 @@ class XsollaAPIService
         $xsollaDuplicateItemsSku = [];
 
         try {
-            $xsollaItems = json_decode($this->requestAPI('GET', 'projects/:projectId/virtual_items/items', []), true);
+            $xsollaItems = json_decode($this->request('GET', 'projects/:projectId/virtual_items/items', []), true);
 
             foreach ($xsollaItems as $item) {
                 if (! Item::ofSku($item['sku'])->first()) {
@@ -125,7 +126,7 @@ class XsollaAPIService
             // 각 아이템 고유 ID에 대해 세부 페이지에 접속해서 동기화시킨다.
             foreach ($xsollaItemIds as $xsollaItemId) {
                 $count++;
-                $xsollaDetailItem = json_decode($this->requestAPI('GET', 'projects/:projectId/virtual_items/items/'.$xsollaItemId, []), true);
+                $xsollaDetailItem = json_decode($this->request('GET', 'projects/:projectId/virtual_items/items/'.$xsollaItemId, []), true);
                 $items = [
                     Item::NAME => $xsollaDetailItem['name']['ko'] ?? $xsollaDetailItem['name']['en'],
                     Item::IMAGE_URL => $xsollaDetailItem['image_url'],
@@ -141,7 +142,7 @@ class XsollaAPIService
                     $convertSku = array_search(explode('_', $xsollaDetailItem['sku']), self::SKU_PREFIX);
                     $items = array_merge($items,
                         [
-                            Item::CLIENT_ID => Client::where(Client::NAME, $convertSku)->value('id'),
+                            Item::CLIENT_ID => \App\Models\Client::whereName($convertSku)->value('id'),
                         ],
                         [
                             Item::SKU => $xsollaDetailItem['sku'],
@@ -154,12 +155,12 @@ class XsollaAPIService
                 }
             }
         } catch (Exception $exception) {
-            (new DiscordNotificationController)->exception($exception, $xsollaItemsSku);
+            app(DiscordNotificationController::class)->exception($exception, $xsollaItemsSku);
 
             return $exception->getMessage();
         }
 
-        (new DiscordNotificationController)->sync($count, $xsollaDuplicateItemsSku);
+        app(DiscordNotificationController::class)->sync($count, $xsollaDuplicateItemsSku);
         $this->print('== End Xsolla Sync from Forte Items ==');
     }
 
