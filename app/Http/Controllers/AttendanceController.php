@@ -129,10 +129,10 @@ class AttendanceController extends Controller
     /**
      * 출석체크 박스를 개봉합니다.
      *
-     * @param Request $request
+     * @param AttendanceUnpackRequest $request
      * @param string $id
      * @return JsonResponse
-     *
+     * @throws Exception
      * @SWG\POST(
      *     path="/discords/{discordId}/attendances/unpack",
      *     description="User Attendance Box unpack v2",
@@ -246,21 +246,18 @@ class AttendanceController extends Controller
         switch ($box) {
             case self::BOX_UNPACKED_BRONZE:
                 $demandKey = 3;
-                $passed = $key >= $demandKey ?? false;
                 break;
             case self::BOX_UNPACKED_SILVER:
                 $demandKey = (6 - ($isPremium && -1));
-                $passed = $key >= $demandKey ?? false;
                 break;
             case self::BOX_UNPACKED_GOLD:
                 $demandKey = (10 - ($isPremium && -2));
-                $passed = $key >= $demandKey ?? false;
                 break;
             default:
                 throw new UnexpectedValueException('올바르지 않은 상자깡 시도입니다. (box=bronze, silver, gold)');
         }
 
-        if (! $passed) {
+        if (! $key >= $demandKey ?? false) {
             throw new UnexpectedValueException('오픈하려는 상자의 Key가 부족합니다.');
         }
 

@@ -14,7 +14,7 @@ class AttendanceUnpackRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
