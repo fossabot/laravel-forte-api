@@ -12,31 +12,33 @@ class ReceiptService extends BaseService {
     /**
      * @var User
      */
-    protected $user;
+    protected User $user;
     /**
      * @var Item
      */
-    protected $item;
+    protected Item $item;
     /**
      * @var Receipt
      */
-    protected $receipt;
+    protected Receipt $receipt;
     /**
      * @var UserItem
      */
-    protected $userItem;
+    protected UserItem $userItem;
     /**
      * @var ItemService
      */
-    protected $itemService;
+    protected ItemService $itemService;
 
 
-    public function __construct(User $user,
-                                Item $item,
-                                Receipt $receipt,
-                                UserItem $userItem,
-                                ItemService $itemService)
-    {
+    public function __construct
+    (
+        User $user,
+        Item $item,
+        Receipt $receipt,
+        UserItem $userItem,
+        ItemService $itemService
+    ) {
         $this->user = $user;
         $this->item = $item;
         $this->receipt = $receipt;
@@ -50,14 +52,14 @@ class ReceiptService extends BaseService {
         $item = $this->itemService->show($itemId);
 
         if ($token !== Client::XSOLLA) {
-            $point = $user->{User::POINTS} - $item->{Item::PRICE};
+            $point = $user->points - $item->price;
         } else {
-            $point = $user->{User::POINTS};
+            $point = $user->points;
         }
 
         $receipt = $this->store($user, $client, $token, $userItemId, $point);
 
-        $user->{User::POINTS} = $point;
+        $user->points = $point;
         $user->save();
 
         return $receipt;
@@ -74,12 +76,12 @@ class ReceiptService extends BaseService {
     public function store(User $user, Client $client, string $token, int $userItemId, int $point): Receipt
     {
         return $this->receipt->create([
-            Receipt::USER_ID => $user->{User::ID},
-            Receipt::CLIENT_ID => $token === Client::XSOLLA ? 1 : $client->{Client::ID},
+            Receipt::USER_ID => $user->id,
+            Receipt::CLIENT_ID => $token === Client::XSOLLA ? 1 : $client->id,
             Receipt::USER_ITEM_ID => $userItemId,
             Receipt::ABOUT_CASH => 1,
             Receipt::REFUND => 0,
-            Receipt::POINTS_OLD => $user->{User::POINTS},
+            Receipt::POINTS_OLD => $user->points,
             Receipt::POINTS_NEW => $point,
         ]);
     }
