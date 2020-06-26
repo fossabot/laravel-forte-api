@@ -8,13 +8,12 @@ use App\Models\Client;
 use App\Models\Item;
 use App\Models\Receipt;
 use App\Models\User;
-use App\Models\UserItem;
-use Exception as ExceptionAlias;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use App\Services\UserService;
-use App\Services\ReceiptService;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
+use UnexpectedValueException;
 
 /**
  * Class XsollaWebhookService.
@@ -29,19 +28,19 @@ class XsollaWebhookService
     /**
      * @var XsollaAPIService
      */
-    protected $xsollaAPI;
+    protected XsollaAPIService $xsollaAPI;
     /**
      * @var UserService
      */
-    protected $userService;
+    protected UserService $userService;
     /**
      * @var ReceiptService
      */
-    protected $receiptService;
+    protected ReceiptService $receiptService;
     /**
      * @var UserItemService
      */
-    protected $userItemService;
+    protected UserItemService $userItemService;
 
     /**
      * XsollaWebhookService constructor.
@@ -50,11 +49,13 @@ class XsollaWebhookService
      * @param ReceiptService $receiptService
      * @param UserItemService $userItemService
      */
-    public function __construct(XsollaAPIService $xsollaAPI,
-                                UserService $userService,
-                                ReceiptService $receiptService,
-                                UserItemService $userItemService)
-    {
+    public function __construct
+    (
+        XsollaAPIService $xsollaAPI,
+        UserService $userService,
+        ReceiptService $receiptService,
+        UserItemService $userItemService
+    ) {
         $this->xsollaAPI = $xsollaAPI;
         $this->merchantId = config('xsolla.merchant_id');
         $this->projectId = config('xsolla.project_id');
@@ -98,6 +99,7 @@ class XsollaWebhookService
      * @param array $data
      * @return JsonResponse
      * @throws ExceptionAlias
+     * @throws Exception
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_payment
      */
     public function payment(array $data): JsonResponse
@@ -106,7 +108,7 @@ class XsollaWebhookService
         $purchaseData = $data['purchase'];
         $transactionData = $data['transaction'];
 
-        if (Receipt::scopeObserverTransaction($transactionData['id']) > 0) {
+        if (Receipt::ofTransactionCount($transactionData['id']) > 0) {
             // This payment is a duplicate payment.
             return new JsonResponse([
                 'success' => [
@@ -116,8 +118,8 @@ class XsollaWebhookService
             ], Response::HTTP_OK);
         }
 
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
             $user = $this->userService->show((int) $userData['id']);
 
             if (isset($purchaseData['virtual_items'])) {
@@ -125,18 +127,18 @@ class XsollaWebhookService
                     $this->userItemService->save($user, Item::convertSkuToId($item[Item::SKU]), Client::XSOLLA);
                 }
             } else {
-                $oldPoint = $user->{User::POINTS};
+                $oldPoint = $user->points;
                 $quantity = $purchaseData['virtual_currency']['quantity'];
-                $user->{User::POINTS} += $quantity;
+                $user->points += $quantity;
 
-                Receipt::store($user->{User::ID}, 1, null, 1, 0, $oldPoint, $user->{User::POINTS}, $transactionData['id']);
+                Receipt::store($user->id, 1, null, 1, 0, $oldPoint, $user->points, $transactionData['id']);
 
                 $userAction = [
                     'name' => $userData,
                     'purchase' => $purchaseData,
                 ];
 
-                (new DiscordNotificationController)->xsollaUserAction('Payment', $userAction);
+                app(DiscordNotificationController::class)->xsollaUserAction('Payment', $userAction);
             }
 
             $user->save();
@@ -149,7 +151,7 @@ class XsollaWebhookService
                     'message' => 'The payment has been completed successfully.',
                 ],
             ], Response::HTTP_OK);
-        } catch (ExceptionAlias $exception) {
+        } catch (Exception $exception) {
             DB::rollback();
 
             return new JsonResponse([
@@ -176,8 +178,8 @@ class XsollaWebhookService
     /**
      * @param array $data
      * @return mixed
-     * @throws ExceptionAlias
-     *@see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_payment
+     * @throws Exception
+     * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_payment
      */
     public function userBalanceOperation(array $data)
     {
@@ -214,8 +216,8 @@ class XsollaWebhookService
      *
      * @param array $data
      * @return string
-     * @throws ExceptionAlias
-     *@see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_purchase
+     * @throws Exception
+     * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_purchase
      */
     private function operationPurchase(array $data)
     {
@@ -225,8 +227,8 @@ class XsollaWebhookService
 
         $items = $data['items'];
 
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
             if ($data['items_operation_type'] === 'add') {
                 foreach ($items as $item) {
                     $this->userItemService->save($user, Item::convertSkuToId($item[Item::SKU]), Client::XSOLLA);
@@ -236,11 +238,11 @@ class XsollaWebhookService
             $user->{USER::POINTS} = $data['virtual_currency_balance']['new_value'];
             $user->save();
             DB::commit();
-        } catch (ExceptionAlias $exception) {
+        } catch (Exception $exception) {
             DB::rollback();
-            (new DiscordNotificationController)->exception($exception, $data);
+            app(DiscordNotificationController::class)->exception($exception, $data);
 
-            return $exception->getMessage();
+            throw new UnexpectedValueException($exception->getMessage());
         }
 
         $userAction = [
@@ -296,20 +298,20 @@ class XsollaWebhookService
     {
         $userData = $data['user'];
         $transactionData = $data['transaction'];
-        if (Receipt::scopeObserverTransaction($transactionData['id']) > 0) {
-            return ['error' => 'Duplicated point relevant'];
+        if (Receipt::ofTransactionCount($transactionData['id']) > 0) {
+            throw new ConflictHttpException('Duplicated point relevant');
         }
 
         $virtualCurrencyBalance = $data['virtual_currency_balance'];
         $user = $this->userService->show($userData['id']);
 
-        $oldPoints = $user->{User::POINTS};
-        $user->{User::POINTS} += $virtualCurrencyBalance['new_value'] - $virtualCurrencyBalance['old_value'];
+        $oldPoints = $user->points;
+        $user->points += $virtualCurrencyBalance['new_value'] - $virtualCurrencyBalance['old_value'];
         $user->save();
 
-        $receipt = Receipt::store($user->{User::ID}, 1, null, 1, 0, $oldPoints, $user->{User::POINTS}, $transactionData['id']);
+        $receipt = Receipt::store($user->id, 1, null, 1, 0, $oldPoints, $user->points, $transactionData['id']);
 
-        (new PointController)->recharge($virtualCurrencyBalance['new_value'], '이용자 포인트 업데이트', $receipt->{Receipt::USER_ID});
+        (new PointController)->recharge($virtualCurrencyBalance['new_value'], '이용자 포인트 업데이트', $receipt->user_id);
 
         return ['receipt_id' => $receipt->{Receipt::ID}];
     }
