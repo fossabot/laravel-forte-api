@@ -49,8 +49,7 @@ class XsollaWebhookService
      * @param ReceiptService $receiptService
      * @param UserItemService $userItemService
      */
-    public function __construct
-    (
+    public function __construct(
         XsollaAPIService $xsollaAPI,
         UserService $userService,
         ReceiptService $receiptService,

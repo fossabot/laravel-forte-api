@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * App\Models\Attendance
+ * App\Models\Attendance.
  *
  * @property int $id
  * @property string $discord_id

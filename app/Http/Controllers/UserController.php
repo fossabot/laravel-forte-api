@@ -3,14 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRegisterFormRequest;
-use App\Services\UserService;
 use App\Models\User;
 use App\Models\XsollaUrl;
+use App\Services\UserService;
 use App\Services\XsollaAPIService;
 use Exception;
 use Http\Discovery\Exception\NotFoundException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use UnexpectedValueException;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,6 +16,8 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use UnexpectedValueException;
 
 class UserController extends Controller
 {
@@ -84,7 +84,7 @@ class UserController extends Controller
         if (! $user) {
             $user = $this->store($socialite);
         } elseif ($user && ($user->name !== $socialite->name)) {
-           $this->userService->update($user->{User::ID}, ['name' => $socialite->name]);
+            $this->userService->update($user->{User::ID}, ['name' => $socialite->name]);
         }
 
         Auth::login($user);
@@ -161,6 +161,7 @@ class UserController extends Controller
     public function show(int $id): JsonResponse
     {
         $user = User::findOrfail($id);
+
         return new JsonResponse($user);
     }
 
@@ -198,6 +199,7 @@ class UserController extends Controller
     public function discord(int $id): JsonResponse
     {
         $discordByUser = User::whereDiscordId($id)->firstOrFail();
+
         return new JsonResponse($discordByUser);
     }
 

@@ -42,6 +42,7 @@ class ReceiptController extends Controller
     public function index(int $id): JsonResponse
     {
         $receipt = Receipt::where(Receipt::USER_ID, $id)->get();
+
         return new JsonResponse($receipt);
     }
 
@@ -89,6 +90,7 @@ class ReceiptController extends Controller
         $receipt = Receipt::findOrFail($receiptId)
             ->where(Receipt::USER_ID, $id)
             ->first();
+
         return new JsonResponse($receipt);
     }
 }

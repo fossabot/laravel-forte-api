@@ -10,7 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 /**
- * App\Models\RequestLog
+ * App\Models\RequestLog.
  *
  * @property int $id
  * @property float $duration microtime start - end
