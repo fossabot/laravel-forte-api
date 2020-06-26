@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 /**
- * App\Models\TrustIP
+ * App\Models\TrustIP.
  *
  * @property int $id
  * @property string $ip

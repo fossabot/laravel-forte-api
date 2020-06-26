@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-use GuzzleHttp\Client;
 use App\Http\Controllers\DiscordNotificationController;
 use App\Models\Item;
 use Exception;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;

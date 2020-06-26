@@ -25,7 +25,7 @@ class StoreUserItemRequest extends FormRequest
     public function rules()
     {
         return [
-            UserItem::ITEM_ID => 'required|numeric|exists:items,id'
+            UserItem::ITEM_ID => 'required|numeric|exists:items,id',
         ];
     }
 }

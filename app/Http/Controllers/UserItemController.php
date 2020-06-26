@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUserItemRequest;
-use App\Services\UserService;
 use App\Models\UserItem;
 use App\Services\UserItemService;
+use App\Services\UserService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -112,6 +112,7 @@ class UserItemController extends Controller
     public function store(StoreUserItemRequest $request, int $id): JsonResponse
     {
         $user = $this->userSerivce->show($id);
+
         return new JsonResponse($this->userItemService
             ->save($user, $request->{UserItem::ITEM_ID}, $request->header('Authorization')));
     }

@@ -3,23 +3,17 @@
 namespace App\Models;
 
 use App;
-use App\Http\Controllers\DiscordNotificationController;
-use App\Http\Controllers\PointController;
-use Auth;
 use Eloquent;
-use Exception;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder as BuilderAlias;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 
 /**
- * App\Models\UserItem
+ * App\Models\UserItem.
  *
  * @property int $id
  * @property int $user_id
@@ -113,7 +107,7 @@ class UserItem extends Model
      */
     public function items(): HasOne
     {
-        return $this->hasOne(Item::class, Item::ID, UserItem::ITEM_ID);
+        return $this->hasOne(Item::class, Item::ID, self::ITEM_ID);
     }
 
     /**

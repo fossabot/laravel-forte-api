@@ -52,7 +52,6 @@ Route::prefix('v2/')->middleware(['api.trust.ip', 'api.headers'])->group(functio
     Route::get('clients/token', 'ClientController@issue');
 });
 
-
 Route::prefix('v2/')->middleware(['api.trust.ip', 'api.headers'])->group(function () {
     Route::post('discords/{discord_id}/attendances', 'AttendanceController@store');
     Route::post('discords/{discord_id}/attendances/unpack', 'AttendanceController@unpack');

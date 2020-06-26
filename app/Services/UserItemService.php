@@ -4,19 +4,17 @@ namespace App\Services;
 
 use App\Http\Controllers\DiscordNotificationController;
 use App\Models\Client;
-use App\Services\UserService;
-use App\Services\ItemService;
 use App\Models\Item;
 use App\Models\Receipt;
 use App\Models\User;
 use App\Models\UserItem;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class UserItemService extends BaseService {
+class UserItemService extends BaseService
+{
     /**
      * @var User
      */
