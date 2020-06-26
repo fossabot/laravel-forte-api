@@ -41,6 +41,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Receipt whereUpdatedAt($value)
  * @method static Builder|Receipt whereUserId($value)
  * @method static Builder|Receipt whereUserItemId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt ofTransactionCount($id)
  * @mixin Eloquent
  * @property-read Client $client
  * @property-read UserItem $item
@@ -104,34 +105,6 @@ class Receipt extends Model
     ];
 
     /**
-     * @param int $id
-     * @return Collection
-     */
-    public static function scopeUserReceiptLists(int $id): Collection
-    {
-        return self::where(self::USER_ID, $id)->get();
-    }
-
-    /**
-     * @param int $id
-     * @param int $receiptId
-     * @return Receipt
-     */
-    public static function scopeUserReceiptDetail(int $id, int $receiptId): self
-    {
-        return self::findOrFail($receiptId)->where(self::USER_ID, $id)->first();
-    }
-
-    /**
-     * @param int $id
-     * @return int
-     */
-    public static function scopeObserverTransaction(int $id): int
-    {
-        return self::where(self::TRANSACTION_ID, $id)->count();
-    }
-
-    /**
      * @param int $userId
      * @param int $clientId
      * @param int $userItemId
@@ -142,9 +115,17 @@ class Receipt extends Model
      * @param int $transactionId
      * @return Receipt|Model
      */
-    public static function store(int $userId, int $clientId, int $userItemId, int $aboutCash,
-                                              int $refund, int $oldPoint, int $newPoint, int $transactionId): self
-    {
+    public static function store
+    (
+        int $userId,
+        int $clientId,
+        int $userItemId,
+        int $aboutCash,
+        int $refund,
+        int $oldPoint,
+        int $newPoint,
+        int $transactionId
+    ): self {
         return self::create([
             self::USER_ID => $userId,
             self::CLIENT_ID => $clientId,
