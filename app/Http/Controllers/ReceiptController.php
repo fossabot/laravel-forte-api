@@ -41,7 +41,8 @@ class ReceiptController extends Controller
      */
     public function index(int $id): JsonResponse
     {
-        return new JsonResponse(Receipt::scopeUserReceiptLists($id));
+        $receipt = Receipt::where(Receipt::USER_ID, $id)->get();
+        return new JsonResponse($receipt);
     }
 
     /**
@@ -85,6 +86,9 @@ class ReceiptController extends Controller
      */
     public function show(int $id, int $receiptId): JsonResponse
     {
-        return new JsonResponse(Receipt::scopeUserReceiptDetail($id, $receiptId));
+        $receipt = Receipt::findOrFail($receiptId)
+            ->where(Receipt::USER_ID, $id)
+            ->first();
+        return new JsonResponse($receipt);
     }
 }
