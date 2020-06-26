@@ -3,16 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRegisterFormRequest;
-use App\Http\Requests\UserUpdateFormRequest;
 use App\Services\UserService;
-use App\Models\Attendance;
-use App\Models\Receipt;
 use App\Models\User;
-use App\Models\UserItem;
 use App\Models\XsollaUrl;
 use App\Services\XsollaAPIService;
-use Carbon\Carbon;
 use Exception;
+use Http\Discovery\Exception\NotFoundException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use UnexpectedValueException;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -38,9 +36,10 @@ class UserController extends Controller
      * @param XsollaAPIService $xsollaAPI
      * @param UserService $userService
      */
-    public function __construct(XsollaAPIService $xsollaAPI,
-                                UserService $userService)
-    {
+    public function __construct(
+        XsollaAPIService $xsollaAPI,
+        UserService $userService
+    ) {
         $this->xsollaAPI = $xsollaAPI;
         $this->userService = $userService;
     }
@@ -97,32 +96,29 @@ class UserController extends Controller
      * 이용자를 추가(회원가입) 합니다.
      *
      * @param UserRegisterFormRequest $user
-     * @param UserService $userService
      * @return JsonResponse
-     * @throws Exception
+     * @throws BadRequestHttpException|Exception
      */
-    public function store(UserRegisterFormRequest $user, UserService $userService): JsonResponse
+    public function store(UserRegisterFormRequest $user): JsonResponse
     {
         DB::beginTransaction();
         try {
-            $user = $userService->save((array) $user);
+            $user = $this->userService->save((array) $user);
 
-            $datas = [
-                'user_id' => $user->{User::ID},
-                'user_name' => $user->{User::NAME},
-                'email' => $user->{User::EMAIL},
+            $userData = [
+                'user_id' => $user->id,
+                'user_name' => $user->name,
+                'email' => $user->email,
             ];
 
-            $this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users', $datas);
+            $this->xsollaAPI->requestAPI('POST', 'projects/:projectId/users', $userData);
 
             DB::commit();
         } catch (Exception $exception) {
             DB::rollBack();
-            (new DiscordNotificationController)->exception($exception, (array) $user);
+            app(DiscordNotificationController::class)->exception($exception, (array) $user);
 
-            return new JsonResponse([
-                'error' => $exception->getMessage(),
-            ], Response::HTTP_BAD_REQUEST);
+            throw new BadRequestHttpException($exception->getMessage());
         }
 
         return new JsonResponse([
@@ -164,7 +160,8 @@ class UserController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        return new JsonResponse($this->userService->show($id));
+        $user = User::findOrfail($id);
+        return new JsonResponse($user);
     }
 
     /**
@@ -200,7 +197,8 @@ class UserController extends Controller
      */
     public function discord(int $id): JsonResponse
     {
-        return new JsonResponse($this->userService->discord($id));
+        $discordByUser = User::whereDiscordId($id)->firstOrFail();
+        return new JsonResponse($discordByUser);
     }
 
     /**
@@ -209,6 +207,7 @@ class UserController extends Controller
      * @param Request $request
      * @param int $id
      * @return JsonResponse
+     * @throws Exception
      * @SWG\Patch(
      *     path="/users/{userId}",
      *     description="Update User Information",
@@ -304,32 +303,26 @@ class UserController extends Controller
     public function xsollaToken(int $id)
     {
         try {
-            $user = $this->userService->show($id);
+            $user = User::findOrfail($id);
+
             if (! $user) {
-                return new JsonResponse([
-                    'message' => 'User '.$id.' not found.',
-                ], Response::HTTP_NOT_FOUND);
+                throw new NotFoundException('User NotFound');
             }
 
-            $mode = '';
-            if (config('app.env') !== 'production') {
-                $mode = 'sandbox-';
-            }
+            $url = sprintf('https://%ssecure.xsolla.com/paystation2/?access_token=',
+                config('app.env') !== 'production' && 'sandbox-');
 
-            $url = 'https://'.$mode.'secure.xsolla.com/paystation2/?access_token=';
-
-            $datas = [
+            $xsollaBuildData = [
                 'user' => [
                     'id' => [
                         'value' => (string) $id,
                     ],
                     'name' => [
-                        'value' => $user->{User::NAME},
+                        'value' => $user->name,
                     ],
                 ],
                 'settings' => [
                     'project_id' => (int) config('xsolla.projectId'),
-                    //                    'mode' => $mode ? 'sandbox' : '', // server is actually deployed, remove its contents
                     'ui' => [
                         'theme' => 'default',
                         'size' => 'large',
@@ -342,7 +335,7 @@ class UserController extends Controller
                 ],
             ];
 
-            $request = json_decode($this->xsollaAPI->requestAPI('POST', 'merchants/:merchantId/token', $datas), true);
+            $request = json_decode($this->xsollaAPI->requestAPI('POST', 'merchants/:merchantId/token', $xsollaBuildData), true);
 
             if (! $request['token']) {
                 return view('xsolla.error');
@@ -350,16 +343,15 @@ class UserController extends Controller
 
             XsollaUrl::create([
                 XsollaUrl::TOKEN => $request['token'],
-                XsollaUrl::USER_ID => $user->{User::ID},
+                XsollaUrl::USER_ID => $user->id,
                 XsollaUrl::REDIRECT_URL => $url.$request['token'],
             ]);
 
             return $request['token'];
-        } catch (Exception $exception) {
-            /** @var array $datas */
-            (new DiscordNotificationController)->exception($exception, $datas);
-
-            return $exception->getMessage();
+        } catch (Exception $e) {
+            /** @var array $xsollaBuildData */
+            app(DiscordNotificationController::class)->exception($e, $xsollaBuildData);
+            throw new UnexpectedValueException($e->getMessage());
         }
     }
 
@@ -373,9 +365,9 @@ class UserController extends Controller
      */
     public function panel(string $token)
     {
-        $url = XsollaUrl::where(XsollaUrl::TOKEN, $token)->first();
-        $items = $this->userService->items($url->{XsollaUrl::USER_ID});
+        $xsollaUrl = XsollaUrl::whereToken($token)->first();
+        $items = $this->userService->items($xsollaUrl->user_id);
 
-        return view('panel', ['items' => $items, 'token' => $url->{XsollaUrl::TOKEN}, 'redirect_url' => $url->{XsollaUrl::REDIRECT_URL}]);
+        return view('panel', ['items' => $items, 'token' => $xsollaUrl->token, 'redirect_url' => $xsollaUrl->redirect_url]);
     }
 }

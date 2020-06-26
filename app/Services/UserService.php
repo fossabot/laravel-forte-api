@@ -5,12 +5,12 @@ namespace App\Services;
 use App\Http\Controllers\DiscordNotificationController;
 use App\Models\User;
 use App\Models\UserItem;
-use Http\Client\Exception;
+use DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use App\Services\XsollaAPIService;
 use Illuminate\Contracts\Pagination\Paginator;
+use Exception;
 
 class UserService extends BaseService {
     /**
@@ -60,16 +60,16 @@ class UserService extends BaseService {
 
     /**
      * @param int $id
-     * @param array $datas
+     * @param array $userData
      * @return User|User[]|array|Collection|Model|null
+     * @throws \Exception
      */
-    public function update(int $id, array $datas = [])
+    public function update(int $id, array $userData = [])
     {
         $user = $this->user->find($id);
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
-
-            foreach ($datas as $key => $data) {
+            foreach ($userData as $key => $data) {
                 if ($this->user->where($key, $data)->first()) {
                     continue;
                 }
@@ -77,18 +77,18 @@ class UserService extends BaseService {
             }
             $user->save();
 
-            $datas = [
+            $userData = [
                 'enabled' => true,
-                'user_name' => $user->{User::NAME},
-                'email' => $user->{User::EMAIL},
+                'user_name' => $user->name,
+                'email' => $user->email,
             ];
 
-            $this->xsollaAPI->requestAPI('PUT', 'projects/:projectId/users/'.$id, $datas);
+            $this->xsollaAPI->requestAPI('PUT', 'projects/:projectId/users/'.$id, $userData);
 
             DB::commit();
         } catch (Exception $exception) {
             DB::rollback();
-            (new DiscordNotificationController)->exception($exception, $datas);
+            (new DiscordNotificationController)->exception($exception, $userData);
 
             return ['error' => $exception->getMessage()];
         }
