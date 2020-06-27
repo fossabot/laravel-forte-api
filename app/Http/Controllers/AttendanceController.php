@@ -184,7 +184,7 @@ class AttendanceController extends Controller
         $demandKey = $this->checkValidateBoxFromKeyCount($box, $key, $isPremium);
         $package = $this->buildProbabilityBoxPackage($box);
 
-        $unpackFromPoint = $this->buildProbability($package);
+        $unpackFromPoint = $this->buildPointByProbability($package);
 
         DB::beginTransaction();
         try {
@@ -217,7 +217,7 @@ class AttendanceController extends Controller
      * @param array $package
      * @return int
      */
-    private function buildProbability(array $package): int
+    private function buildPointByProbability(array $package): int
     {
         $package = collect($package);
         $probabilities = collect($package->keys()->all());
