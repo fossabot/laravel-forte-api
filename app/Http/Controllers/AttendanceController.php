@@ -14,6 +14,7 @@ use DB;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use UnexpectedValueException;
 
@@ -91,7 +92,7 @@ class AttendanceController extends Controller
                 AttendanceV2::KEY_COUNT => 1,
             ], Response::HTTP_CREATED);
         } else {
-            $keyAcquiredAt = collect(json_decode($attendance->key_acquired_at, true));
+            $keyAcquiredAt = $this->convertJsonToCollection($attendance->key_acquired_at);
 
             if ($keyAcquiredAt->last() && Carbon::parse($keyAcquiredAt->last())->isToday()) {
                 $timeDiff = Carbon::now()
@@ -190,7 +191,7 @@ class AttendanceController extends Controller
             $user->points += $unpackFromPoint;
             $user->save();
 
-            $boxUnpackedAt = collect(json_decode($attendance->box_unpacked_at, true));
+            $boxUnpackedAt = $this->convertJsonToCollection($attendance->box_unpacked_at);
             $attendance->key_count = $attendance->key_count - $demandKey;
             $attendance->box_unpacked_at = $boxUnpackedAt->push(Carbon::now()->toDateTimeString());
             $attendance->save();
@@ -294,5 +295,10 @@ class AttendanceController extends Controller
         }
 
         return $package;
+    }
+
+    private function convertJsonToCollection(string $value): Collection
+    {
+        return collect(json_decode($value, true));
     }
 }
