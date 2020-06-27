@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\AttendanceBoxType;
 use App\Http\Requests\AttendanceUnpackRequest;
 use App\Models\AttendanceV2;
 use App\Models\Receipt;
@@ -19,9 +20,6 @@ use UnexpectedValueException;
 class AttendanceController extends Controller
 {
     private const KEY_MAX_COUNT = 10;
-    private const BOX_UNPACKED_BRONZE = 'bronze';
-    private const BOX_UNPACKED_SILVER = 'silver';
-    private const BOX_UNPACKED_GOLD = 'gold';
 
     /**
      * @var AttendanceService
@@ -243,13 +241,13 @@ class AttendanceController extends Controller
     private function checkValidateBoxFromKeyCount(string $box, int $key, bool $isPremium): int
     {
         switch ($box) {
-            case self::BOX_UNPACKED_BRONZE:
+            case AttendanceBoxType::BRONZE:
                 $demandKey = 3;
                 break;
-            case self::BOX_UNPACKED_SILVER:
+            case AttendanceBoxType::SILVER:
                 $demandKey = (6 - ($isPremium && -1));
                 break;
-            case self::BOX_UNPACKED_GOLD:
+            case AttendanceBoxType::GOLD:
                 $demandKey = (10 - ($isPremium && -2));
                 break;
             default:
@@ -270,21 +268,21 @@ class AttendanceController extends Controller
     private function buildProbabilityBoxPackage(string $box): array
     {
         switch ($box) {
-            case self::BOX_UNPACKED_BRONZE:
+            case AttendanceBoxType::BRONZE:
                 $package = [
                     69 => 1,
                     7 => 10,
                     24 => 3,
                 ];
                 break;
-            case self::BOX_UNPACKED_SILVER:
+            case AttendanceBoxType::SILVER:
                 $package = [
                     70 => 10,
                     5 => 50,
                     25 => 30,
                 ];
                 break;
-            case self::BOX_UNPACKED_GOLD:
+            case AttendanceBoxType::GOLD:
                 $package = [
                     71 => 20,
                     3 => 100,
