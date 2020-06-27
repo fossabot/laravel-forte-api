@@ -15,6 +15,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use UnexpectedValueException;
 
@@ -241,6 +242,7 @@ class AttendanceController extends Controller
      */
     private function checkValidateBoxFromKeyCount(string $box, int $key, bool $isPremium): int
     {
+        $box = Str::lower($box);
         switch ($box) {
             case AttendanceBoxType::BRONZE:
                 $demandKey = 3;
@@ -268,6 +270,7 @@ class AttendanceController extends Controller
      */
     private function buildProbabilityBoxPackage(string $box): array
     {
+        $box = Str::lower($box);
         switch ($box) {
             case AttendanceBoxType::BRONZE:
                 $package = [
