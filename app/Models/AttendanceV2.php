@@ -43,7 +43,7 @@ class AttendanceV2 extends Model
     ];
 
     protected $casts = [
-        [self::KEY_ACQUIRED_AT => 'array'],
-        [self::BOX_UNPACKED_AT => 'array'],
+        self::KEY_ACQUIRED_AT => 'array',
+        self::BOX_UNPACKED_AT => 'array',
     ];
 }
