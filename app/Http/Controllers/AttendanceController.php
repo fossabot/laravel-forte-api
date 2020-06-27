@@ -179,7 +179,7 @@ class AttendanceController extends Controller
         $user = User::whereDiscordId($id);
         $key = $attendance->key_count;
         $isPremium = $request->isPremium ?? false;
-        $box = $request->box;
+        $box = Str::lower($request->box);
 
         $demandKey = $this->checkValidateBoxFromKeyCount($box, $key, $isPremium);
         $package = $this->buildProbabilityBoxPackage($box);
@@ -242,7 +242,6 @@ class AttendanceController extends Controller
      */
     private function checkValidateBoxFromKeyCount(string $box, int $key, bool $isPremium): int
     {
-        $box = Str::lower($box);
         switch ($box) {
             case AttendanceBoxType::BRONZE:
                 $demandKey = 3;
@@ -270,7 +269,6 @@ class AttendanceController extends Controller
      */
     private function buildProbabilityBoxPackage(string $box): array
     {
-        $box = Str::lower($box);
         switch ($box) {
             case AttendanceBoxType::BRONZE:
                 $package = [
