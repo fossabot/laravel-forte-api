@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Http\Controllers\DiscordNotificationController;
-use App\Http\Controllers\PointController;
 use App\Jobs\XsollaRechargeJob;
 use App\Models\Client;
 use App\Models\Item;
