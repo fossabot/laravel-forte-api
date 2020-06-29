@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\XsollaRechargeJob;
 use App\Models\Client;
 use App\Models\Receipt;
 use App\Models\User;
@@ -9,6 +10,7 @@ use App\Services\XsollaAPIService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Queue;
 
 class PointController extends Controller
 {
@@ -43,7 +45,7 @@ class PointController extends Controller
 
             $receipt = Receipt::store($user->{User::ID}, 5, null, 0, 0, $oldPoints, $user->{User::POINTS}, 0);
 
-            $this->recharge(self::MAX_POINT, '스태프 포인트 지급', $receipt->{Receipt::USER_ID});
+            Queue::push(new XsollaRechargeJob($user, self::MAX_POINT, '스태프 포인트 지급'));
 
             (new DiscordNotificationController)->point($user->{User::EMAIL}, $user->{User::DISCORD_ID}, self::MAX_POINT, $user->{User::POINTS});
         }
@@ -90,7 +92,7 @@ class PointController extends Controller
      */
     public function store(Request $request, int $id): JsonResponse
     {
-        $user = User::scopeGetUser($id);
+        $user = User::find($id);
 
         if (! $user) {
             return new JsonResponse([
@@ -112,41 +114,10 @@ class PointController extends Controller
 
         $receipt = Receipt::store($id, $clientId, null, 0, 0, $oldPoints, $user->{User::POINTS}, 0);
 
-        $this->recharge($request->points, '이용자 포인트 지급', $receipt->{Receipt::USER_ID});
+        Queue::push(new XsollaRechargeJob($user, $request->points, '이용자 포인트 지급'));
 
         (new DiscordNotificationController)->point($user->{User::EMAIL}, $user->{User::DISCORD_ID}, $request->{User::POINTS}, $user->{User::POINTS});
 
         return new JsonResponse(['receipt_id' => $receipt->{Receipt::ID}]);
-    }
-
-    /**
-     * @param int $point
-     * @param string $comment
-     * @param int $userId
-     */
-    public function recharge(int $point, string $comment, int $userId): void
-    {
-        $user = User::find($userId);
-        $needPoint = 0;
-        $repetition = false;
-
-        while (true) {
-            $datas = [
-                'amount' => $repetition ? $needPoint : $point,
-                'comment' => $comment,
-                'project_id' => config('xsolla.projectKey'),
-                'user_id' => $userId,
-            ];
-
-            $response = json_decode($this->xsollaAPI->request('POST', 'projects/:projectId/users/'.$userId.'/recharge', $datas), true);
-
-            if ($user->{User::POINTS} !== $response['amount']) {
-                $repetition = true;
-                $needPoint = $user->{User::POINTS} - $response['amount'];
-                continue;
-            } else {
-                break;
-            }
-        }
     }
 }

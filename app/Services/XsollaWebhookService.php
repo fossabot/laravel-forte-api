@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Controllers\DiscordNotificationController;
 use App\Http\Controllers\PointController;
+use App\Jobs\XsollaRechargeJob;
 use App\Models\Client;
 use App\Models\Item;
 use App\Models\Receipt;
@@ -12,6 +13,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Queue;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use UnexpectedValueException;
 
@@ -310,7 +312,7 @@ class XsollaWebhookService
 
         $receipt = Receipt::store($user->id, 1, null, 1, 0, $oldPoints, $user->points, $transactionData['id']);
 
-        (new PointController)->recharge($virtualCurrencyBalance['new_value'], '이용자 포인트 업데이트', $receipt->user_id);
+        Queue::push(new XsollaRechargeJob($user, $virtualCurrencyBalance['new_value'], '이용자 포인트 업데이트'));
 
         return ['receipt_id' => $receipt->{Receipt::ID}];
     }
