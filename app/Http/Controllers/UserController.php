@@ -324,7 +324,7 @@ class UserController extends Controller
                     ],
                 ],
                 'settings' => [
-                    'project_id' => (int) config('xsolla.projectId'),
+                    'project_id' => (int) config('xsolla.project_id'),
                     'ui' => [
                         'theme' => 'default',
                         'size' => 'large',
