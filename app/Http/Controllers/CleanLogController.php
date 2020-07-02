@@ -6,7 +6,6 @@ use App\Models\RequestLog;
 use App\Services\BackupService;
 use Carbon\Carbon;
 use Illuminate\Filesystem\Filesystem;
-use phpDocumentor\Reflection\Types\Boolean;
 
 class CleanLogController extends Controller
 {
@@ -61,7 +60,7 @@ class CleanLogController extends Controller
         return $logs;
     }
 
-    private function isRequestsCacheDirectoryNotExists(): Boolean
+    private function isRequestsCacheDirectoryNotExists(): bool
     {
         return !file_exists(storage_path('requests'));
     }
