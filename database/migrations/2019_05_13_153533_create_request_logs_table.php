@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateRequestLogsTable extends Migration
 {
-
-
-
     /**
      * Run the migrations.
      *

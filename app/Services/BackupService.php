@@ -49,10 +49,9 @@ class BackupService
         Storage::delete($path);
     }
 
-
     private function isStorageDirectoryNotExists(): bool
     {
-        return !file_exists(storage_path('backups'));
+        return ! file_exists(storage_path('backups'));
     }
 
     private function makeStorageDirectory(): void
@@ -77,7 +76,7 @@ class BackupService
 
     private function saveFileToS3($file): void
     {
-        Storage::disk('s3')->put('SQL/'. $this->getSqlFilePath(), file_get_contents($file));
+        Storage::disk('s3')->put('SQL/'.$this->getSqlFilePath(), file_get_contents($file));
     }
 
     private function getSqlFilePath()
@@ -92,7 +91,7 @@ class BackupService
 
     private function getLogFilePath()
     {
-        return $this->getYear($this->yesterday).'-'.$this->getMonth($this->yesterday).  '/'.$this->yesterday.'.log';
+        return $this->getYear($this->yesterday).'-'.$this->getMonth($this->yesterday).'/'.$this->yesterday.'.log';
     }
 
     public function getYear(string $date)
