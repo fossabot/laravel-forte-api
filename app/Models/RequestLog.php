@@ -56,7 +56,7 @@ class RequestLog extends Model
     const UPDATED_AT = 'updated_at';
 
     protected $fillable = [
-        self::DURATION, self::URL, self::METHOD, self::IP, self::REQUEST, self::RESPONSE,
+        self::DURATION, self::URL, self::METHOD, self::IP, self::REQUEST, self::RESPONSE, self::CREATED_AT
     ];
 
     /**
