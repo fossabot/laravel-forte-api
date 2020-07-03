@@ -41,8 +41,7 @@ class CleanLogController extends Controller
     {
         $logs = $this->getYesterdaysLogs();
 
-        if ($this->isRequestsCacheDirectoryNotExists())
-        {
+        if ($this->isRequestsCacheDirectoryNotExists()) {
             $this->createRequestCacheDirectory();
         }
 
@@ -62,7 +61,7 @@ class CleanLogController extends Controller
 
     private function isRequestsCacheDirectoryNotExists(): bool
     {
-        return !file_exists(storage_path('requests'));
+        return ! file_exists(storage_path('requests'));
     }
 
     private function createRequestCacheDirectory(): void
