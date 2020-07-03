@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateRequestLogsTable extends Migration
 {
+
+
+
     /**
      * Run the migrations.
      *
@@ -22,6 +25,7 @@ class CreateRequestLogsTable extends Migration
             $table->text('request');
             $table->text('response');
             $table->timestamps();
+            $table->softDeletes('deleted_at', 0);
         });
     }
 
