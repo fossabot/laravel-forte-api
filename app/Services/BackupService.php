@@ -37,6 +37,19 @@ class BackupService
         $this->saveFileToS3AndDeleteFromLocal($path);
     }
 
+    /**
+     * Request Log backup.
+     */
+    public function request()
+    {
+        $path = storage_path().'/requests/'.$this->yesterday.'.log';
+
+        Storage::disk('s3')->put('Request/'.$this->getLogFilePath(), file_get_contents($path));
+
+        Storage::delete($path);
+    }
+
+
     private function isStorageDirectoryNotExists(): bool
     {
         return !file_exists(storage_path('backups'));
@@ -64,9 +77,12 @@ class BackupService
 
     private function saveFileToS3($file): void
     {
-        Storage::disk('s3')->put('SQL/'.
-            $this->getYear($this->yesterday).'-'.$this->getMonth($this->yesterday)
-            .'/'.$this->yesterday.'.sql', file_get_contents($file));
+        Storage::disk('s3')->put('SQL/'. $this->getSqlFilePath(), file_get_contents($file));
+    }
+
+    private function getSqlFilePath()
+    {
+        return $this->getYear($this->yesterday).'-'.$this->getMonth($this->yesterday).'/'.$this->yesterday.'.sql';
     }
 
     private function deleteFile($file): void
@@ -74,16 +90,9 @@ class BackupService
         Storage::delete($file);
     }
 
-    /**
-     * Request Log backup.
-     */
-    public function request()
+    private function getLogFilePath()
     {
-        $path = storage_path().'/requests/'.$this->yesterday.'.log';
-
-        Storage::disk('s3')->put('Request/'.$this->getYear($this->yesterday).'-'.$this->getMonth($this->yesterday).  '/'.$this->yesterday.'.log', file_get_contents($path));
-
-        Storage::delete($path);
+        return $this->getYear($this->yesterday).'-'.$this->getMonth($this->yesterday).  '/'.$this->yesterday.'.log';
     }
 
     public function getYear(string $date)
@@ -95,6 +104,4 @@ class BackupService
     {
         return substr($date, 5, 2);
     }
-
-    //2020-06-09
 }
