@@ -209,7 +209,7 @@ class AttendanceController extends Controller
      *     ),
      * )
      */
-    public function unpack(AttendanceUnpackRequest $request, string $id): JsonResponse
+    public function unpack(AttendanceUnpackRequest $request, string $id)
     {
         $attendance = AttendanceV2::query()
             ->whereDiscordId($id)
@@ -248,7 +248,11 @@ class AttendanceController extends Controller
         app(PointController::class)->recharge($unpackFromPoint, '포르테 출석체크 보상', $receipt->user_id);
         app(DiscordNotificationController::class)->point($user->email, $user->discord_id, $unpackFromPoint, $user->points);
 
-        return new JsonResponse($attendance);
+        return new JsonResponse(
+            [
+                'point' => $unpackFromPoint,
+            ],
+        );
     }
 
     /**
