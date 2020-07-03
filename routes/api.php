@@ -37,10 +37,14 @@ Route::prefix('v2/')->middleware(['api.trust.ip', 'api.headers'])->group(functio
     });
 
     Route::prefix('discords')->group(function () {
-        Route::get('attendances', 'UserController@attendances');
         Route::prefix('{discord_id}')->group(function () {
             Route::get('', 'UserController@discord');
             Route::post('attendances', 'UserController@attendance');
+        });
+        Route::prefix('attendances')->group(function () {
+            Route::get('', 'AttendanceController@show');
+            Route::post('', 'AttendanceController@store');
+            Route::post('unpack', 'AttendanceController@unpack');
         });
     });
 
@@ -50,11 +54,6 @@ Route::prefix('v2/')->middleware(['api.trust.ip', 'api.headers'])->group(functio
     });
 
     Route::get('clients/token', 'ClientController@issue');
-});
-
-Route::prefix('v2/')->middleware(['api.trust.ip', 'api.headers'])->group(function () {
-    Route::post('discords/{discord_id}/attendances', 'AttendanceController@store');
-    Route::post('discords/{discord_id}/attendances/unpack', 'AttendanceController@unpack');
 });
 
 Route::post('v2/xsolla', 'XsollaWebhookController@index')->middleware('api.xsolla');

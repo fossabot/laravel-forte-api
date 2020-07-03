@@ -45,6 +45,44 @@ class AttendanceController extends Controller
     }
 
     /**
+     * 팀 크레센도 디스코드 이용자의 key 개수를 확인합니다.
+     *
+     * @param string $id
+     * @return JsonResponse
+     *
+     * @SWG\GET(
+     *     path="/discords/{discordId}/attendances",
+     *     description="User Attendance v2",
+     *     produces={"application/json"},
+     *     tags={"Discord"},
+     *     @SWG\Parameter(
+     *         name="Authorization",
+     *         in="header",
+     *         description="Authorization Token",
+     *         required=true,
+     *         type="string"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="discordId",
+     *         in="path",
+     *         description="Discord Id",
+     *         required=true,
+     *         type="string"
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Successful User Attendance v2"
+     *     ),
+     * )
+     */
+    public function show(string $id): JsonResponse
+    {
+        $attendance = AttendanceV2::whereDiscordId($id)->first();
+
+        return new JsonResponse($attendance);
+    }
+
+    /**
      * 팀 크레센도 디스코드 이용자가 출석체크를 합니다.
      *
      * @param string $id
