@@ -26,19 +26,15 @@ class BackupService
      */
     public function database()
     {
-        if (! file_exists(storage_path('backups'))) {
-            mkdir(storage_path('backups'), 0777);
+        if ($this->isStorageDirectoryNotExists()) {
+            $this->makeStorageDirectory();
         }
 
-        MySql::create()
-            ->setDbName(config('database.connections.mysql.database'))
-            ->setUserName(config('database.connections.mysql.username'))
-            ->setPassword(config('database.connections.mysql.password'))
-            ->dumpToFile(storage_path().'/backups/'.$this->yesterday.'.sql');
-
         $path = storage_path().'/backups/'.$this->yesterday.'.sql';
-        Storage::disk('s3')->put('SQL/'.substr($this->yesterday, 0, 7).'/'.$this->yesterday.'.sql', file_get_contents($path));
-        Storage::delete($path);
+
+        $this->dumpDatabaseTo($path);
+
+        $this->saveFileToS3AndDeleteFromLocal($path);
     }
 
     /**
@@ -47,7 +43,65 @@ class BackupService
     public function request()
     {
         $path = storage_path().'/requests/'.$this->yesterday.'.log';
-        Storage::disk('s3')->put('Request/'.substr($this->yesterday, 0, 7).'/'.$this->yesterday.'.log', file_get_contents($path));
+
+        Storage::disk('s3')->put('Request/'.$this->getLogFilePath(), file_get_contents($path));
+
         Storage::delete($path);
+    }
+
+
+    private function isStorageDirectoryNotExists(): bool
+    {
+        return !file_exists(storage_path('backups'));
+    }
+
+    private function makeStorageDirectory(): void
+    {
+        mkdir(storage_path('backups'), 0777);
+    }
+
+    private function dumpDatabaseTo($file): void
+    {
+        MySql::create()
+            ->setDbName(config('database.connections.mysql.database'))
+            ->setUserName(config('database.connections.mysql.username'))
+            ->setPassword(config('database.connections.mysql.password'))
+            ->dumpToFile($file);
+    }
+
+    private function saveFileToS3AndDeleteFromLocal($file): void
+    {
+        $this->saveFileToS3($file);
+        $this->deleteFile($file);
+    }
+
+    private function saveFileToS3($file): void
+    {
+        Storage::disk('s3')->put('SQL/'. $this->getSqlFilePath(), file_get_contents($file));
+    }
+
+    private function getSqlFilePath()
+    {
+        return $this->getYear($this->yesterday).'-'.$this->getMonth($this->yesterday).'/'.$this->yesterday.'.sql';
+    }
+
+    private function deleteFile($file): void
+    {
+        Storage::delete($file);
+    }
+
+    private function getLogFilePath()
+    {
+        return $this->getYear($this->yesterday).'-'.$this->getMonth($this->yesterday).  '/'.$this->yesterday.'.log';
+    }
+
+    public function getYear(string $date)
+    {
+        return substr($date, 0, 4);
+    }
+
+    public function getMonth(string $date)
+    {
+        return substr($date, 5, 2);
     }
 }
