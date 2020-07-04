@@ -62,6 +62,7 @@ class Client extends Model
         self::NAME, self::XSOLLA_SELECTED_GROUP_NAME, self::TOKEN, self::PREV_TOKEN,
     ];
 
+
     /**
      * @return HasMany
      */
@@ -78,4 +79,5 @@ class Client extends Model
     {
         return self::where(self::TOKEN, $token)->first();
     }
+
 }

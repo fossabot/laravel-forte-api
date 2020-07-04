@@ -16,6 +16,7 @@
         "fruitcake/laravel-cors": "^2.0",
         "getsolaris/laravel-make-service": "dev-master",
         "guzzlehttp/guzzle": "^6.3",
+        "javoscript/laravel-macroable-models": "^1.0",
         "laravel-notification-channels/discord": "^1.1",
         "laravel/framework": "^7.0",
         "laravel/socialite": "^4.2",
