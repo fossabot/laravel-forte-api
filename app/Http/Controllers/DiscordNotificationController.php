@@ -38,7 +38,7 @@ class DiscordNotificationController extends Controller
             'parameters' => $params,
         ]);
 
-        return app(Discord::class)->send(in_array(self::CHANNEL_ERROR, self::DISCORD_CHANNELS), [
+        return app(Discord::class)->send(self::CHANNEL_ERROR, [
             'content' => '['.config('app.env').'> '.now().'] API ERROR',
             'tts' => false,
             'embed' => [
@@ -57,7 +57,7 @@ class DiscordNotificationController extends Controller
     {
         $params = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
 
-        return app(Discord::class)->send(in_array(self::CHANNEL_XSOLLA_SYNC, self::DISCORD_CHANNELS), [
+        return app(Discord::class)->send(self::CHANNEL_XSOLLA_SYNC, [
             'content' => '['.config('app.env').'> '.now().'] Xsolla Sync',
             'tts' => false,
             'embed' => [
@@ -72,7 +72,7 @@ class DiscordNotificationController extends Controller
      */
     public function deploy()
     {
-        return app(Discord::class)->send(in_array(self::CHANNEL_FORTE_DEPLOY, self::DISCORD_CHANNELS), [
+        return app(Discord::class)->send(self::CHANNEL_FORTE_DEPLOY, [
             'content' => 'AWS Auto Deploy Notification',
             'tts' => false,
             'embed' => [
@@ -91,7 +91,7 @@ class DiscordNotificationController extends Controller
     {
         $params = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
 
-        return app(Discord::class)->send(in_array(self::CHANNEL_XSOLLA_USER_ACTION, self::DISCORD_CHANNELS), [
+        return app(Discord::class)->send(self::CHANNEL_XSOLLA_USER_ACTION, [
             'content' => now().'] Xsolla User Log',
             'tts' => false,
             'embed' => [
@@ -110,7 +110,7 @@ class DiscordNotificationController extends Controller
      */
     public function point(string $email, int $discordId, int $deposit, int $point)
     {
-        return app(Discord::class)->send(in_array(self::CHANNEL_USER_POINT_TRACKING, self::DISCORD_CHANNELS), [
+        return app(Discord::class)->send(self::CHANNEL_USER_POINT_TRACKING, [
             'content' => now().'] User Point Deposit Log',
             'tts' => false,
             'embed' => [

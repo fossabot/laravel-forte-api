@@ -117,7 +117,7 @@ class Receipt extends Model
     public static function store(
         int $userId,
         int $clientId,
-        int $userItemId,
+        ?int $userItemId,
         int $aboutCash,
         int $refund,
         int $oldPoint,
