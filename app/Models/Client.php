@@ -92,7 +92,7 @@ class Client extends Model
     public function setNewTokenAttribute($token): void
     {
         $this->attributes[self::PREV_TOKEN] = $this->attributes[self::TOKEN];
-        $this->attributes[self::TOKEN] = 'forte' . $token;
+        $this->attributes[self::TOKEN] = 'forte-' . $token;
     }
 
 }
