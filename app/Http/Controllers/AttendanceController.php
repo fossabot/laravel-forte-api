@@ -17,8 +17,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use Queue;
+use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use UnexpectedValueException;
 
 class AttendanceController extends Controller
