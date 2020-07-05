@@ -25,7 +25,6 @@ class AttendanceUnpackRequest extends FormRequest
     public function rules()
     {
         return [
-            'discord_id' => 'required|string',
             'box' => ['required', 'string', AttendanceBoxType::rule()],
             'is_premium' => 'numeric|min:0|max:1',
         ];

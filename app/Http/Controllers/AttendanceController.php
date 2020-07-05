@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\AttendanceBoxType;
 use App\Http\Requests\AttendanceUnpackRequest;
+use App\Jobs\XsollaRechargeJob;
 use App\Models\AttendanceV2;
 use App\Models\Receipt;
 use App\Models\User;
@@ -17,6 +18,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
+use Queue;
 use UnexpectedValueException;
 
 class AttendanceController extends Controller
@@ -131,7 +133,7 @@ class AttendanceController extends Controller
                 AttendanceV2::KEY_COUNT => 1,
             ], Response::HTTP_CREATED);
         } else {
-            $keyAcquiredAt = $this->convertJsonToCollection($attendance->key_acquired_at);
+            $keyAcquiredAt = collect($attendance->key_acquired_at);
 
             if ($keyAcquiredAt->last() && Carbon::parse($keyAcquiredAt->last())->isToday()) {
                 $timeDiff = Carbon::now()
@@ -214,7 +216,7 @@ class AttendanceController extends Controller
         $attendance = AttendanceV2::query()
             ->whereDiscordId($id)
             ->firstOrFail();
-        $user = User::whereDiscordId($id);
+        $user = User::whereDiscordId($id)->firstOrFail();
         $key = $attendance->key_count;
         $isPremium = $request->isPremium ?? false;
         $box = Str::lower($request->box);
@@ -230,7 +232,7 @@ class AttendanceController extends Controller
             $user->points += $unpackFromPoint;
             $user->save();
 
-            $boxUnpackedAt = $this->convertJsonToCollection($attendance->box_unpacked_at);
+            $boxUnpackedAt = collect($attendance->box_unpacked_at);
             $attendance->key_count = $attendance->key_count - $demandKey;
             $attendance->box_unpacked_at = $boxUnpackedAt->push(Carbon::now()->toDateTimeString());
             $attendance->save();
@@ -245,7 +247,7 @@ class AttendanceController extends Controller
             throw new AccessDeniedException($e);
         }
 
-        app(PointController::class)->recharge($unpackFromPoint, '포르테 출석체크 보상', $receipt->user_id);
+        Queue::push(new XsollaRechargeJob($user, $unpackFromPoint, '포르테 출석체크 보상'));
         app(DiscordNotificationController::class)->point($user->email, $user->discord_id, $unpackFromPoint, $user->points);
 
         return new JsonResponse(
@@ -289,17 +291,17 @@ class AttendanceController extends Controller
                 $demandKey = 3;
                 break;
             case AttendanceBoxType::SILVER:
-                $demandKey = (6 - ($isPremium && -1));
+                $demandKey = $isPremium ? 5 : 6;
                 break;
             case AttendanceBoxType::GOLD:
-                $demandKey = (10 - ($isPremium && -2));
+                $demandKey = $isPremium ? 8 : 10;
                 break;
             default:
                 throw new UnexpectedValueException('올바르지 않은 상자깡 시도입니다. (box=bronze, silver, gold)');
         }
 
-        if (! $key >= $demandKey ?? false) {
-            throw new UnexpectedValueException('오픈하려는 상자의 Key가 부족합니다.');
+        if ($key < $demandKey) {
+            abort(Response::HTTP_BAD_REQUEST, '상자를 여는데 필요한 열쇠가 부족합니다.');
         }
 
         return $demandKey;
