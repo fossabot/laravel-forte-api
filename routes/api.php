@@ -39,12 +39,11 @@ Route::prefix('v2/')->middleware(['api.trust.ip', 'api.headers'])->group(functio
     Route::prefix('discords')->group(function () {
         Route::prefix('{discord_id}')->group(function () {
             Route::get('', 'UserController@discord');
-            Route::post('attendances', 'UserController@attendance');
-        });
-        Route::prefix('attendances')->group(function () {
-            Route::get('', 'AttendanceController@show');
-            Route::post('', 'AttendanceController@store');
-            Route::post('unpack', 'AttendanceController@unpack');
+            Route::prefix('attendances')->group(function () {
+                Route::get('', 'AttendanceController@show');
+                Route::post('', 'AttendanceController@store');
+                Route::post('unpack', 'AttendanceController@unpack');
+            });
         });
     });
 
