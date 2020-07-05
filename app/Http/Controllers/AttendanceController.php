@@ -253,6 +253,7 @@ class AttendanceController extends Controller
         return new JsonResponse(
             [
                 'point' => $unpackFromPoint,
+                'key_count' => $attendance->key_count,
             ],
         );
     }
