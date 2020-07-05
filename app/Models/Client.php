@@ -39,7 +39,7 @@ class Client extends Model
     const NAME = 'name';
     const XSOLLA_SELECTED_GROUP_NAME = 'xsolla_selected_group_name';
     const TOKEN = 'token';
-    const PREV_TOKEN = 'token';
+    const PREV_TOKEN = 'prev_token';
 
     const SKILEBOT = 'skilebot';
     const BAECHUBOT = 'baechubotv2';
@@ -78,6 +78,21 @@ class Client extends Model
     public static function bringNameByToken(string $token): self
     {
         return self::where(self::TOKEN, $token)->first();
+    }
+
+    /**
+     * Use this mutator to set new token
+     * <code>$client->newToken = "value" // set a new token</code>
+     *
+     * @param   string  $token  new token
+     *
+     * @return  void
+     */
+
+    public function setNewTokenAttribute($token): void
+    {
+        $this->attributes[self::PREV_TOKEN] = $this->attributes[self::TOKEN];
+        $this->attributes[self::TOKEN] = 'forte' . $token;
     }
 
 }

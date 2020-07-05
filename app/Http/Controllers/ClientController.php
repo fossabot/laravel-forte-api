@@ -16,8 +16,14 @@ class ClientController extends Controller
     {
         foreach (Client::get() as $client) {
             if ($client->isRenewable())
-                $client->updateToken($this->generateToken());
+                $this->renewToken($client);
         }
+    }
+
+    private function renewToken($client)
+    {
+        $client->newToken = $this->generateToken();
+        $client->save();
     }
 
     /**
