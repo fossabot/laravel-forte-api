@@ -314,9 +314,9 @@ class AttendanceController extends Controller
         switch ($box) {
             case AttendanceBoxType::BRONZE:
                 $package = [
-                    69 => 1,
-                    7 => 10,
-                    24 => 3,
+                    69 => 3,
+                    7 => 20,
+                    24 => 10,
                 ];
                 break;
             case AttendanceBoxType::SILVER:
