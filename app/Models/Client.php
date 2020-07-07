@@ -62,7 +62,6 @@ class Client extends Model
         self::NAME, self::XSOLLA_SELECTED_GROUP_NAME, self::TOKEN, self::PREV_TOKEN,
     ];
 
-
     /**
      * @return HasMany
      */
@@ -82,17 +81,15 @@ class Client extends Model
 
     /**
      * Use this mutator to set new token
-     * <code>$client->newToken = "value" // set a new token</code>
+     * <code>$client->newToken = "value" // set a new token</code>.
      *
      * @param   string  $token  new token
      *
      * @return  void
      */
-
     public function setNewTokenAttribute($token): void
     {
         $this->attributes[self::PREV_TOKEN] = $this->attributes[self::TOKEN];
-        $this->attributes[self::TOKEN] = 'forte-' . $token;
+        $this->attributes[self::TOKEN] = 'forte-'.$token;
     }
-
 }

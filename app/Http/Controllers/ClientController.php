@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 
@@ -15,8 +14,9 @@ class ClientController extends Controller
     public function renewal()
     {
         foreach (Client::get() as $client) {
-            if ($client->isRenewable())
+            if ($client->isRenewable()) {
                 $this->renewToken($client);
+            }
         }
     }
 
