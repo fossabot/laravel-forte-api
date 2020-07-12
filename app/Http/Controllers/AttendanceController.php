@@ -247,7 +247,7 @@ class AttendanceController extends Controller
             throw new AccessDeniedException($e);
         }
 
-        Queue::push(new XsollaRechargeJob($user, $unpackFromPoint, '포르테 출석체크 보상'));
+        Queue::pushOn('xsolla recharge', new XsollaRechargeJob($user, $unpackFromPoint, '포르테 출석체크 보상'));
         app(DiscordNotificationController::class)->point($user->email, $user->discord_id, $unpackFromPoint, $user->points);
 
         return new JsonResponse(

@@ -195,7 +195,7 @@ class UserItemService extends BaseService
         $withdraw->user_item_id = $userItem->id;
         $withdraw->save();
 
-        Queue::push(new XsollaRechargeJob($user, $item->price, '포르테 아이템 청약철회'));
+        Queue::pushOn('xsolla recharge', new XsollaRechargeJob($user, $item->price, '포르테 아이템 청약철회'));
 
         return $userItem;
     }
