@@ -25,6 +25,7 @@ Route::prefix('v2/')->middleware(['api.trust.ip', 'api.headers'])->group(functio
                 Route::prefix('{item_id}')->group(function () {
                     Route::put('', 'UserItemController@update');
                     Route::delete('', 'UserItemController@destroy');
+                    Route::post('withdraw', 'UserItemController@withdraw');
                 });
             });
             Route::prefix('receipts')->group(function () {
