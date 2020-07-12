@@ -3,15 +3,18 @@
 namespace App\Services;
 
 use App\Http\Controllers\DiscordNotificationController;
+use App\Jobs\XsollaRechargeJob;
 use App\Models\Client;
 use App\Models\Item;
 use App\Models\Receipt;
 use App\Models\User;
 use App\Models\UserItem;
+use App\Models\Withdraw;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Queue;
 
 class UserItemService extends BaseService
 {
@@ -172,5 +175,28 @@ class UserItemService extends BaseService
         ]);
     }
 
-    // TODO: withdraw
+    /**
+     * @param User $user
+     * @param Item $item
+     * @param UserItem $userItem
+     * @return UserItem
+     * @throws Exception
+     */
+    public function withdraw(User $user, Item $item, UserItem $userItem): UserItem
+    {
+        $userItem->delete();
+
+        $user->points = $user->points + $item->price;
+        $user->save();
+
+        $withdraw = new Withdraw();
+        $withdraw->user_id = $user->id;
+        $withdraw->item_id = $item->id;
+        $withdraw->user_item_id = $userItem->id;
+        $withdraw->save();
+
+        Queue::push(new XsollaRechargeJob($user, $item->price, '포르테 아이템 청약철회'));
+
+        return $userItem;
+    }
 }
