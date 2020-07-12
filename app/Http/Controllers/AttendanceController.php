@@ -15,7 +15,6 @@ use DB;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Queue;
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
