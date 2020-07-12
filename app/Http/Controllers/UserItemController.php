@@ -282,10 +282,9 @@ class UserItemController extends Controller
      * 이용자의 아이템을 청약철회 합니다.
      *
      * @param int $id
-     * @param int $itemId
+     * @param int $userItemId
      * @return JsonResponse
-     * @throws Exception
-     *
+     * @throws MessageException
      * @SWG\Post(
      *     path="/users/{userId}/items/{userItemId}/withdraw",
      *     description="Withdraw User Item",
@@ -318,16 +317,16 @@ class UserItemController extends Controller
      *     ),
      * )
      */
-    public function withdraw(int $id, int $itemId): JsonResponse
+    public function withdraw(int $id, int $userItemId): JsonResponse
     {
         $user = User::findOrFail($id);
-        $item = Item::findOrFail($itemId);
-        $userItem = UserItem::whereItemId($itemId)
+        $userItem = UserItem::find($userItemId)
             ->whereUserId($id)
             ->firstOrFail();
+        $item = Item::findOrFail($userItem->item_id);
 
         $withdraw = Withdraw::whereUserId($user->id)->first();
-        if (Carbon::parse($withdraw->created_at)->isToday()) {
+        if ($withdraw && Carbon::parse($withdraw->created_at)->isToday()) {
             throw new MessageException('하루에 한번만 청약철회가 가능합니다.');
         }
 
