@@ -17,7 +17,6 @@ use Illuminate\Routing\Controller as BaseController;
  *     @SWG\Info(
  *         version="2.0",
  *         title="Forte API",
- *         @SWG\Contact(name="Kevin", url="https://mingeun.com"),
  *     ),
  * )
  */
