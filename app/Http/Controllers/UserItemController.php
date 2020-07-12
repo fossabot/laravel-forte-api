@@ -2,11 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\MessageException;
 use App\Http\Requests\StoreUserItemRequest;
+use App\Models\Item;
+use App\Models\User;
 use App\Models\UserItem;
+use App\Models\Withdraw;
 use App\Services\UserItemService;
 use App\Services\UserService;
+use Carbon\Carbon;
 use Exception;
+use UnexpectedValueException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -270,5 +276,65 @@ class UserItemController extends Controller
     public function destroy(int $id, int $itemId): JsonResponse
     {
         return new JsonResponse($this->userItemService->destroy($id, $itemId));
+    }
+
+    /**
+     * 이용자의 아이템을 청약철회 합니다.
+     *
+     * @param int $id
+     * @param int $itemId
+     * @return JsonResponse
+     * @throws Exception
+     *
+     * @SWG\Post(
+     *     path="/users/{userId}/items/{userItemId}/withdraw",
+     *     description="Withdraw User Item",
+     *     produces={"application/json"},
+     *     tags={"User Item"},
+     *     @SWG\Parameter(
+     *         name="Authorization",
+     *         in="header",
+     *         description="Authorization Token",
+     *         required=true,
+     *         type="string"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="userId",
+     *         in="path",
+     *         description="User Id",
+     *         required=true,
+     *         type="integer"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="userItemId",
+     *         in="path",
+     *         description="User Item Id",
+     *         required=true,
+     *         type="integer"
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Successful Withdraw User Item"
+     *     ),
+     * )
+     */
+    public function withdraw(int $id, int $itemId): JsonResponse
+    {
+        $user = User::findOrFail($id);
+        $item = Item::findOrFail($itemId);
+        $userItem = UserItem::whereItemId($itemId)
+            ->whereUserId($id)
+            ->firstOrFail();
+
+        $withdraw = Withdraw::whereUserId($user->id)->first();
+        if (Carbon::parse($withdraw->created_at)->isToday()) {
+            throw new MessageException('하루에 한번만 청약철회가 가능합니다.');
+        }
+
+        if (! in_array($item->sku, UserItem::DISABLE_WITHDRAW_ITEMS)) {
+            return new JsonResponse($this->userItemService->withdraw($user, $item, $userItem));
+        }
+
+        throw new UnexpectedValueException('청약철회가 불가능한 상품입니다.');
     }
 }
