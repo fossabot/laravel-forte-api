@@ -311,7 +311,7 @@ class XsollaWebhookService
 
         $receipt = Receipt::store($user->id, 1, null, 1, 0, $oldPoints, $user->points, $transactionData['id']);
 
-        Queue::pushOn('xsolla recharge', new XsollaRechargeJob($user, $virtualCurrencyBalance['new_value'], '이용자 포인트 업데이트'));
+        Queue::pushOn('xsolla-recharge', new XsollaRechargeJob($user, $virtualCurrencyBalance['new_value'], '이용자 포인트 업데이트'));
 
         return ['receipt_id' => $receipt->{Receipt::ID}];
     }

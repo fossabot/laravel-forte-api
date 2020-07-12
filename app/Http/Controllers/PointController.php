@@ -45,7 +45,7 @@ class PointController extends Controller
 
             $receipt = Receipt::store($user->{User::ID}, 5, null, 0, 0, $oldPoints, $user->{User::POINTS}, 0);
 
-            Queue::pushOn('xsolla recharge', new XsollaRechargeJob($user, self::MAX_POINT, '스태프 포인트 지급'));
+            Queue::pushOn('xsolla-recharge', new XsollaRechargeJob($user, self::MAX_POINT, '스태프 포인트 지급'));
 
             (new DiscordNotificationController)->point($user->{User::EMAIL}, $user->{User::DISCORD_ID}, self::MAX_POINT, $user->{User::POINTS});
         }
@@ -114,7 +114,7 @@ class PointController extends Controller
 
         $receipt = Receipt::store($id, $clientId, null, 0, 0, $oldPoints, $user->{User::POINTS}, 0);
 
-        Queue::pushOn('xsolla recharge', new XsollaRechargeJob($user, $request->points, '이용자 포인트 지급'));
+        Queue::pushOn('xsolla-recharge', new XsollaRechargeJob($user, $request->points, '이용자 포인트 지급'));
 
         (new DiscordNotificationController)->point($user->{User::EMAIL}, $user->{User::DISCORD_ID}, $request->{User::POINTS}, $user->{User::POINTS});
 
