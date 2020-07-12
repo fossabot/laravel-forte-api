@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\Withdraw
+ * App\Models\Withdraw.
  *
  * @property int $id
  * @property int $item_id
