@@ -19,6 +19,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Queue;
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use UnexpectedValueException;
 
 class AttendanceController extends Controller
@@ -211,7 +212,7 @@ class AttendanceController extends Controller
      *     ),
      * )
      */
-    public function unpack(AttendanceUnpackRequest $request, string $id)
+    public function unpack(AttendanceUnpackRequest $request, string $id): JsonResponse
     {
         $attendance = AttendanceV2::query()
             ->whereDiscordId($id)
@@ -237,7 +238,7 @@ class AttendanceController extends Controller
             $attendance->box_unpacked_at = $boxUnpackedAt->push(Carbon::now()->toDateTimeString());
             $attendance->save();
 
-            $receipt = Receipt::store($user->id, 5, null, 0, 0, $oldPoints, $user->points, 0);
+            Receipt::store($user->id, 5, null, 0, 0, $oldPoints, $user->points, 0);
 
             DB::commit();
         } catch (Exception $e) {
@@ -302,7 +303,7 @@ class AttendanceController extends Controller
         }
 
         if ($key < $demandKey) {
-            abort(Response::HTTP_BAD_REQUEST, '상자를 여는데 필요한 열쇠가 부족합니다.');
+            throw new BadRequestHttpException('상자를 여는데 필요한 열쇠가 부족합니다.');
         }
 
         return $demandKey;
@@ -341,10 +342,5 @@ class AttendanceController extends Controller
         }
 
         return $package;
-    }
-
-    private function convertJsonToCollection(string $value): Collection
-    {
-        return collect(json_decode($value, true));
     }
 }
