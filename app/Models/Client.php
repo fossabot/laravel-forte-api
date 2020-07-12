@@ -32,6 +32,7 @@ use Illuminate\Support\Carbon;
  * @mixin Eloquent
  * @property-read Collection|UserItem[] $items
  * @property-read int|null $items_count
+ * @property-write mixed $new_token
  */
 class Client extends Model
 {
