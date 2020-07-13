@@ -8,15 +8,17 @@ use App\Models\XsollaUrl;
 use App\Services\UserService;
 use App\Services\XsollaAPIService;
 use Exception;
+use GuzzleHttp\Exception\GuzzleException;
 use Http\Discovery\Exception\NotFoundException;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use DB;
 use Illuminate\View\View;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Throwable;
 use UnexpectedValueException;
 
 class UserController extends Controller
@@ -74,7 +76,8 @@ class UserController extends Controller
 
     /**
      * @return JsonResponse|string
-     * @throws Exception
+     * @throws GuzzleException
+     * @throws Throwable
      */
     public function login()
     {
@@ -97,7 +100,8 @@ class UserController extends Controller
      *
      * @param UserRegisterFormRequest $user
      * @return JsonResponse
-     * @throws BadRequestHttpException|Exception
+     * @throws GuzzleException
+     * @throws Throwable
      */
     public function store(UserRegisterFormRequest $user): JsonResponse
     {
@@ -301,6 +305,7 @@ class UserController extends Controller
     /**
      * @param int $id
      * @return JsonResponse|string
+     * @throws GuzzleException
      */
     public function xsollaToken(int $id)
     {

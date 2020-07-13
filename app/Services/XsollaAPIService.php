@@ -7,6 +7,7 @@ use App\Models\Item;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use Illuminate\Support\Str;
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -69,12 +70,13 @@ class XsollaAPIService
     /**
      * @param string $method
      * @param string $uri
-     * @param array $datas
+     * @param array $bodyData
      * @return array|StreamInterface|string
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function request(string $method, string $uri, array $datas)
+    public function request(string $method, string $uri, array $bodyData)
     {
-        if (strpos($uri, ':projectId') !== false) {
+        if (Str::contains($uri, 'projectId')) {
             $uri = str_replace(':projectId', $this->projectId, $uri);
         } else {
             $uri = str_replace(':merchantId', $this->merchantId, $uri);
@@ -82,7 +84,7 @@ class XsollaAPIService
 
         try {
             $response = $this->client->request($method, $this->endpoint.$uri, [
-                'body' => json_encode($datas),
+                'body' => json_encode($bodyData),
                 'headers' => [
                     'Authorization' => 'Basic '.$this->authKey,
                     'Accept' => 'application/json',
@@ -92,7 +94,7 @@ class XsollaAPIService
 
             return $response->getBody();
         } catch (ClientException $exception) {
-            app(DiscordNotificationController::class)->exception($exception, $datas);
+            app(DiscordNotificationController::class)->exception($exception, $bodyData);
 
             throw new BadRequestHttpException($exception->getMessage());
         }
@@ -100,6 +102,7 @@ class XsollaAPIService
 
     /**
      * @return mixed
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function syncItems()
     {
