@@ -298,12 +298,12 @@ class XsollaWebhookService
     {
         $userData = $data['user'];
         $transactionData = $data['transaction'];
-        if (Receipt::ofTransactionCount($transactionData['id']) > 0) {
+        if (Receipt::whereTransactionId($transactionData['id'])->exists()) {
             throw new ConflictHttpException('Duplicated point relevant');
         }
 
         $virtualCurrencyBalance = $data['virtual_currency_balance'];
-        $user = $this->userService->show($userData['id']);
+        $user = User::findOrFail($userData['id']);
 
         $oldPoints = $user->points;
         $user->points += $virtualCurrencyBalance['new_value'] - $virtualCurrencyBalance['old_value'];
