@@ -17,21 +17,22 @@ class UserService extends BaseService
     /**
      * @var User
      */
-    protected $user;
+    protected User $user;
 
     /**
      * @var XsollaAPIService
      */
-    protected $xsollaAPI;
+    protected XsollaAPIService $xsollaAPI;
 
     /**
      * UserService constructor.
      * @param User $user
      * @param XsollaAPIService $xsollaAPIService
      */
-    public function __construct(User $user,
-                                XsollaAPIService $xsollaAPIService)
-    {
+    public function __construct(
+        User $user,
+        XsollaAPIService $xsollaAPIService
+    ) {
         $this->user = $user;
         $this->xsollaAPI = $xsollaAPIService;
     }
@@ -64,6 +65,8 @@ class UserService extends BaseService
      * @param array $userData
      * @return User|User[]|array|Collection|Model|null
      * @throws \Exception
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Throwable
      */
     public function update(int $id, array $userData = [])
     {
@@ -101,6 +104,7 @@ class UserService extends BaseService
      * @param int $id
      * @return User
      * @throws \Exception
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function destroy(int $id): User
     {
