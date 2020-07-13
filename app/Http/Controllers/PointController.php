@@ -46,7 +46,6 @@ class PointController extends Controller
             Receipt::store($user->id, 5, null, 0, 0, $oldPoints, $user->points, 0);
 
             Queue::pushOn('xsolla-recharge', new XsollaRechargeJob($user, self::MAX_POINT, '스태프 포인트 지급'));
-
         }
 
         app(DiscordNotificationController::class)->message('스태프 포인트 일괄 지급 완료');
