@@ -30,6 +30,7 @@ class XsollaRechargeJob extends Job
      *
      * @param PointService $pointService
      * @return void
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function handle(PointService $pointService)
     {

@@ -24,6 +24,7 @@ class PointService
      * @param User $user
      * @param int $point
      * @param string $comment
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function recharge(User $user, int $point, string $comment): void
     {
