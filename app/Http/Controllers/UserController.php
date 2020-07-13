@@ -86,8 +86,11 @@ class UserController extends Controller
 
         if (! $user) {
             $user = $this->store($socialite);
-        } elseif ($user && ($user->name !== $socialite->name)) {
-            $this->userService->update($user->{User::ID}, ['name' => $socialite->name]);
+        } elseif ($user && (($user->name !== $socialite->name) || $user->email !== $socialite->email)) {
+            $this->userService->update($user->id, [
+                'name' => $socialite->name,
+                'email' => $socialite->email,
+            ]);
         }
 
         Auth::login($user);
