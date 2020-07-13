@@ -12,11 +12,12 @@ class XsollaWebhookController extends Controller
     const TYPE_USER_VALIDATION = 'user_validation';
     const TYPE_PAYMENT = 'payment';
     const TYPE_USER_BALANCE_OPERATION = 'user_balance_operation';
+    const TYPE_REFUND = 'refund';
 
     /**
      * @var XsollaWebhookService
      */
-    protected $xws;
+    private XsollaWebhookService $xws;
 
     /**
      * XsollaWebhookController constructor.
@@ -44,6 +45,7 @@ class XsollaWebhookController extends Controller
             case self::TYPE_PAYMENT:
                 $data = $this->xws->payment($request->all());
                 break;
+            case self::TYPE_REFUND:
             case self::TYPE_USER_BALANCE_OPERATION:
                 $data = $this->xws->userBalanceOperation($request->all());
                 break;
