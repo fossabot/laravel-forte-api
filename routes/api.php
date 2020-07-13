@@ -13,49 +13,52 @@
 
 const CURRENT_VERSION = 'v2';
 
-Route::prefix(CURRENT_VERSION)->middleware(['api.trust.ip', 'api.headers'])->group(function () {
-    Route::prefix('users')->group(function () {
-        Route::resource('', 'UserController');
-        Route::prefix('{user_id}')->group(function () {
-            Route::get('', 'UserController@show');
-            Route::patch('', 'UserController@update');
-            Route::delete('', 'UserController@destroy');
-            Route::prefix('items')->group(function () {
-                Route::get('', 'UserItemController@index');
-                Route::post('', 'UserItemController@store');
-                Route::get('{user_item_id}', 'UserItemController@show');
-                Route::prefix('{item_id}')->group(function () {
-                    Route::put('', 'UserItemController@update');
-                    Route::delete('', 'UserItemController@destroy');
-                    Route::post('withdraw', 'UserItemController@withdraw');
+Route::prefix(CURRENT_VERSION)->group(function () {
+    Route::middleware(['api.trust.ip', 'api.headers'])->group(function () {
+        Route::prefix('users')->group(function () {
+            Route::resource('', 'UserController');
+            Route::prefix('{user_id}')->group(function () {
+                Route::get('', 'UserController@show');
+                Route::patch('', 'UserController@update');
+                Route::delete('', 'UserController@destroy');
+                Route::prefix('items')->group(function () {
+                    Route::get('', 'UserItemController@index');
+                    Route::post('', 'UserItemController@store');
+                    Route::get('{user_item_id}', 'UserItemController@show');
+                    Route::prefix('{item_id}')->group(function () {
+                        Route::put('', 'UserItemController@update');
+                        Route::delete('', 'UserItemController@destroy');
+                        Route::post('withdraw', 'UserItemController@withdraw');
+                    });
+                });
+                Route::prefix('receipts')->group(function () {
+                    Route::get('', 'ReceiptController@index');
+                    Route::get('{receipt_id}', 'ReceiptController@show');
+                });
+                Route::post('points', 'PointController@store');
+                Route::get('xsolla/token', 'UserController@xsollaToken');
+            });
+        });
+
+        Route::prefix('discords')->group(function () {
+            Route::prefix('{discord_id}')->group(function () {
+                Route::get('', 'UserController@discord');
+                Route::prefix('attendances')->group(function () {
+                    Route::get('', 'AttendanceController@show');
+                    Route::post('', 'AttendanceController@store');
+                    Route::post('unpack', 'AttendanceController@unpack');
                 });
             });
-            Route::prefix('receipts')->group(function () {
-                Route::get('', 'ReceiptController@index');
-                Route::get('{receipt_id}', 'ReceiptController@show');
-            });
-            Route::post('points', 'PointController@store');
-            Route::get('xsolla/token', 'UserController@xsollaToken');
         });
-    });
 
-    Route::prefix('discords')->group(function () {
-        Route::prefix('{discord_id}')->group(function () {
-            Route::get('', 'UserController@discord');
-            Route::prefix('attendances')->group(function () {
-                Route::get('', 'AttendanceController@show');
-                Route::post('', 'AttendanceController@store');
-                Route::post('unpack', 'AttendanceController@unpack');
-            });
+        Route::prefix('items')->group(function () {
+            Route::get('', 'ItemController@index');
+            Route::get('{item_id}', 'ItemController@show');
         });
+
+        Route::get('clients/token', 'ClientController@issue');
     });
 
-    Route::prefix('items')->group(function () {
-        Route::get('', 'ItemController@index');
-        Route::get('{item_id}', 'ItemController@show');
-    });
-
-    Route::get('clients/token', 'ClientController@issue');
+    Route::post('xsolla', 'XsollaWebhookController@index')->middleware('api.xsolla');
 });
 
-Route::post(CURRENT_VERSION . '/xsolla', 'XsollaWebhookController@index')->middleware('api.xsolla');
