@@ -61,4 +61,3 @@ Route::prefix(CURRENT_VERSION)->group(function () {
 
     Route::post('xsolla', 'XsollaWebhookController@index')->middleware('api.xsolla');
 });
-
