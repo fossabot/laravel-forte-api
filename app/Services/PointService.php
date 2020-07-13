@@ -28,7 +28,9 @@ class PointService
     public function recharge(User $user, int $point, string $comment): void
     {
         // job에 올라가는 것 까지 확인하기 위해 recharge 메소드에서 환경에 따른 처리
-        if (config('app.env') !== 'production') return;
+        if (config('app.env') !== 'production') {
+            return;
+        }
 
         $needPoint = 0;
         $repetition = false;
