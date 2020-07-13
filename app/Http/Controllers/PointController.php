@@ -36,18 +36,18 @@ class PointController extends Controller
      */
     public function schedule()
     {
-        $users = User::ofType(self::STAFF_TYPE);
+        $users = User::ofType(self::STAFF_TYPE)->get();
 
         foreach ($users as $user) {
             $oldPoints = $user->points;
-            $user->{User::POINTS} += self::MAX_POINT;
+            $user->points += self::MAX_POINT;
             $user->save();
 
-            $receipt = Receipt::store($user->{User::ID}, 5, null, 0, 0, $oldPoints, $user->{User::POINTS}, 0);
+            Receipt::store($user->id, 5, null, 0, 0, $oldPoints, $user->points, 0);
 
             Queue::pushOn('xsolla-recharge', new XsollaRechargeJob($user, self::MAX_POINT, '스태프 포인트 지급'));
 
-            (new DiscordNotificationController)->point($user->{User::EMAIL}, $user->{User::DISCORD_ID}, self::MAX_POINT, $user->{User::POINTS});
+            app(DiscordNotificationController::class)->point($user->email, $user->discord_id, self::MAX_POINT, $user->points);
         }
     }
 
