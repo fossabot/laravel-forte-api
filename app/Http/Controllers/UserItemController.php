@@ -285,6 +285,8 @@ class UserItemController extends Controller
      * @param int $userItemId
      * @return JsonResponse
      * @throws MessageException
+     * @throws Exception
+     *
      * @SWG\Post(
      *     path="/users/{userId}/items/{userItemId}/withdraw",
      *     description="Withdraw User Item",
@@ -320,9 +322,13 @@ class UserItemController extends Controller
     public function withdraw(int $id, int $userItemId): JsonResponse
     {
         $user = User::findOrFail($id);
-        $userItem = UserItem::find($userItemId)
-            ->whereUserId($id)
-            ->firstOrFail();
+        /** @var UserItem $userItem */
+        $userItem = $user->items()->find($userItemId);
+
+        if (is_null($userItem)) {
+            throw new MessageException('삭제된 아이템이거나, 이미 청약철회가 진행된 아이템입니다.');
+        }
+
         $item = Item::findOrFail($userItem->item_id);
 
         $withdraw = Withdraw::whereUserId($user->id)->first();
