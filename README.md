@@ -51,16 +51,16 @@ phpunit
 
 ## 👤 Author
 
-**Kevin**
+**김민근**
 * GitHub: [@getsolaris](https://github.com/getsolaris)
 
-**Skile**
+**이정민**
 * GitHub: [@GBS-Skile](https://github.com/GBS-Skile)
 
-**Heewon**
+**강희원**
 * GitHub: [@kang-heewon](https://github.com/kang-heewon)
 
-**HyungJu**
+**성형주**
 * GitHub: [@HyungJu](https://github.com/HyungJu)
 
 
