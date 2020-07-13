@@ -19,6 +19,7 @@ use Illuminate\Support\Str;
 use Queue;
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Throwable;
 use UnexpectedValueException;
 
 class AttendanceController extends Controller
@@ -172,6 +173,8 @@ class AttendanceController extends Controller
      * @param string $id
      * @return JsonResponse
      * @throws Exception
+     * @throws Throwable
+     *
      * @SWG\POST(
      *     path="/discords/{discordId}/attendances/unpack",
      *     description="User Attendance Box unpack v2",
