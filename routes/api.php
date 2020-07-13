@@ -11,7 +11,9 @@
 |
 */
 
-Route::prefix('v2/')->middleware(['api.trust.ip', 'api.headers'])->group(function () {
+const CURRENT_VERSION = 'v2';
+
+Route::prefix(CURRENT_VERSION)->middleware(['api.trust.ip', 'api.headers'])->group(function () {
     Route::prefix('users')->group(function () {
         Route::resource('', 'UserController');
         Route::prefix('{user_id}')->group(function () {
@@ -56,4 +58,4 @@ Route::prefix('v2/')->middleware(['api.trust.ip', 'api.headers'])->group(functio
     Route::get('clients/token', 'ClientController@issue');
 });
 
-Route::post('v2/xsolla', 'XsollaWebhookController@index')->middleware('api.xsolla');
+Route::post(CURRENT_VERSION . '/xsolla', 'XsollaWebhookController@index')->middleware('api.xsolla');
