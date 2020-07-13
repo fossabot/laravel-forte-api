@@ -292,7 +292,7 @@ class XsollaWebhookService
     /**
      * User Balance Operation Central Point Processing Function.
      * @param array $data
-     * @return array|array
+     * @return array
      */
     private function operationPointRelevant(array $data): array
     {
