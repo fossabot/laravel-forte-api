@@ -12,7 +12,7 @@ class CleanRequestLog extends Command
      *
      * @var string
      */
-    protected $signature = 'log:clean';
+    protected $signature = 'command:clean-log';
 
     /**
      * The console command description.

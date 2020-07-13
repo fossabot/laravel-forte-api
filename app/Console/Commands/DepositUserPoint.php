@@ -12,7 +12,7 @@ class DepositUserPoint extends Command
      *
      * @var string
      */
-    protected $signature = 'deposit:point';
+    protected $signature = 'command:staff-points';
 
     /**
      * The console command description.

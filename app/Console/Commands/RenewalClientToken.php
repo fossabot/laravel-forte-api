@@ -12,7 +12,7 @@ class RenewalClientToken extends Command
      *
      * @var string
      */
-    protected $signature = 'client:renewal-token';
+    protected $signature = 'command:client-renewal-token';
 
     /**
      * The console command description.
