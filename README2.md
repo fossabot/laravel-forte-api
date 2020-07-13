@@ -1,4 +1,4 @@
-<img width="150" align="right" src="./logo.png">
+<img width="100" align="right" src="./logo.png">
 <h1 align="center" >Welcome to Forte API v2 👋</h1>
 
 <p>
