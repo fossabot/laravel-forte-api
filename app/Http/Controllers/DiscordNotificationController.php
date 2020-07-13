@@ -13,14 +13,7 @@ class DiscordNotificationController extends Controller
     const CHANNEL_XSOLLA_USER_ACTION = '595192089457983490';
     const CHANNEL_USER_POINT_TRACKING = '648068498609799168';
     const CHANNEL_FORTE_DEPLOY = '576091937811988482';
-
-    const DISCORD_CHANNELS = [
-        self::CHANNEL_ERROR,
-        self::CHANNEL_XSOLLA_SYNC,
-        self::CHANNEL_XSOLLA_USER_ACTION,
-        self::CHANNEL_USER_POINT_TRACKING,
-        self::CHANNEL_FORTE_DEPLOY,
-    ];
+    const CHANNEL_FORTE = '467604242589548564';
 
     /**
      * @param Exception $exception
@@ -85,7 +78,7 @@ class DiscordNotificationController extends Controller
     /**
      * @param string $action
      * @param array $data
-     * @return mixed
+     * @return array
      */
     public function xsollaUserAction(string $action, array $data = [])
     {
@@ -106,7 +99,7 @@ class DiscordNotificationController extends Controller
      * @param int $discordId
      * @param int $deposit
      * @param int $point
-     * @return
+     * @return array
      */
     public function point(string $email, int $discordId, int $deposit, int $point)
     {
@@ -115,6 +108,21 @@ class DiscordNotificationController extends Controller
             'tts' => false,
             'embed' => [
                 'description' => "EMAIL: {$email} \n Discord ID: {$discordId} \n Deposit: {$deposit} \n User Point: {$point}",
+            ],
+        ]);
+    }
+
+    /**
+     * @param string $message
+     * @return array
+     */
+    public function message(string $message): array
+    {
+        return app(Discord::class)->send(self::CHANNEL_FORTE, [
+            'content' => now().'] Forte API Message',
+            'tts' => false,
+            'embed' => [
+                'description' => sprintf('%s', $message),
             ],
         ]);
     }
