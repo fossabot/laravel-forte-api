@@ -40,7 +40,6 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Receipt whereUpdatedAt($value)
  * @method static Builder|Receipt whereUserId($value)
  * @method static Builder|Receipt whereUserItemId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Receipt ofTransactionCount($id)
  * @mixin Eloquent
  * @property-read Client $client
  * @property-read UserItem $item
