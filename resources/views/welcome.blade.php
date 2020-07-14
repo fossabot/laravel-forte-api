@@ -25,7 +25,6 @@
             }
 
             .flex-center {
-                align-items: center;
                 display: flex;
                 justify-content: center;
             }
@@ -75,6 +74,7 @@
             $.ajax({
                 url: README_URL,
                 success: function (data) {
+                    console.log(data);
                     let converter = new showdown.Converter(),
                         text      = data,
                         html      = converter.makeHtml(text);
