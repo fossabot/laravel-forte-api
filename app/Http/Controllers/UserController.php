@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Laravel\Socialite\Facades\Socialite;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Throwable;
 use UnexpectedValueException;
