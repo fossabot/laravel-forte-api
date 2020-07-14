@@ -22,7 +22,7 @@ class DiscordNotificationController extends Controller
      */
     public function exception(Exception $exception, array $data = [])
     {
-        $params = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
+        $params = $this->convertArrayToJson($data);
 
         ErrorLog::create([
             'environment' => config('app.env'),
@@ -48,7 +48,7 @@ class DiscordNotificationController extends Controller
      */
     public function sync(int $count, array $data = [])
     {
-        $params = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
+        $params = $this->convertArrayToJson($data);
 
         return app(Discord::class)->send(self::CHANNEL_XSOLLA_SYNC, [
             'content' => '['.config('app.env').'> '.now().'] Xsolla Sync',
@@ -82,7 +82,7 @@ class DiscordNotificationController extends Controller
      */
     public function xsollaUserAction(string $action, array $data = [])
     {
-        $params = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
+        $params = $this->convertArrayToJson($data);
 
         return app(Discord::class)->send(self::CHANNEL_XSOLLA_USER_ACTION, [
             'content' => now().'] Xsolla User Log',
@@ -125,5 +125,19 @@ class DiscordNotificationController extends Controller
                 'description' => sprintf('%s', $message),
             ],
         ]);
+    }
+
+    /**
+     * @param array $params
+     * @return string
+     */
+    private function convertArrayToJson(array $params): string
+    {
+        return json_encode($params,
+            JSON_PRETTY_PRINT |
+            JSON_UNESCAPED_SLASHES |
+            JSON_UNESCAPED_UNICODE |
+            JSON_NUMERIC_CHECK
+        );
     }
 }
