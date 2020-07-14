@@ -12,7 +12,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Queue;
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 class PointController extends Controller
 {
