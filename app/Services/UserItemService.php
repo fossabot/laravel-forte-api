@@ -21,19 +21,19 @@ class UserItemService extends BaseService
     /**
      * @var User
      */
-    protected $user;
+    protected User $user;
+    /**
+     * @var ItemService
+     */
+    protected ItemService $itemService;
     /**
      * @var UserItem
      */
-    protected $itemService;
-    /**
-     * @var UserItem
-     */
-    protected $userItem;
+    protected UserItem $userItem;
     /**
      * @var UserService
      */
-    protected $userService;
+    protected UserService $userService;
 
     /**
      * UserItemService constructor.
@@ -42,11 +42,12 @@ class UserItemService extends BaseService
      * @param ItemService $itemService
      * @param UserService $userService
      */
-    public function __construct(User $user,
-                                UserItem $userItem,
-                                ItemService $itemService,
-                                UserService $userService)
-    {
+    public function __construct(
+        User $user,
+        UserItem $userItem,
+        ItemService $itemService,
+        UserService $userService
+    ) {
         $this->user = $user;
         $this->userItem = $userItem;
         $this->userService = $userService;
@@ -73,6 +74,7 @@ class UserItemService extends BaseService
      * @param string $token
      * @return array
      * @throws Exception
+     * @throws \Throwable
      */
     public function save(User $user, int $itemId, string $token): array
     {
@@ -114,6 +116,7 @@ class UserItemService extends BaseService
      * @param string $token
      * @return UserItem|array|Builder
      * @throws Exception
+     * @throws \Throwable
      */
     public function update(int $id, int $itemId, array $data, string $token)
     {
