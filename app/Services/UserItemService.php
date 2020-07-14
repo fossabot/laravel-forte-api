@@ -34,6 +34,10 @@ class UserItemService extends BaseService
      * @var UserService
      */
     protected UserService $userService;
+    /**
+     * @var ReceiptService
+     */
+    protected ReceiptService $receiptService;
 
     /**
      * UserItemService constructor.
@@ -41,17 +45,20 @@ class UserItemService extends BaseService
      * @param UserItem $userItem
      * @param ItemService $itemService
      * @param UserService $userService
+     * @param ReceiptService $receiptService
      */
     public function __construct(
         User $user,
         UserItem $userItem,
         ItemService $itemService,
-        UserService $userService
+        UserService $userService,
+        ReceiptService $receiptService
     ) {
         $this->user = $user;
         $this->userItem = $userItem;
         $this->userService = $userService;
         $this->itemService = $itemService;
+        $this->receiptService = $receiptService;
     }
 
     /**
