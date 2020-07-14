@@ -64,7 +64,7 @@ class UserItemService extends BaseService
     /**
      * @param int $id
      * @param int $itemId
-     * @return UserItem|Model|\Illuminate\Database\Query\Builder|object
+     * @return UserItem
      */
     public function show(int $id, int $itemId): UserItem
     {
