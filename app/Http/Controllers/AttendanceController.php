@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\AttendanceBoxType;
+use App\Exceptions\MessageException;
 use App\Http\Requests\AttendanceUnpackRequest;
 use App\Jobs\XsollaRechargeJob;
 use App\Models\AttendanceV2;
@@ -18,7 +19,6 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Queue;
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Throwable;
 use UnexpectedValueException;
 
@@ -287,6 +287,7 @@ class AttendanceController extends Controller
      * @param int $key
      * @param bool $isPremium
      * @return int
+     * @throws MessageException
      */
     private function checkValidateBoxFromKeyCount(string $box, int $key, bool $isPremium): int
     {
@@ -305,7 +306,7 @@ class AttendanceController extends Controller
         }
 
         if ($key < $demandKey) {
-            throw new BadRequestHttpException('상자를 여는데 필요한 열쇠가 부족합니다.');
+            throw new MessageException('상자를 여는데 필요한 열쇠가 부족합니다.');
         }
 
         return $demandKey;
