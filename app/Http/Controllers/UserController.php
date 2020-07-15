@@ -124,8 +124,6 @@ class UserController extends Controller
         } catch (Exception $exception) {
             DB::rollBack();
             app(DiscordNotificationController::class)->exception($exception, (array) $user);
-
-            throw new BadRequestHttpException($exception->getMessage());
         }
 
         return new JsonResponse([
@@ -361,7 +359,6 @@ class UserController extends Controller
         } catch (Exception $e) {
             /** @var array $xsollaBuildData */
             app(DiscordNotificationController::class)->exception($e, $xsollaBuildData);
-            throw new UnexpectedValueException($e->getMessage());
         }
     }
 

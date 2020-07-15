@@ -92,9 +92,7 @@ class UserService extends BaseService
             DB::commit();
         } catch (Exception $exception) {
             DB::rollback();
-            (new DiscordNotificationController)->exception($exception, $userData);
-
-            return ['error' => $exception->getMessage()];
+            app(DiscordNotificationController::class)->exception($exception, $userData);
         }
 
         return $user;

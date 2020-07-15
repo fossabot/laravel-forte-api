@@ -241,8 +241,6 @@ class XsollaWebhookService
         } catch (Exception $exception) {
             DB::rollback();
             app(DiscordNotificationController::class)->exception($exception, $data);
-
-            throw new UnexpectedValueException($exception->getMessage());
         }
 
         $userAction = [

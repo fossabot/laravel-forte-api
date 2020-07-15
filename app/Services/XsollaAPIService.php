@@ -95,8 +95,6 @@ class XsollaAPIService
             return $response->getBody();
         } catch (ClientException $exception) {
             app(DiscordNotificationController::class)->exception($exception, $bodyData);
-
-            throw new BadRequestHttpException($exception->getMessage());
         }
     }
 
@@ -159,8 +157,6 @@ class XsollaAPIService
             }
         } catch (Exception $exception) {
             app(DiscordNotificationController::class)->exception($exception, $xsollaItemsSku);
-
-            return $exception->getMessage();
         }
 
         app(DiscordNotificationController::class)->sync($count, $xsollaDuplicateItemsSku);

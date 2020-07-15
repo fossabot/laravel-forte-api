@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\MessageException;
 use App\Models\ErrorLog;
 use Exception;
 use NotificationChannels\Discord\Discord;
@@ -18,7 +19,8 @@ class DiscordNotificationController extends Controller
     /**
      * @param Exception $exception
      * @param array $data
-     * @return array
+     * @return void
+     * @throws MessageException
      */
     public function exception(Exception $exception, array $data = [])
     {
@@ -31,7 +33,7 @@ class DiscordNotificationController extends Controller
             'parameters' => $params,
         ]);
 
-        return app(Discord::class)->send(self::CHANNEL_ERROR, [
+        app(Discord::class)->send(self::CHANNEL_ERROR, [
             'content' => '['.config('app.env').'> '.now().'] API ERROR',
             'tts' => false,
             'embed' => [
@@ -39,6 +41,8 @@ class DiscordNotificationController extends Controller
                 'description' => "`ERROR` \n {$exception->getMessage()} \n `PARAMS` \n ``` {$params} ```",
             ],
         ]);
+
+        throw new MessageException($exception->getMessage());
     }
 
     /**
