@@ -9,7 +9,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Str;
 use Psr\Http\Message\StreamInterface;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class XsollaAPIService
 {
