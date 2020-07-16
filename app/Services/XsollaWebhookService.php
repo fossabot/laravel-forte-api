@@ -14,7 +14,6 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Queue;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
-use UnexpectedValueException;
 
 /**
  * Class XsollaWebhookService.
