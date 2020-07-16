@@ -246,8 +246,6 @@ class AttendanceController extends Controller
         } catch (Exception $e) {
             DB::rollBack();
             app(DiscordNotificationController::class)->exception($e, $request->all());
-
-            throw new AccessDeniedException($e);
         }
 
         Queue::pushOn('xsolla-recharge', new XsollaRechargeJob($user, $unpackFromPoint, '포르테 출석체크 보상'));
