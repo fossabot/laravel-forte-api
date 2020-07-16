@@ -13,6 +13,8 @@ class XsollaWebhookController extends Controller
     const TYPE_PAYMENT = 'payment';
     const TYPE_USER_BALANCE_OPERATION = 'user_balance_operation';
     const TYPE_REFUND = 'refund';
+    const TYPE_COUPON = 'coupon';
+    const TYPE_IN_GAME_PURCHASE = 'inGamePurchase';
 
     /**
      * @var XsollaWebhookService
@@ -32,6 +34,7 @@ class XsollaWebhookController extends Controller
      * @param Request $request
      * @return JsonResponse
      * @throws Exception
+     * @throws \Throwable
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_webhooks_list
      */
     public function index(Request $request)

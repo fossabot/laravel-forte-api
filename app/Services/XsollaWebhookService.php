@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Http\Controllers\DiscordNotificationController;
+use App\Http\Controllers\XsollaWebhookController;
 use App\Jobs\XsollaRechargeJob;
 use App\Models\Client;
 use App\Models\Item;
@@ -11,7 +12,7 @@ use App\Models\User;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
+use DB;
 use Queue;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use UnexpectedValueException;
@@ -98,8 +99,8 @@ class XsollaWebhookService
      *
      * @param array $data
      * @return JsonResponse
-     * @throws ExceptionAlias
      * @throws Exception
+     * @throws \Throwable
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_payment
      */
     public function payment(array $data): JsonResponse
@@ -108,7 +109,7 @@ class XsollaWebhookService
         $purchaseData = $data['purchase'];
         $transactionData = $data['transaction'];
 
-        if (Receipt::ofTransactionCount($transactionData['id']) > 0) {
+        if (Receipt::whereTransactionId($transactionData['id'])->exists()) {
             // This payment is a duplicate payment.
             return new JsonResponse([
                 'success' => [
@@ -120,7 +121,7 @@ class XsollaWebhookService
 
         DB::beginTransaction();
         try {
-            $user = $this->userService->show((int) $userData['id']);
+            $user = User::findOrFail((int) $userData['id']);
 
             if (isset($purchaseData['virtual_items'])) {
                 foreach ($purchaseData['virtual_items']['items'] as $item) {
@@ -129,7 +130,9 @@ class XsollaWebhookService
             } else {
                 $oldPoint = $user->points;
                 $quantity = $purchaseData['virtual_currency']['quantity'];
+
                 $user->points += $quantity;
+                $user->save();
 
                 Receipt::store($user->id, 1, null, 1, 0, $oldPoint, $user->points, $transactionData['id']);
 
@@ -140,8 +143,6 @@ class XsollaWebhookService
 
                 app(DiscordNotificationController::class)->xsollaUserAction('Payment', $userAction);
             }
-
-            $user->save();
 
             DB::commit();
 
@@ -164,21 +165,10 @@ class XsollaWebhookService
     }
 
     /**
-     * sends when payment is cancelled for unknown reason.
-     * @param array $data
-     * @return array|array
-     * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_refund
-     * @deprecated xsolla webhooks refund method is no use
-     */
-    public function refund(array $data)
-    {
-        return $data;
-    }
-
-    /**
      * @param array $data
      * @return mixed
      * @throws Exception
+     * @throws \Throwable
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_payment
      */
     public function userBalanceOperation(array $data)
@@ -186,18 +176,16 @@ class XsollaWebhookService
         $operationType = $data['operation_type'];
 
         switch ($operationType) {
-            case 'payment':
+            case XsollaWebhookController::TYPE_COUPON:
+            case XsollaWebhookController::TYPE_REFUND:
+            case XsollaWebhookController::TYPE_PAYMENT:
                 $this->operationPayment($data);
                 break;
-            case 'inGamePurchase':
+            case XsollaWebhookController::TYPE_IN_GAME_PURCHASE:
                 $this->operationPurchase($data);
                 break;
-            case 'coupon':
-                $this->operationCoupon($data);
-                break;
-            case 'refund':
-                $this->operationRefund($data);
-                break;
+            default:
+                throw new UnexpectedValueException();
         }
     }
 
@@ -217,13 +205,14 @@ class XsollaWebhookService
      * @param array $data
      * @return string
      * @throws Exception
+     * @throws \Throwable
      * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_purchase
      */
     private function operationPurchase(array $data)
     {
         $userData = $data['user'];
         $userId = (int) $userData['id'];
-        $user = $this->userService->show($userId);
+        $user = User::findOrFail($userId);
 
         $items = $data['items'];
 
@@ -235,7 +224,7 @@ class XsollaWebhookService
                 }
             }
 
-            $user->{USER::POINTS} = $data['virtual_currency_balance']['new_value'];
+            $user->points = $data['virtual_currency_balance']['new_value'];
             $user->save();
             DB::commit();
         } catch (Exception $exception) {
@@ -244,47 +233,16 @@ class XsollaWebhookService
         }
 
         $userAction = [
-            'name' => $userData['name'] ?? $ $userData['email'],
+            'name' => $userData['name'] ?? $userData['email'],
             'items' => $items,
             'balance' => $data['virtual_currency_balance'],
         ];
 
-        (new DiscordNotificationController)->xsollaUserAction('Item Purchase', $userAction);
+        app(DiscordNotificationController::class)->xsollaUserAction('Item Purchase', $userAction);
 
         return new JsonResponse([
             'message' => 'Success',
         ], Response::HTTP_OK);
-    }
-
-    /**
-     * @param array $data
-     * @return array
-     * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_redeem_coupon
-     */
-    private function operationCoupon(array $data): array
-    {
-        return $this->operationPointRelevant($data);
-    }
-
-    /**
-     * @param array $data
-     * @return array
-     * @deprecated
-     * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_manual_update
-     */
-    private function operationInternal(array $data): array
-    {
-        return $this->operationPointRelevant($data);
-    }
-
-    /**
-     * @param array $data
-     * @return array
-     * @see https://developers.xsolla.com/ko/api/v2/getting-started/#api_webhooks_user_balance_refund
-     */
-    private function operationRefund(array $data): array
-    {
-        return $this->operationPointRelevant($data);
     }
 
     /**
@@ -311,6 +269,6 @@ class XsollaWebhookService
 
         Queue::pushOn('xsolla-recharge', new XsollaRechargeJob($user, $virtualCurrencyBalance['new_value'], '이용자 포인트 업데이트'));
 
-        return ['receipt_id' => $receipt->{Receipt::ID}];
+        return ['receipt_id' => $receipt->id];
     }
 }
