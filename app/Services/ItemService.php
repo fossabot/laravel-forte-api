@@ -5,33 +5,32 @@ namespace App\Services;
 use App\Models\Item;
 use App\Models\User;
 use App\Models\UserItem;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 
 class ItemService extends BaseService
 {
     /**
      * @var User
      */
-    protected $user;
+    protected User $user;
     /**
      * @var Item
      */
-    protected $item;
+    protected Item $item;
     /**
      * @var UserItem
      */
-    protected $userItem;
+    protected UserItem $userItem;
     /**
      * @var UserService
      */
-    protected $userService;
+    protected UserService $userService;
 
-    public function __construct(User $user,
-                                Item $item,
-                                UserItem $userItem,
-                                UserService $userService)
-    {
+    public function __construct(
+        User $user,
+        Item $item,
+        UserItem $userItem,
+        UserService $userService
+    ) {
         $this->user = $user;
         $this->item = $item;
         $this->userItem = $userItem;
@@ -40,7 +39,7 @@ class ItemService extends BaseService
 
     /**
      * @param int $id
-     * @return Item|Item[]|Collection|Model|null
+     * @return Item
      */
     public function show(int $id): Item
     {
