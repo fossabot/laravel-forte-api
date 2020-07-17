@@ -69,7 +69,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
         <script>
-            let README_URL = 'https://raw.githubusercontent.com/team-crescendo/laravel-forte-api/refactoring/master/README.md';
+            let README_URL = 'https://raw.githubusercontent.com/team-crescendo/laravel-forte-api/master/README.md';
 
             $.ajax({
                 url: README_URL,
