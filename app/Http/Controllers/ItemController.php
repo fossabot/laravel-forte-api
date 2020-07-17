@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ItemController extends Controller
 {
@@ -33,7 +33,9 @@ class ItemController extends Controller
      */
     public function index(): JsonResponse
     {
-        return new JsonResponse(Item::scopeAllItemLists());
+        $items = Item::get();
+
+        return new JsonResponse($items);
     }
 
     /**
@@ -41,6 +43,7 @@ class ItemController extends Controller
      *
      * @param int $id
      * @return JsonResponse
+     * @throws NotFoundHttpException
      *
      * @SWG\Get(
      *     path="/items/{itemId}",
@@ -69,6 +72,12 @@ class ItemController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        return new JsonResponse(Item::scopeItemDetail($id));
+        $item = Item::find($id);
+
+        if (is_null($item)) {
+            throw new NotFoundHttpException('해당 아이템이 존재하지 않습니다.');
+        }
+
+        return new JsonResponse($item);
     }
 }
