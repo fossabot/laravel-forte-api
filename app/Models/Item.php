@@ -92,23 +92,6 @@ class Item extends Model
     }
 
     /**
-     * @return Collection
-     */
-    public static function scopeAllItemLists(): Collection
-    {
-        return self::get();
-    }
-
-    /**
-     * @param int $id
-     * @return Item
-     */
-    public static function scopeItemDetail(int $id): self
-    {
-        return self::find($id);
-    }
-
-    /**
      * @param string $sku
      * @return int
      */
