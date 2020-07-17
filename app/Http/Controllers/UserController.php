@@ -79,7 +79,7 @@ class UserController extends Controller
      */
     public function login()
     {
-        $socialite = Socialite::driver('discord')->user();
+        $socialite = \Socialite::driver('discord')->user();
         $user = $this->userService->discord($socialite->id);
 
         if (! $user) {
@@ -371,6 +371,11 @@ class UserController extends Controller
     public function panel(string $token)
     {
         $xsollaUrl = XsollaUrl::whereToken($token)->first();
+
+        if (! $xsollaUrl) {
+            return \Socialite::with('discord')->redirect();
+        }
+
         $items = $this->userService->items($xsollaUrl->user_id);
 
         return view('panel', ['items' => $items, 'token' => $xsollaUrl->token, 'redirect_url' => $xsollaUrl->redirect_url]);
