@@ -74,7 +74,6 @@
             $.ajax({
                 url: README_URL,
                 success: function (data) {
-                    console.log(data);
                     let converter = new showdown.Converter(),
                         text      = data,
                         html      = converter.makeHtml(text);
@@ -83,6 +82,10 @@
                 }
             });
 
+            console.log(
+                '전역까지 ' +
+                Math.floor((new Date("April 30, 2022").getTime() - new Date()) / (1000 * 60 * 60 * 24)) + '일 남았습니다.'
+            );
         </script>
     </body>
 </html>
