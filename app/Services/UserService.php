@@ -37,18 +37,21 @@ class UserService extends BaseService
         $this->xsollaAPI = $xsollaAPIService;
     }
 
+    /**
+     * @return Paginator
+     */
     public function index(): Paginator
     {
-        return $this->user->whereNull($this->user::DELETED_AT)->paginate();
+        return $this->user->whereNull(User::DELETED_AT)->paginate();
     }
 
     /**
      * @param int $id
-     * @return User|User[]|Collection|Model|null
+     * @return User
      */
     public function show(int $id): User
     {
-        return $this->user->find($id);
+        return $this->user->findOrFail($id);
     }
 
     /**
@@ -122,9 +125,9 @@ class UserService extends BaseService
 
     /**
      * @param int $id
-     * @return User|Builder|Model|object
+     * @return User|Builder
      */
-    public function discord(int $id): User
+    public function discord(int $id)
     {
         return $this->user->where($this->user::DISCORD_ID, $id)->firstOrFail();
     }
