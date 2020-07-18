@@ -12,7 +12,7 @@ use App\Models\UserItem;
 use App\Models\Withdraw;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\DB;
+use DB;
 use Queue;
 
 class UserItemService extends BaseService
@@ -126,9 +126,9 @@ class UserItemService extends BaseService
      */
     public function update(int $id, int $itemId, array $data, string $token)
     {
-        $userItem = $this->userItem->find($itemId)->ofUser($id);
+        $userItem = $this->userItem->ofUser($id)->find($itemId);
 
-        if ($this->itemService->show($userItem->{UserItem::ITEM_ID})->{ITEM::CONSUMABLE} === 0) {
+        if ($this->itemService->show($userItem->item_id)->consumable === 0) {
             return ['message' => 'Bad Request Consumed value is true'];
         }
 
