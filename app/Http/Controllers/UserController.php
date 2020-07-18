@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRegisterFormRequest;
 use App\Models\User;
+use App\Models\UserItem;
 use App\Models\XsollaUrl;
 use App\Services\UserService;
 use App\Services\XsollaAPIService;
@@ -376,7 +377,9 @@ class UserController extends Controller
             return \Socialite::with('discord')->redirect();
         }
 
-        $items = $this->userService->items($xsollaUrl->user_id);
+        $items = UserItem::whereUserId($xsollaUrl->user_id)
+            ->with('items')
+            ->get();
 
         return view('panel', ['items' => $items, 'token' => $xsollaUrl->token, 'redirect_url' => $xsollaUrl->redirect_url]);
     }

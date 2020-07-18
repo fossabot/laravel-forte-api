@@ -141,12 +141,12 @@
                         @foreach($items as $item)
                             <div class="col-md-4">
                                 <div class="card mb-4 shadow-sm">
-                                    <img class="card-img-top" src="{{ $item->image_url }}" alt="{{ $item->name }}">
+                                    <img class="card-img-top" src="{{ $item->items->image_url }}" alt="{{ $item->items->name }}">
                                     <div class="card-body">
-                                        <h5 class="card-title">{{ $item->name }}</h5>
+                                        <h5 class="card-title">{{ $item->items->name }}</h5>
                                         <p class="card-text">
-                                            @if($item->price > 0)
-                                                <img src="{{ asset('img/forte-point.png') }}" style="width: 18px; margin-top: -4px" /> {{ $item->price }}
+                                            @if($item->items->price > 0)
+                                                <img src="{{ asset('img/forte-point.png') }}" style="width: 18px; margin-top: -4px" /> {{ $item->items->price }}
                                             @else
                                                 이벤트 지급
                                             @endif
