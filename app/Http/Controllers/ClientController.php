@@ -12,7 +12,7 @@ class ClientController extends Controller
     /**
      * @return void
      */
-    public function renewal()
+    public function renewal(): void
     {
         foreach (Client::get() as $client) {
             if ($client->isRenewable()) {
@@ -21,7 +21,7 @@ class ClientController extends Controller
         }
     }
 
-    private function renewToken($client)
+    private function renewToken($client): void
     {
         $client->newToken = $this->generateToken();
         $client->save();
@@ -30,7 +30,7 @@ class ClientController extends Controller
     /**
      * @return string
      */
-    private function generateToken()
+    private function generateToken(): string
     {
         return Hash::make(Str::Random(40));
     }
