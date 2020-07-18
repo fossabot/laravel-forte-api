@@ -8,6 +8,7 @@ use App\Models\UserItem;
 use App\Models\XsollaUrl;
 use App\Services\UserService;
 use App\Services\XsollaAPIService;
+use Auth;
 use DB;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
@@ -16,7 +17,6 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Auth;
 use Illuminate\View\View;
 use Throwable;
 
