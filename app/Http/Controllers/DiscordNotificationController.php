@@ -19,10 +19,10 @@ class DiscordNotificationController extends Controller
     /**
      * @param Exception $exception
      * @param array $data
-     * @return void
+     * @return MessageException
      * @throws MessageException
      */
-    public function exception(Exception $exception, array $data = [])
+    public function exception(Exception $exception, array $data = []): MessageException
     {
         $params = $this->convertArrayToJson($data);
 
@@ -46,11 +46,10 @@ class DiscordNotificationController extends Controller
     }
 
     /**
-     * @param int $count
      * @param array $data
      * @return array
      */
-    public function sync(int $count, array $data = [])
+    public function sync(array $data = []): array
     {
         $params = $this->convertArrayToJson($data);
 
@@ -59,7 +58,7 @@ class DiscordNotificationController extends Controller
             'tts' => false,
             'embed' => [
                 'title' => 'Sync Information',
-                'description' => "`COUNT` \n {$count} \n `ITEM SKU` \n ``` {$params} ```",
+                'description' => "`ITEM SKU` \n ``` {$params} ```",
             ],
         ]);
     }
@@ -67,7 +66,7 @@ class DiscordNotificationController extends Controller
     /**
      * @return array
      */
-    public function deploy()
+    public function deploy(): array
     {
         return app(Discord::class)->send(self::CHANNEL_FORTE_DEPLOY, [
             'content' => 'AWS Auto Deploy Notification',
@@ -84,7 +83,7 @@ class DiscordNotificationController extends Controller
      * @param array $data
      * @return array
      */
-    public function xsollaUserAction(string $action, array $data = [])
+    public function xsollaUserAction(string $action, array $data = []): array
     {
         $params = $this->convertArrayToJson($data);
 
@@ -105,7 +104,7 @@ class DiscordNotificationController extends Controller
      * @param int $point
      * @return array
      */
-    public function point(string $email, int $discordId, int $deposit, int $point)
+    public function point(string $email, int $discordId, int $deposit, int $point): array
     {
         return app(Discord::class)->send(self::CHANNEL_USER_POINT_TRACKING, [
             'content' => now().'] User Point Deposit Log',

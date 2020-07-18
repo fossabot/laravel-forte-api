@@ -73,7 +73,9 @@ class UserItemController extends Controller
      */
     public function index(int $id): JsonResponse
     {
-        return new JsonResponse($this->userSerivce->items($id));
+        $items = UserItem::whereUserId($id)->with('items')->get();
+
+        return new JsonResponse($items);
     }
 
     /**

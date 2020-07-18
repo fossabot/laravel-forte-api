@@ -8,6 +8,7 @@ use App\Models\UserItem;
 use App\Models\XsollaUrl;
 use App\Services\UserService;
 use App\Services\XsollaAPIService;
+use Auth;
 use DB;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
@@ -16,7 +17,6 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Throwable;
 
@@ -85,7 +85,7 @@ class UserController extends Controller
 
         if (! $user) {
             $user = $this->store($socialite);
-        } elseif ($user && (($user->name !== $socialite->name) || $user->email !== $socialite->email)) {
+        } elseif ($user && $user->isDirty(['name', 'email'])) {
             $this->userService->update($user->id, [
                 'name' => $socialite->name,
                 'email' => $socialite->email,
@@ -94,7 +94,7 @@ class UserController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('user.panel', $this->xsollaToken($user->{User::ID}));
+        return redirect()->route('user.panel', $this->xsollaToken($user->id));
     }
 
     /**

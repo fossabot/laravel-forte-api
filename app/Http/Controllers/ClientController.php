@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
-use Illuminate\Http\JsonResponse;
 use Hash;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 
 class ClientController extends Controller
