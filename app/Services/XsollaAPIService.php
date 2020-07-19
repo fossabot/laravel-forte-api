@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Exceptions\MessageException;
 use App\Http\Controllers\DiscordNotificationController;
 use App\Models\Item;
 use DB;
@@ -21,31 +20,31 @@ class XsollaAPIService
     ];
 
     /**
-     * @var Client $client
+     * @var Client
      */
     protected Client $client;
     /**
-     * @var string $merchantId
+     * @var string
      */
     protected string $merchantId;
     /**
-     * @var string $projectId
+     * @var string
      */
     protected string $projectId;
     /**
-     * @var string $projectKey
+     * @var string
      */
     protected string $projectKey;
     /**
-     * @var string $apiKey
+     * @var string
      */
     protected string $apiKey;
     /**
-     * @var string $authKey
+     * @var string
      */
     protected string $authKey;
     /**
-     * @var string $endpoint
+     * @var string
      */
     protected string $endpoint;
 
@@ -109,7 +108,7 @@ class XsollaAPIService
             $xsollaByItems = json_decode($this->request('GET', 'projects/:projectId/virtual_items/items', []), true);
 
             foreach ($xsollaByItems as $xsollaByItem) {
-                $xsollaByItemDetail = json_decode($this->request('GET', 'projects/:projectId/virtual_items/items/' . $xsollaByItem['id'], []), true);
+                $xsollaByItemDetail = json_decode($this->request('GET', 'projects/:projectId/virtual_items/items/'.$xsollaByItem['id'], []), true);
 
                 $item = [
                     Item::SKU => $xsollaByItemDetail['sku'],
