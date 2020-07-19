@@ -101,11 +101,10 @@ class XsollaAPIService
      * @return mixed
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function syncItems()
+    public function syncItems(): void
     {
         $this->print('== Xsolla Sync from Forte Items Start ==');
 
-        $count = 0;
         $xsollaItemsSku = [];
         $xsollaItemIds = [];
         $xsollaDuplicateItemsSku = [];
@@ -125,7 +124,6 @@ class XsollaAPIService
 
             // 각 아이템 고유 ID에 대해 세부 페이지에 접속해서 동기화시킨다.
             foreach ($xsollaItemIds as $xsollaItemId) {
-                $count++;
                 $xsollaDetailItem = json_decode($this->request('GET', 'projects/:projectId/virtual_items/items/'.$xsollaItemId, []), true);
                 $items = [
                     Item::NAME => $xsollaDetailItem['name']['ko'] ?? $xsollaDetailItem['name']['en'],
@@ -158,7 +156,7 @@ class XsollaAPIService
             app(DiscordNotificationController::class)->exception($exception, $xsollaItemsSku);
         }
 
-        app(DiscordNotificationController::class)->sync($count, $xsollaDuplicateItemsSku);
+        app(DiscordNotificationController::class)->sync($xsollaDuplicateItemsSku);
         $this->print('== End Xsolla Sync from Forte Items ==');
     }
 
