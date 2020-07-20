@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Controllers\DiscordNotificationController;
 use App\Models\Item;
+use DB;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -21,35 +22,31 @@ class XsollaAPIService
     /**
      * @var Client
      */
-    protected $client;
+    protected Client $client;
     /**
-     * @var
+     * @var string
      */
-    protected $merchantId;
+    protected string $merchantId;
     /**
-     * @var
+     * @var string
      */
-    protected $projectId;
+    protected string $projectId;
     /**
-     * @var
+     * @var string
      */
-    protected $projectKey;
+    protected string $projectKey;
     /**
-     * @var
+     * @var string
      */
-    protected $apiKey;
+    protected string $apiKey;
     /**
-     * @var
+     * @var string
      */
-    protected $authKey;
+    protected string $authKey;
     /**
-     * @var
+     * @var string
      */
-    protected $endpoint;
-    /**
-     * @var
-     */
-    protected $command;
+    protected string $endpoint;
 
     /**
      * XsollaAPIService constructor.
@@ -98,79 +95,62 @@ class XsollaAPIService
     }
 
     /**
-     * @return mixed
+     * @return void
      * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Throwable
      */
-    public function syncItems()
+    public function syncItems(): void
     {
-        $this->print('== Xsolla Sync from Forte Items Start ==');
+        $addedItemNames = [];
 
-        $count = 0;
-        $xsollaItemsSku = [];
-        $xsollaItemIds = [];
-        $xsollaDuplicateItemsSku = [];
-
+        DB::beginTransaction();
         try {
-            $xsollaItems = json_decode($this->request('GET', 'projects/:projectId/virtual_items/items', []), true);
+            $xsollaByItems = json_decode($this->request('GET', 'projects/:projectId/virtual_items/items', []), true);
 
-            foreach ($xsollaItems as $item) {
-                if (! Item::ofSku($item['sku'])->first()) {
-                    $xsollaDuplicateItemsSku[] = $item['sku'];
-                }
-                $xsollaItemsSku[] = $item['sku'];
-                $xsollaItemIds[] = $item['id'];
-            }
+            foreach ($xsollaByItems as $xsollaByItem) {
+                $xsollaByItemDetail = json_decode($this->request('GET', 'projects/:projectId/virtual_items/items/'.$xsollaByItem['id'], []), true);
 
-            Item::whereNotIn(Item::SKU, $xsollaItemsSku)->delete();
-
-            // 각 아이템 고유 ID에 대해 세부 페이지에 접속해서 동기화시킨다.
-            foreach ($xsollaItemIds as $xsollaItemId) {
-                $count++;
-                $xsollaDetailItem = json_decode($this->request('GET', 'projects/:projectId/virtual_items/items/'.$xsollaItemId, []), true);
-                $items = [
-                    Item::NAME => $xsollaDetailItem['name']['ko'] ?? $xsollaDetailItem['name']['en'],
-                    Item::IMAGE_URL => $xsollaDetailItem['image_url'],
-                    Item::PRICE => $xsollaDetailItem['virtual_currency_price'] ?? 0,
-                    Item::ENABLED => $xsollaDetailItem['enabled'] == true ? 1 : 0,
-                    Item::CONSUMABLE => $xsollaDetailItem['permanent'] == true ? 0 : 1,
-                    Item::EXPIRATION_TIME => $xsollaDetailItem['expiration'] ?? null,
-                    Item::PURCHASE_LIMIT => $xsollaDetailItem['purchase_limit'] ?? null,
+                $item = [
+                    Item::SKU => $xsollaByItemDetail['sku'],
+                    Item::NAME => $xsollaByItemDetail['name']['ko'] ?? $xsollaByItemDetail['name']['en'],
+                    Item::IMAGE_URL => $xsollaByItemDetail['image_url'],
+                    Item::PRICE => $xsollaByItemDetail['virtual_currency_price'] ?? 0,
+                    Item::ENABLED => $xsollaByItemDetail['enabled'] == true ? 1 : 0,
+                    Item::CONSUMABLE => $xsollaByItemDetail['permanent'] == true ? 0 : 1,
+                    Item::EXPIRATION_TIME => $xsollaByItemDetail['expiration'] ?? null,
+                    Item::PURCHASE_LIMIT => $xsollaByItemDetail['purchase_limit'] ?? null,
                 ];
 
-                // Forte DB 에 아이템이 없을 경우 생성
-                if (! Item::ofSku($xsollaDetailItem['sku'])->first()) {
-                    $convertSku = array_search(explode('_', $xsollaDetailItem['sku']), self::SKU_PREFIX);
-                    $items = array_merge($items,
-                        [
-                            Item::CLIENT_ID => \App\Models\Client::whereName($convertSku)->value('id'),
-                        ],
-                        [
-                            Item::SKU => $xsollaDetailItem['sku'],
-                        ],
-                    );
-
-                    Item::create($items);
+                $existItem = Item::whereSku($item['sku']);
+                if ($existItem->first()) {
+                    // TODO: isDirty check
+                    $existItem->update($item);
                 } else {
-                    Item::ofSku($xsollaDetailItem['sku'])->update($items);
+                    $sku = $this->convertXsollaSkuToPrefix($item['sku']);
+
+                    $item[Item::CLIENT_ID] = \App\Models\Client::whereName($sku)->value('id');
+
+                    $addedItemNames[] = $item[Item::NAME];
+                    Item::create($item);
                 }
             }
+
+            DB::commit();
         } catch (Exception $exception) {
-            app(DiscordNotificationController::class)->exception($exception, $xsollaItemsSku);
+            DB::rollback();
+
+            app(DiscordNotificationController::class)->exception($exception, []);
         }
 
-        app(DiscordNotificationController::class)->sync($count, $xsollaDuplicateItemsSku);
-        $this->print('== End Xsolla Sync from Forte Items ==');
+        app(DiscordNotificationController::class)->sync($addedItemNames);
     }
 
     /**
-     * @param string $message
+     * @param string $sku
+     * @return string
      */
-    private function print(string $message)
+    protected function convertXsollaSkuToPrefix(string $sku): string
     {
-        if ($this->command) {
-            $this->command->info($message);
-        } else {
-            dump($message);
-        }
+        return array_search(explode('_', $sku)[0], self::SKU_PREFIX);
     }
 }
