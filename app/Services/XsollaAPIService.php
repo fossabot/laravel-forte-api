@@ -10,6 +10,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Str;
 use Psr\Http\Message\StreamInterface;
+use UnexpectedValueException;
 
 class XsollaAPIService
 {
@@ -74,8 +75,10 @@ class XsollaAPIService
     {
         if (Str::contains($uri, 'projectId')) {
             $uri = str_replace(':projectId', $this->projectId, $uri);
-        } else {
+        } else if (Str::contains($uri, 'merchantId')) {
             $uri = str_replace(':merchantId', $this->merchantId, $uri);
+        } else {
+            throw new UnexpectedValueException();
         }
 
         try {
