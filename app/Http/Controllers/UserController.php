@@ -344,7 +344,6 @@ class UserController extends Controller
                 'user_id' => $user->id,
                 'expired' => 0,
                 'redirect_url' => $url.$request['token'],
-                'hit' => 0,
             ]);
 
             return $request['token'];
