@@ -26,7 +26,7 @@ Route::get('panel', function () {
     return \Socialite::with('discord')->redirect();
 });
 Route::get('panel/{token}', 'UserController@panel')->name('user.panel')->middleware('auth.forte');
-Route::post('withdraw', 'UserItemController@withdraw');
+//Route::post('withdraw', 'UserItemController@withdraw');
 
 /*
  * @deprecated admin dashboard

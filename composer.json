@@ -24,6 +24,7 @@
         "sentry/sentry-laravel": "1.0.0",
         "socialiteproviders/discord": "^2.0",
         "spatie/db-dumper": "^2.14",
+        "spatie/laravel-query-builder": "^2.8",
         "symfony/options-resolver": "^3.0",
         "symfony/psr-http-message-bridge": "^1.2",
         "team-reflex/discord-php": "^4.0",
