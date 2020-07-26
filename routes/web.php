@@ -22,6 +22,9 @@ Route::get('error', function () {
 Route::get('panel', function () {
     return \Socialite::with('discord')->redirect();
 });
+Route::any('panel/withdraw/{id}', 'UserController@withdraw')->middleware('auth.forte');
+
+
 Route::get('panel/{token}', 'UserController@panel')->name('user.panel')->middleware('auth.forte');
 //Route::post('withdraw', 'UserItemController@withdraw');
 
@@ -29,3 +32,4 @@ Route::get('login/discord', function () {
     return \Socialite::with('discord')->redirect();
 })->name('login');
 Route::get('login/discord/callback', 'UserController@login');
+
