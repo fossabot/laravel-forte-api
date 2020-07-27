@@ -204,7 +204,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.33.1/sweetalert2.min.js"></script>
 <script>
     @if(isset($item->user_id))
-        function withdraw(id) {
+        function withdraw(item_id) {
             Swal.fire({
                 title: '청약철회',
                 html: "구매하신 아이템의 청약철회는 구매 기간으로부터 7일이 지나지 않았고, 최종 수령을 받지 않은 아이템만 가능합니다.<br>자세한 사항은 <a href='https://cafe.naver.com/teamcrescendocafe/book5101938/759'>카페</a>를 참고하세요.<br><br>청약철회를 진행하려면 아래 버튼을 눌러주세요",
@@ -222,7 +222,7 @@
                         }
                     });
 
-                    $.post( "/panel/withdraw/"+id).done(function (response){
+                    $.post( "/withdraw/"+item_id).done(function (response){
                         Swal.fire({
                             title: '성공',
                             text: '청약철회가 완료되었습니다!',
