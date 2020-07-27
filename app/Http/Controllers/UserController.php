@@ -12,8 +12,8 @@ use App\Models\XsollaUrl;
 use App\Services\UserItemService;
 use App\Services\UserService;
 use App\Services\XsollaAPIService;
-use Carbon\Carbon;
 use Auth;
+use Carbon\Carbon;
 use DB;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
@@ -23,8 +23,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
-use Laravel\Socialite\Facades\Socialite;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Throwable;
 
 class UserController extends Controller
@@ -391,7 +389,8 @@ class UserController extends Controller
         return view('panel', ['items' => $items, 'token' => $xsollaUrl->token, 'redirect_url' => $xsollaUrl->redirect_url]);
     }
 
-    public function withdraw($id, UserItemService $userItemService){
+    public function withdraw($id, UserItemService $userItemService)
+    {
         $userItem = UserItem::find($id);
         $user = Auth::user();
 
