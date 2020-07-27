@@ -21,12 +21,12 @@ class UserItemController extends Controller
     /**
      * @var UserService
      */
-    protected $userSerivce;
+    protected UserService $userSerivce;
 
     /**
      * @var UserItemService
      */
-    protected $userItemService;
+    protected UserItemService $userItemService;
 
     /**
      * UserItemController constructor.
@@ -73,7 +73,9 @@ class UserItemController extends Controller
      */
     public function index(int $id): JsonResponse
     {
-        return new JsonResponse($this->userSerivce->items($id));
+        $items = UserItem::whereUserId($id)->with('items')->get();
+
+        return new JsonResponse($items);
     }
 
     /**
@@ -83,6 +85,8 @@ class UserItemController extends Controller
      * @param int $id
      * @return mixed
      * @throws Exception
+     * @throws \Throwable
+     *
      * @SWG\Post(
      *     path="/users/{userId}/items",
      *     description="Store(save) the User buying Item",
@@ -175,6 +179,8 @@ class UserItemController extends Controller
      * @param int $itemId
      * @return JsonResponse
      * @throws Exception
+     * @throws \Throwable
+     *
      * @SWG\Put(
      *     path="/users/{userId}/items/{userItemId}",
      *     description="Update User Item",

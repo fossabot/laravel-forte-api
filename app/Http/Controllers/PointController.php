@@ -7,9 +7,9 @@ use App\Models\Client;
 use App\Models\Receipt;
 use App\Models\User;
 use App\Services\XsollaAPIService;
+use Http\Discovery\Exception\NotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Queue;
 
 class PointController extends Controller
@@ -20,7 +20,7 @@ class PointController extends Controller
     /**
      * @var XsollaAPIService
      */
-    protected $xsollaAPI;
+    protected XsollaAPIService $xsollaAPI;
 
     /**
      * UserController constructor.
@@ -94,30 +94,22 @@ class PointController extends Controller
     {
         $user = User::find($id);
 
-        if (! $user) {
-            return new JsonResponse([
-                'message' => 'User does not exist',
-            ], Response::HTTP_NOT_FOUND);
+        if (! $user || $user->trashed()) {
+            throw new NotFoundException('User does not exist or withdraw User');
         }
 
-        if ($user->trashed()) {
-            return new JsonResponse([
-                'message' => 'Withdraw User Account',
-            ], Response::HTTP_BAD_REQUEST);
-        }
-
-        $oldPoints = $user->{User::POINTS};
-        $user->{User::POINTS} += $request->points;
+        $oldPoints = $user->points;
+        $user->points += $request->input('point');
         $user->save();
 
         $clientId = Client::bringNameByToken($request->header('Authorization'))->id;
 
-        $receipt = Receipt::store($id, $clientId, null, 0, 0, $oldPoints, $user->{User::POINTS}, 0);
+        $receipt = Receipt::store($id, $clientId, null, 0, 0, $oldPoints, $user->points, 0);
 
-        Queue::pushOn('xsolla-recharge', new XsollaRechargeJob($user, $request->points, '이용자 포인트 지급'));
+        Queue::pushOn('xsolla-recharge', new XsollaRechargeJob($user, $request->input('point'), '이용자 포인트 지급'));
 
-        (new DiscordNotificationController)->point($user->{User::EMAIL}, $user->{User::DISCORD_ID}, $request->{User::POINTS}, $user->{User::POINTS});
+        app(DiscordNotificationController::class)->point($user->email, $user->discord_id, $request->input('point'), $user->points);
 
-        return new JsonResponse(['receipt_id' => $receipt->{Receipt::ID}]);
+        return new JsonResponse(['receipt_id' => $receipt->id]);
     }
 }

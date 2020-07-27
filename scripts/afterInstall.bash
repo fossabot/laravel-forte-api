@@ -4,7 +4,7 @@ sudo rsync --delete-before --verbose --archive /var/www/release/ /var/www/larave
 
 cd /var/www/laravel-central-api
 sudo php artisan aws:codedeploy
-sudo composer install
+sudo cp -r /var/www/release-files/vendor /var/www/laravel-central-api
 sudo cp /var/www/release-files/.env /var/www/laravel-central-api
 sudo cp /var/www/release-files/Controller.php /var/www/laravel-central-api/app/Http/Controllers
 sudo php artisan key:generate

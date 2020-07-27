@@ -11,9 +11,7 @@
 |
 */
 
-const CURRENT_VERSION = 'v2';
-
-Route::prefix(CURRENT_VERSION)->group(function () {
+Route::prefix('v2')->group(function () {
     Route::middleware(['api.trust.ip', 'api.headers'])->group(function () {
         Route::prefix('users')->group(function () {
             Route::resource('', 'UserController');

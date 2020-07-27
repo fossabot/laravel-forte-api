@@ -3,15 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use Hash;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class ClientController extends Controller
 {
     /**
      * @return void
      */
-    public function renewal()
+    public function renewal(): void
     {
         foreach (Client::get() as $client) {
             if ($client->isRenewable()) {
@@ -20,7 +21,7 @@ class ClientController extends Controller
         }
     }
 
-    private function renewToken($client)
+    private function renewToken($client): void
     {
         $client->newToken = $this->generateToken();
         $client->save();
@@ -29,16 +30,9 @@ class ClientController extends Controller
     /**
      * @return string
      */
-    private function generateToken()
+    private function generateToken(): string
     {
-        $merge = '';
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
-        for ($i = 0; $i < 30; $i++) {
-            $merge .= $characters[rand(0, strlen($characters) - 1)];
-        }
-
-        return Hash::make($merge);
+        return Hash::make(Str::Random(40));
     }
 
     /**
@@ -66,13 +60,15 @@ class ClientController extends Controller
      */
     public function issue(): JsonResponse
     {
-        $client = Client::where(Client::PREV_TOKEN, $_SERVER['HTTP_AUTHORIZATION'])->first() ?: null;
+        $client = Client::wherePrevToken($_SERVER['HTTP_AUTHORIZATION'])->first() ?: null;
 
         if (! empty($client)) {
             return new JsonResponse([
-                Client::TOKEN => $client->{Client::TOKEN},
-                Client::UPDATED_AT => $client->{Client::UPDATED_AT},
+                Client::TOKEN => $client->token,
+                Client::UPDATED_AT => $client->updated_at,
             ]);
         }
+
+        return new JsonResponse([]);
     }
 }

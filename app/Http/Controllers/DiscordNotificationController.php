@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\MessageException;
 use App\Models\ErrorLog;
 use Exception;
 use NotificationChannels\Discord\Discord;
@@ -18,11 +19,12 @@ class DiscordNotificationController extends Controller
     /**
      * @param Exception $exception
      * @param array $data
-     * @return array
+     * @return MessageException
+     * @throws MessageException
      */
-    public function exception(Exception $exception, array $data = [])
+    public function exception(Exception $exception, array $data = []): MessageException
     {
-        $params = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
+        $params = $this->convertArrayToJson($data);
 
         ErrorLog::create([
             'environment' => config('app.env'),
@@ -31,7 +33,7 @@ class DiscordNotificationController extends Controller
             'parameters' => $params,
         ]);
 
-        return app(Discord::class)->send(self::CHANNEL_ERROR, [
+        app(Discord::class)->send(self::CHANNEL_ERROR, [
             'content' => '['.config('app.env').'> '.now().'] API ERROR',
             'tts' => false,
             'embed' => [
@@ -39,23 +41,24 @@ class DiscordNotificationController extends Controller
                 'description' => "`ERROR` \n {$exception->getMessage()} \n `PARAMS` \n ``` {$params} ```",
             ],
         ]);
+
+        throw new MessageException($exception->getMessage());
     }
 
     /**
-     * @param int $count
      * @param array $data
      * @return array
      */
-    public function sync(int $count, array $data = [])
+    public function sync(array $data = []): array
     {
-        $params = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
+        $params = $this->convertArrayToJson($data);
 
         return app(Discord::class)->send(self::CHANNEL_XSOLLA_SYNC, [
             'content' => '['.config('app.env').'> '.now().'] Xsolla Sync',
             'tts' => false,
             'embed' => [
                 'title' => 'Sync Information',
-                'description' => "`COUNT` \n {$count} \n `ITEM SKU` \n ``` {$params} ```",
+                'description' => "`ITEM SKU` \n ``` {$params} ```",
             ],
         ]);
     }
@@ -63,7 +66,7 @@ class DiscordNotificationController extends Controller
     /**
      * @return array
      */
-    public function deploy()
+    public function deploy(): array
     {
         return app(Discord::class)->send(self::CHANNEL_FORTE_DEPLOY, [
             'content' => 'AWS Auto Deploy Notification',
@@ -80,9 +83,9 @@ class DiscordNotificationController extends Controller
      * @param array $data
      * @return array
      */
-    public function xsollaUserAction(string $action, array $data = [])
+    public function xsollaUserAction(string $action, array $data = []): array
     {
-        $params = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
+        $params = $this->convertArrayToJson($data);
 
         return app(Discord::class)->send(self::CHANNEL_XSOLLA_USER_ACTION, [
             'content' => now().'] Xsolla User Log',
@@ -101,7 +104,7 @@ class DiscordNotificationController extends Controller
      * @param int $point
      * @return array
      */
-    public function point(string $email, int $discordId, int $deposit, int $point)
+    public function point(string $email, int $discordId, int $deposit, int $point): array
     {
         return app(Discord::class)->send(self::CHANNEL_USER_POINT_TRACKING, [
             'content' => now().'] User Point Deposit Log',
@@ -125,5 +128,19 @@ class DiscordNotificationController extends Controller
                 'description' => sprintf('%s', $message),
             ],
         ]);
+    }
+
+    /**
+     * @param array $params
+     * @return string
+     */
+    private function convertArrayToJson(array $params): string
+    {
+        return json_encode($params,
+            JSON_PRETTY_PRINT |
+            JSON_UNESCAPED_SLASHES |
+            JSON_UNESCAPED_UNICODE |
+            JSON_NUMERIC_CHECK
+        );
     }
 }

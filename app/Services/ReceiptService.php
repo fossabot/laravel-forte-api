@@ -45,9 +45,16 @@ class ReceiptService extends BaseService
         $this->itemService = $itemService;
     }
 
+    /**
+     * @param User $user
+     * @param int $itemId
+     * @param int $userItemId
+     * @param string $token
+     * @return Receipt
+     */
     public function save(User $user, int $itemId, int $userItemId, string $token): Receipt
     {
-        $client = $token === Client::XSOLLA ?: Client::bringNameByToken($token);
+        $client = $token === Client::XSOLLA ? Client::find(1) : Client::whereToken($token)->first();
         $item = $this->itemService->show($itemId);
 
         if ($token !== Client::XSOLLA) {
@@ -56,7 +63,7 @@ class ReceiptService extends BaseService
             $point = $user->points;
         }
 
-        $receipt = $this->store($user, $client, $token, $userItemId, $point);
+        $receipt = $this->store($user, $client, $userItemId, $point);
 
         $user->points = $point;
         $user->save();
@@ -67,16 +74,15 @@ class ReceiptService extends BaseService
     /**
      * @param User $user
      * @param Client $client
-     * @param string $token
      * @param int $userItemId
      * @param int $point
      * @return Receipt
      */
-    public function store(User $user, Client $client, string $token, int $userItemId, int $point): Receipt
+    public function store(User $user, Client $client, int $userItemId, int $point): Receipt
     {
         return $this->receipt->create([
             Receipt::USER_ID => $user->id,
-            Receipt::CLIENT_ID => $token === Client::XSOLLA ? 1 : $client->id,
+            Receipt::CLIENT_ID => $client->id,
             Receipt::USER_ITEM_ID => $userItemId,
             Receipt::ABOUT_CASH => 1,
             Receipt::REFUND => 0,

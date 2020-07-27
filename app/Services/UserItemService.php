@@ -10,10 +10,9 @@ use App\Models\Receipt;
 use App\Models\User;
 use App\Models\UserItem;
 use App\Models\Withdraw;
+use DB;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 use Queue;
 
 class UserItemService extends BaseService
@@ -21,19 +20,23 @@ class UserItemService extends BaseService
     /**
      * @var User
      */
-    protected $user;
+    protected User $user;
+    /**
+     * @var ItemService
+     */
+    protected ItemService $itemService;
     /**
      * @var UserItem
      */
-    protected $itemService;
-    /**
-     * @var UserItem
-     */
-    protected $userItem;
+    protected UserItem $userItem;
     /**
      * @var UserService
      */
-    protected $userService;
+    protected UserService $userService;
+    /**
+     * @var ReceiptService
+     */
+    protected ReceiptService $receiptService;
 
     /**
      * UserItemService constructor.
@@ -41,22 +44,26 @@ class UserItemService extends BaseService
      * @param UserItem $userItem
      * @param ItemService $itemService
      * @param UserService $userService
+     * @param ReceiptService $receiptService
      */
-    public function __construct(User $user,
-                                UserItem $userItem,
-                                ItemService $itemService,
-                                UserService $userService)
-    {
+    public function __construct(
+        User $user,
+        UserItem $userItem,
+        ItemService $itemService,
+        UserService $userService,
+        ReceiptService $receiptService
+    ) {
         $this->user = $user;
         $this->userItem = $userItem;
         $this->userService = $userService;
         $this->itemService = $itemService;
+        $this->receiptService = $receiptService;
     }
 
     /**
      * @param int $id
      * @param int $itemId
-     * @return UserItem|Model|\Illuminate\Database\Query\Builder|object
+     * @return UserItem
      */
     public function show(int $id, int $itemId): UserItem
     {
@@ -73,6 +80,7 @@ class UserItemService extends BaseService
      * @param string $token
      * @return array
      * @throws Exception
+     * @throws \Throwable
      */
     public function save(User $user, int $itemId, string $token): array
     {
@@ -114,12 +122,13 @@ class UserItemService extends BaseService
      * @param string $token
      * @return UserItem|array|Builder
      * @throws Exception
+     * @throws \Throwable
      */
     public function update(int $id, int $itemId, array $data, string $token)
     {
-        $userItem = $this->userItem->find($itemId)->ofUser($id);
+        $userItem = $this->userItem->ofUser($id)->find($itemId);
 
-        if ($this->itemService->show($userItem->{UserItem::ITEM_ID})->{ITEM::CONSUMABLE} === 0) {
+        if ($this->itemService->show($userItem->item_id)->consumable === 0) {
             return ['message' => 'Bad Request Consumed value is true'];
         }
 
