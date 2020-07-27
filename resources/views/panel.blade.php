@@ -31,6 +31,7 @@
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.33.1/sweetalert2.min.css" rel="stylesheet">
     <style>
         * {
             font-family: 'Noto Sans KR', sans-serif;
@@ -139,7 +140,7 @@
                         @endif
 
                         @foreach($items as $item)
-                            <div class="col-md-4">
+                            <div class="col-md-4" id="i-{{$item->id}}">
                                 <div class="card mb-4 shadow-sm">
                                     <img class="card-img-top" src="{{ $item->items->image_url }}" alt="{{ $item->items->name }}">
                                     <div class="card-body">
@@ -151,24 +152,24 @@
                                                 이벤트 지급
                                             @endif
                                         </p>
-                                        {{--                                        <div class="d-flex justify-content-between align-items-center">--}}
-                                        {{--                                            <small class="text-muted">--}}
-                                        {{--                                            {{ isset($item->deleted_at) ? '철회: ' . $item->deleted_at->format('y년 m월 d일 H시 m분') : '구매: ' . $item->created_at->format('y년 m월 d일 H시 m분') }}--}}
-                                        {{--                                            </small>--}}
-                                        {{--                                            <div class="btn-group">--}}
-                                        {{--                                                @if($item->consumed > 0)--}}
-                                        {{--                                                    <button type="button" class="btn btn-sm btn-outline-secondary" disabled>사용됨</button>--}}
-                                        {{--                                                @elseif (date_diff(new \DateTime($item->created_at), new \DateTime())->format("%R%a") > 7)--}}
-                                        {{--                                                    <button type="button" class="btn btn-sm btn-outline-warning" disabled>--}}
-                                        {{--                                                        {{ date_diff(new \DateTime($item->created_at), new \DateTime())->format("%R%a")}} 일 지남--}}
-                                        {{--                                                    </button>--}}
-                                        {{--                                                @elseif ($item->deleted_at)--}}
-                                        {{--                                                    <button type="button" class="btn btn-sm btn-outline-danger" disabled>청약철회 완료</button>--}}
-                                        {{--                                                @else--}}
-                                        {{--                                                    <button id="btn-{{ $item->id }}" type="button" class="btn btn-sm btn-outline-success" onclick="withdraw({{ $item->id }})">청약철회</button>--}}
-                                        {{--                                                @endif--}}
-                                        {{--                                            </div>--}}
-                                        {{--                                        </div>--}}
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">
+                                            {{ isset($item->deleted_at) ? '철회: ' . $item->deleted_at : '구매: ' . $item->created_at }}
+                                            </small>
+                                            <div class="btn-group">
+                                                @if($item->consumed > 0)
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" disabled>사용됨</button>
+                                                @elseif (date_diff(new \DateTime($item->created_at), new \DateTime())->format("%R%a") > 7)
+                                                    <button type="button" class="btn btn-sm btn-outline-warning" disabled>
+                                                        {{ date_diff(new \DateTime($item->created_at), new \DateTime())->format("%R%a")}} 일 지남
+                                                    </button>
+                                                @elseif ($item->deleted_at)
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" disabled>청약철회 완료</button>
+                                                @else
+                                                    <button id="btn-{{ $item->id }}" type="button" class="btn btn-sm btn-outline-success" onclick="withdraw({{ $item->id }})">청약철회</button>
+                                                @endif
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -200,5 +201,46 @@
 
 <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.33.1/sweetalert2.min.js"></script>
+<script>
+    @if(isset($item->user_id))
+        function withdraw(id) {
+            Swal.fire({
+                title: '청약철회',
+                html: "구매하신 아이템의 청약철회는 구매 기간으로부터 7일이 지나지 않았고, 최종 수령을 받지 않은 아이템만 가능합니다.<br>자세한 사항은 <a href='https://cafe.naver.com/teamcrescendocafe/book5101938/759'>카페</a>를 참고하세요.<br><br>청약철회를 진행하려면 아래 버튼을 눌러주세요",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: '네',
+                cancelButtonText: '아니요'
+            }).then((result) => {
+                if (result.value) {
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    });
+
+                    $.post( "/panel/withdraw/"+id).done(function (response){
+                        Swal.fire({
+                            title: '성공',
+                            text: '청약철회가 완료되었습니다!',
+                            type: 'success'
+                        })
+                        location.reload()
+
+                    }).fail(function (response) {
+                        Swal.fire({
+                            title: '안내',
+                            text: response.responseJSON.message,
+                            type: 'info'
+                        })
+                    });
+                }
+            })
+        }
+    @endif
+</script>
 </body>
 </html>

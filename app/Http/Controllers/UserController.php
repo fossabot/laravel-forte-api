@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\MessageException;
 use App\Http\Requests\UserRegisterFormRequest;
+use App\Models\Item;
 use App\Models\User;
 use App\Models\UserItem;
+use App\Models\Withdraw;
 use App\Models\XsollaUrl;
+use App\Services\UserItemService;
 use App\Services\UserService;
 use App\Services\XsollaAPIService;
+use Carbon\Carbon;
 use Auth;
 use DB;
 use Exception;
@@ -18,6 +23,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
+use Laravel\Socialite\Facades\Socialite;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Throwable;
 
 class UserController extends Controller
@@ -382,5 +389,31 @@ class UserController extends Controller
             ->get();
 
         return view('panel', ['items' => $items, 'token' => $xsollaUrl->token, 'redirect_url' => $xsollaUrl->redirect_url]);
+    }
+
+    public function withdraw($id, UserItemService $userItemService){
+        $userItem = UserItem::find($id);
+        $user = Auth::user();
+
+        if (is_null($userItem)) {
+            throw new MessageException('삭제된 아이템이거나, 이미 청약철회가 진행된 아이템입니다.');
+        }
+
+        if ($userItem->user_id !== $user->id) {
+            throw new MessageException('본인의 아이템만 청약철회가 가능합니다');
+        }
+
+        $item = Item::findOrFail($userItem->item_id);
+
+        $withdraw = Withdraw::whereUserId($user->id)->first();
+        if ($withdraw && Carbon::parse($withdraw->created_at)->isToday()) {
+            throw new MessageException('하루에 한번만 청약철회가 가능합니다.');
+        }
+
+        if (! in_array($item->sku, UserItem::DISABLE_WITHDRAW_ITEMS)) {
+            return new JsonResponse($userItemService->withdraw($user, $item, $userItem));
+        }
+
+        throw new UnexpectedValueException('청약철회가 불가능한 상품입니다.');
     }
 }
