@@ -36,6 +36,7 @@
         * {
             font-family: 'Noto Sans KR', sans-serif;
         }
+
         .bd-placeholder-img {
             font-size: 1.125rem;
             text-anchor: middle;
@@ -80,7 +81,7 @@
             margin-bottom: .25rem;
         }
 
-        #title-outline{
+        #title-outline {
             color: black;
             -webkit-text-fill-color: white; /* Will override color (regardless of order) */
             -webkit-text-stroke-width: 1px;
@@ -89,15 +90,18 @@
             display: inline;
             font-weight: bolder;
         }
+
         #title {
             display: inline;
             font-weight: bolder;
         }
+
         .nav-pills .nav-link {
             color: black;
             opacity: 0.6;
         }
-        .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+
+        .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
             color: black;
             background-color: white;
             font-weight: bolder;
@@ -110,7 +114,8 @@
 <main role="main">
     <section class="container">
         <div class="jumbotron">
-            <img style="width: 10rem; padding-bottom: 1.5rem;display: block" src="https://team-crescendo.me/wp-content/uploads/2019/07/Blue@2x.png">
+            <img style="width: 10rem; padding-bottom: 1.5rem;display: block"
+                 src="https://team-crescendo.me/wp-content/uploads/2019/07/Blue@2x.png">
             <div class="row" style="width: 100vw">
                 <div class="col-sm">
                     <h1 id="title-outline" class="mr-1">Forte</h1>
@@ -118,13 +123,17 @@
                 </div>
                 <ul class="nav nav-pills mb-3 col-sm" id="pills-tab" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active" id="pills-shop-tab" data-toggle="pill" href="#shop" role="tab" aria-controls="shop" aria-selected="false">상점</a>
+                        <a class="nav-link active" id="pills-shop-tab" data-toggle="pill" href="#shop" role="tab"
+                           aria-controls="shop" aria-selected="false">상점</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="pills-inventory-tab" data-toggle="pill" href="#inventory" role="tab" aria-controls="inventory" aria-selected="true">인벤토리</a>
+                        <a class="nav-link" id="pills-inventory-tab" data-toggle="pill" href="#inventory" role="tab"
+                           aria-controls="inventory" aria-selected="true">인벤토리</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="pills-item-detail-tab" href="https://cafe.naver.com/teamcrescendocafe/book5101938/1396" role="tab" aria-controls="item-detail" aria-selected="true">아이템 상세 안내</a>
+                        <a class="nav-link" id="pills-item-detail-tab"
+                           href="https://cafe.naver.com/teamcrescendocafe/book5101938/1396" role="tab"
+                           aria-controls="item-detail" aria-selected="true">아이템 상세 안내</a>
                     </li>
                 </ul>
             </div>
@@ -142,31 +151,42 @@
                         @foreach($items as $item)
                             <div class="col-md-4" id="i-{{$item->id}}">
                                 <div class="card mb-4 shadow-sm">
-                                    <img class="card-img-top" src="{{ $item->items->image_url }}" alt="{{ $item->items->name }}">
+                                    <img class="card-img-top" src="{{ $item->items->image_url }}"
+                                         alt="{{ $item->items->name }}">
                                     <div class="card-body">
                                         <h5 class="card-title">{{ $item->items->name }}</h5>
                                         <p class="card-text">
                                             @if($item->items->price > 0)
-                                                <img src="{{ asset('img/forte-point.png') }}" style="width: 18px; margin-top: -4px" /> {{ $item->items->price }}
+                                                <img src="{{ asset('img/forte-point.png') }}"
+                                                     style="width: 18px; margin-top: -4px"/> {{ $item->items->price }}
                                             @else
                                                 이벤트 지급
                                             @endif
                                         </p>
                                         <div class="d-flex justify-content-between align-items-center">
                                             <small class="text-muted">
-                                            {{ isset($item->deleted_at) ? '철회: ' . $item->deleted_at : '구매: ' . $item->created_at }}
+                                                {{ isset($item->deleted_at) ? '철회: ' . $item->deleted_at : '구매: ' . $item->created_at }}
                                             </small>
                                             <div class="btn-group">
                                                 @if($item->consumed > 0)
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary" disabled>사용됨</button>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                            disabled>사용됨
+                                                    </button>
                                                 @elseif (date_diff(new \DateTime($item->created_at), new \DateTime())->format("%R%a") > 7)
-                                                    <button type="button" class="btn btn-sm btn-outline-warning" disabled>
-                                                        {{ date_diff(new \DateTime($item->created_at), new \DateTime())->format("%R%a")}} 일 지남
+                                                    <button type="button" class="btn btn-sm btn-outline-warning"
+                                                            disabled>
+                                                        {{ date_diff(new \DateTime($item->created_at), new \DateTime())->format("%R%a")}}
+                                                        일 지남
                                                     </button>
                                                 @elseif ($item->deleted_at)
-                                                    <button type="button" class="btn btn-sm btn-outline-danger" disabled>청약철회 완료</button>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                                            disabled>청약철회 완료
+                                                    </button>
                                                 @else
-                                                    <button id="btn-{{ $item->id }}" type="button" class="btn btn-sm btn-outline-success" onclick="withdraw({{ $item->id }})">청약철회</button>
+                                                    <button id="btn-{{ $item->id }}" type="button"
+                                                            class="btn btn-sm btn-outline-success"
+                                                            onclick="withdraw({{ $item->id }})">청약철회
+                                                    </button>
                                                 @endif
                                             </div>
                                         </div>
@@ -179,8 +199,8 @@
 
                 <div class="tab-pane fade show active" id="shop" role="tabpanel" aria-labelledby="pills-shop-tab">
                     <div class="row">
-                        <embed type="text/html" src="{{ $redirect_url }}" style="top:0; left:0; width: 100%; height:550px;">
-                        {{--                        <iframe src="{{ $redirect_url }}" frameborder="0" allowfullscreen style="position:absolute; top:0; left:0; width: 100%; height:100%;" />--}}
+                        <embed type="text/html" src="{{ $redirect_url }}"
+                               style="top:0; left:0; width: 100%; height:550px;">
                     </div>
                 </div>
             </div>
@@ -190,9 +210,16 @@
 
 <footer class="text-muted">
     <div class="container">
-        <div id="text-13" class="widget widget_text">			<div class="textwidget"><p style="line-height: 17px; font-size: 12px;">팀 크레센도<br>
+        <div id="text-13" class="widget widget_text">
+            <div class="textwidget"><p style="line-height: 17px; font-size: 12px;">팀 크레센도<br>
                     대표자: 이정민 | skile@crsd.team | 010-2269-3816</p>
-                <p style="text-align: left; line-height: 17px; font-size: 12px;"><a href="https://team-crescendo.me/policy/bot-terms/">봇 이용약관</a>&nbsp; &nbsp; &nbsp;<strong><a href="https://team-crescendo.me/policy/privacy/">개인정보취급방침</a></strong>&nbsp; &nbsp; &nbsp;<a href="https://team-crescendo.me/email-security/">이메일 무단 수집 거부</a><br><a href="https://discord.gg/DF3yxBS" target="_blank" rel="noopener noreferrer">공식 디스코드</a>&nbsp; &nbsp; &nbsp;<a href="https://cafe.naver.com/teamcrescendocafe" target="_blank" rel="noopener noreferrer">공식카페</a></p>
+                <p style="text-align: left; line-height: 17px; font-size: 12px;"><a
+                        href="https://team-crescendo.me/policy/bot-terms/">봇 이용약관</a>&nbsp; &nbsp; &nbsp;<strong><a
+                            href="https://team-crescendo.me/policy/privacy/">개인정보취급방침</a></strong>&nbsp; &nbsp; &nbsp;<a
+                        href="https://team-crescendo.me/email-security/">이메일 무단 수집 거부</a><br><a
+                        href="https://discord.gg/DF3yxBS" target="_blank" rel="noopener noreferrer">공식 디스코드</a>&nbsp;
+                    &nbsp; &nbsp;<a href="https://cafe.naver.com/teamcrescendocafe" target="_blank"
+                                    rel="noopener noreferrer">공식카페</a></p>
                 <p style="line-height: 17px; font-size: 12px;">© 2017-2020 Team Crescendo. All Right Reserved.</p>
             </div>
         </div>
@@ -204,42 +231,40 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.33.1/sweetalert2.min.js"></script>
 <script>
     @if(isset($item->user_id))
-        function withdraw(item_id) {
-            Swal.fire({
-                title: '청약철회',
-                html: "구매하신 아이템의 청약철회는 구매 기간으로부터 7일이 지나지 않았고, 최종 수령을 받지 않은 아이템만 가능합니다.<br>자세한 사항은 <a href='https://cafe.naver.com/teamcrescendocafe/book5101938/759'>카페</a>를 참고하세요.<br><br>청약철회를 진행하려면 아래 버튼을 눌러주세요",
-                type: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: '네',
-                cancelButtonText: '아니요'
-            }).then((result) => {
-                if (result.value) {
-                    $.ajaxSetup({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        }
-                    });
-
-                    $.post( "/withdraw/"+item_id).done(function (response){
-                        Swal.fire({
-                            title: '성공',
-                            text: '청약철회가 완료되었습니다!',
-                            type: 'success'
-                        })
-                        location.reload()
-
-                    }).fail(function (response) {
-                        Swal.fire({
-                            title: '안내',
-                            text: response.responseJSON.message,
-                            type: 'info'
-                        })
-                    });
-                }
-            })
-        }
+    function withdraw(item_id) {
+        Swal.fire({
+            title: '청약철회',
+            html: "구매하신 아이템의 청약철회는 구매 기간으로부터 7일이 지나지 않았고, 최종 수령을 받지 않은 아이템만 가능합니다.<br>자세한 사항은 <a href='https://cafe.naver.com/teamcrescendocafe/book5101938/759'>카페</a>를 참고하세요.<br><br>청약철회를 진행하려면 아래 버튼을 눌러주세요",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '네',
+            cancelButtonText: '아니요'
+        }).then((result) => {
+            if (result.value) {
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+                $.post("/withdraw/" + item_id).done(function (response) {
+                    Swal.fire({
+                        title: '성공',
+                        text: '청약철회가 완료되었습니다!',
+                        type: 'success'
+                    })
+                    location.reload()
+                }).fail(function (response) {
+                    Swal.fire({
+                        title: '안내',
+                        text: response.responseJSON.message,
+                        type: 'info'
+                    })
+                });
+            }
+        })
+    }
     @endif
 </script>
 </body>
