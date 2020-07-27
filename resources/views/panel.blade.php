@@ -154,7 +154,7 @@
                                         </p>
                                         <div class="d-flex justify-content-between align-items-center">
                                             <small class="text-muted">
-                                            {{ isset($item->deleted_at) ? '철회: ' . $item->deleted_at->format('y년 m월 d일 H시 m분') : '구매: ' . $item->created_at->format('y년 m월 d일 H시 m분') }}
+                                            {{ isset($item->deleted_at) ? '철회: ' . $item->deleted_at : '구매: ' . $item->created_at }}
                                             </small>
                                             <div class="btn-group">
                                                 @if($item->consumed > 0)
@@ -207,7 +207,7 @@
         function withdraw(id) {
             Swal.fire({
                 title: '청약철회',
-                text: "청약철회 주의사항",
+                html: "구매하신 아이템의 청약철회는 구매 기간으로부터 7일이 지나지 않았고, 최종 수령을 받지 않은 아이템만 가능합니다.<br>자세한 사항은 <a href='https://cafe.naver.com/teamcrescendocafe/book5101938/759'>카페</a>를 참고하세요.<br><br>청약철회를 진행하려면 아래 버튼을 눌러주세요",
                 type: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -216,13 +216,26 @@
                 cancelButtonText: '아니요'
             }).then((result) => {
                 if (result.value) {
-                    $.post( "/api/v2/users/{{ $item->user_id }}/items/"+id+"/withdraw", function( data ) {
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    });
+
+                    $.post( "/panel/withdraw/"+id).done(function (response){
                         Swal.fire({
-                            type: 'success',
-                            title: '청약철회',
-                            text: '성공했습니다'
-                        });
-                        $("#i-"+id).css('display', 'none');
+                            title: '성공',
+                            text: '청약철회가 완료되었습니다!',
+                            type: 'success'
+                        })
+                        location.reload()
+
+                    }).fail(function (response) {
+                        Swal.fire({
+                            title: '안내',
+                            text: response.responseJSON.message,
+                            type: 'info'
+                        })
                     });
                 }
             })
