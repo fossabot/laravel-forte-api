@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Http\Controllers\DiscordNotificationController;
-use App\Models\Item;
 use App\Models\User;
 use App\Models\UserItem;
 use DB;
@@ -153,6 +152,7 @@ class UserService extends BaseService
     public function items(int $id): Collection
     {
         $user = $this->user->find($id);
+
         return UserItem::withTrashed()->whereUserId($user->id)->with('items')->get();
     }
 }
