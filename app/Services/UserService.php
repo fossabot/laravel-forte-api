@@ -151,6 +151,7 @@ class UserService extends BaseService
      */
     public function items(int $id): Collection
     {
-        return UserItem::withTrashed()->where("user_id", $this->user->find($id)->id)->with('items')->get();
+        $user = $this->user->find($id);
+        return UserItem::withTrashed()->whereUserId($user->id)->with('items')->get();
     }
 }
