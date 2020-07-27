@@ -24,18 +24,19 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
 use Throwable;
+use UnexpectedValueException;
 
 class UserController extends Controller
 {
     /**
      * @var XsollaAPIService
      */
-    protected $xsollaAPI;
+    protected XsollaAPIService $xsollaAPI;
 
     /**
      * @var UserService
      */
-    protected $userService;
+    protected UserService $userService;
 
     /**
      * UserController constructor.
@@ -389,6 +390,13 @@ class UserController extends Controller
         return view('panel', ['items' => $items, 'token' => $xsollaUrl->token, 'redirect_url' => $xsollaUrl->redirect_url]);
     }
 
+    /**
+     * @param $id
+     * @param UserItemService $userItemService
+     * @return JsonResponse
+     * @throws MessageException
+     * @throws Exception
+     */
     public function withdraw($id, UserItemService $userItemService)
     {
         $userItem = UserItem::find($id);
