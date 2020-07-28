@@ -23,10 +23,10 @@
 
 
 
-### ✨ [Demo]( https://forte.team-crescendo.me)
+### ✨ [Demo](https://forte.team-crescendo.me)
 
 ## 👀 How do we work on?
- * https://mingeun.com/2020-06-24/team-crescendo-forte-memoirs/
+ * [https://mingeun.com/2020-06-24/team-crescendo-forte-memoirs/](https://mingeun.com/2020-06-24/team-crescendo-forte-memoirs/)
 
 ## 🤔 Our infra architecture
  * AWS EC2
@@ -38,10 +38,10 @@
 - PHP 7.4+
 
 ## ⬇️ Install
-Refer to https://github.com/team-crescendo/laravel-forte-api/blob/refactoring/master/INSTALL.md
+Refer to [https://github.com/team-crescendo/laravel-forte-api/blob/master/INSTALL.md](https://github.com/team-crescendo/laravel-forte-api/blob/master/INSTALL.md)
 
 ## 💲 Usage
-Refer to https://forte.team-crescendo.me/api/documentation
+Refer to [https://forte.team-crescendo.me/api/documentation](https://forte.team-crescendo.me/api/documentation)
 
 ## ✅ Run tests
 
@@ -70,12 +70,5 @@ Contributions, issues and feature requests are welcome!<br />Feel free to check 
 
 When you are to contribute to **Forte API**, please follow these rules.
 
-### ⚒ Issue Information 
-- 이슈 라벨
-    - hotfix: 버그 발생 시 이슈 생성 후 해당 라벨을 추가합니다.
-    - database: 데이터베이스 관련된 추가/오류는 해당 라벨을 추가합니다.
-    - develop: 개발을 포함한 이슈에는 해당 라벨을 추가합니다.
-    - feature: 신규 개발 시 해당 라벨을 추가합니다.
-    
 ### 🔴 Commit Message Rules
 - [Conventional Commits](https://www.conventionalcommits.org/) 
