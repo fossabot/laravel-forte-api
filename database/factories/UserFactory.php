@@ -16,7 +16,7 @@ use Illuminate\Support\Str;
 
 $factory->define(App\Models\User::class, function (Faker $faker) {
     return [
-        'discord_id' => $faker->randomNumber(18),
+        'discord_id' => $faker->randomNumber(),
         'name' => $faker->name,
         'email' => $faker->unique()->safeEmail,
         'points' => 0,
