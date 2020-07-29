@@ -1,4 +1,4 @@
-<img width="100" align="right" src="./logo.png">
+<img width="100" align="right" src="https://raw.githubusercontent.com/team-crescendo/laravel-forte-api/master/logo.png">
 <h1 align="center" >Welcome to Forte API v2 👋</h1>
 
 <p>
