@@ -19,6 +19,11 @@ class CheckTrustIP
      */
     public function handle($request, Closure $next)
     {
+
+        if (config('app.env') === 'testing') {
+            return $next($request);
+        }
+
         if (! TrustIP::where('ip', request()->ip())->first()) {
             return new JsonResponse([
                 'error' => [
