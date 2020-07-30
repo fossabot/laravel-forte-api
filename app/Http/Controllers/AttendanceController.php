@@ -14,6 +14,7 @@ use App\Services\XsollaAPIService;
 use Carbon\Carbon;
 use DB;
 use Exception;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
@@ -34,6 +35,9 @@ class AttendanceController extends Controller
      * @var XsollaAPIService
      */
     private XsollaAPIService $xsollaAPIService;
+
+    private $attendance;
+    private $id;
 
     /**
      * AttendanceController constructor.
@@ -117,52 +121,86 @@ class AttendanceController extends Controller
      */
     public function store(string $id): JsonResponse
     {
-        $date = Carbon::now()->toDateTimeString();
-        $attendance = AttendanceV2::query()
+        $this->attendance = AttendanceV2::query()
             ->whereDiscordId($id)
             ->first();
+        $this->id = $id;
 
-        if (! $attendance) {
-            AttendanceV2::insert([
-                AttendanceV2::DISCORD_ID => $id,
-                AttendanceV2::KEY_ACQUIRED_AT => json_encode([$date]),
-            ]);
+        if ($this->isAttendanceNotExists())
+            return $this->createAttendance();
+        if ($this->isKeyOccupiedTodayExists())
+            return $this->keyOccupiedTodayExists();
+        if ($this->isExceedingKeyLimit())
+            return $this->exceedKeyLimit();
+        else
+            return $this->checkAttendance();
+    }
 
-            return new JsonResponse([
-                'status' => 'success',
-                AttendanceV2::KEY_COUNT => 1,
-            ], Response::HTTP_CREATED);
-        } else {
-            $keyAcquiredAt = collect($attendance->key_acquired_at);
+    private function isAttendanceNotExists()
+    {
+        return ! $this->attendance;
+    }
 
-            if ($keyAcquiredAt->last() && Carbon::parse($keyAcquiredAt->last())->isToday()) {
-                $timeDiff = Carbon::now()
-                    ->diff(Carbon::tomorrow())
-                    ->format('%hh %im %ss');
+    private function isKeyOccupiedTodayExists()
+    {
+        $keyAcquiredAt = collect($this->attendance->key_acquired_at);
+        return $keyAcquiredAt->last() && Carbon::parse($keyAcquiredAt->last())->isToday();
+    }
 
-                return new JsonResponse([
-                    'status' => 'exist_attendance',
-                    'diff' => $timeDiff,
-                ], Response::HTTP_CONFLICT);
-            }
+    private function isExceedingKeyLimit()
+    {
+        return $this->attendance->key_count >= self::KEY_MAX_COUNT;
+    }
 
-            if ($attendance->key_count < self::KEY_MAX_COUNT) {
-                $attendance->update([
-                    AttendanceV2::KEY_COUNT => $attendance->key_count + 1,
-                    AttendanceV2::KEY_ACQUIRED_AT => $keyAcquiredAt->push($date),
-                ]);
+    private function createAttendance()
+    {
+        $date = Carbon::now()->toDateTimeString();
 
-                return new JsonResponse([
-                    'status' => 'success',
-                    AttendanceV2::KEY_COUNT => $attendance->key_count,
-                ], Response::HTTP_OK);
-            } else {
-                return new JsonResponse([
-                    'status' => 'max_key_count',
-                    AttendanceV2::KEY_COUNT => $attendance->key_count,
-                ], Response::HTTP_CONFLICT);
-            }
-        }
+        AttendanceV2::insert([
+            AttendanceV2::DISCORD_ID => $this->id,
+            AttendanceV2::KEY_ACQUIRED_AT => json_encode([$date]),
+        ]);
+
+        return new JsonResponse([
+            'status' => 'success',
+            AttendanceV2::KEY_COUNT => 1,
+        ], Response::HTTP_CREATED);
+    }
+
+    private function checkAttendance()
+    {
+        $keyAcquiredAt = collect($this->attendance->key_acquired_at);
+        $now = Carbon::now()->toDateTimeString();
+
+        $this->attendance->update([
+            AttendanceV2::KEY_COUNT => $this->attendance->key_count + 1,
+            AttendanceV2::KEY_ACQUIRED_AT => $keyAcquiredAt->push($now),
+        ]);
+
+        return new JsonResponse([
+            'status' => 'success',
+            AttendanceV2::KEY_COUNT => $this->attendance->key_count,
+        ], Response::HTTP_OK);
+    }
+
+    private function exceedKeyLimit()
+    {
+        return new JsonResponse([
+            'status' => 'max_key_count',
+            AttendanceV2::KEY_COUNT => $this->attendance->key_count,
+        ], Response::HTTP_CONFLICT);
+    }
+
+    private function keyOccupiedTodayExists()
+    {
+        $timeDiff = Carbon::now()
+            ->diff(Carbon::tomorrow())
+            ->format('%hh %im %ss');
+
+        return new JsonResponse([
+            'status' => 'exist_attendance',
+            'diff' => $timeDiff,
+        ], Response::HTTP_CONFLICT);
     }
 
     /**
