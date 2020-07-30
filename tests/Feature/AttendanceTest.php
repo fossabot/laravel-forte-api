@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\AttendanceV2;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -37,15 +39,45 @@ class AttendanceTest extends TestCase
         $this->withoutExceptionHandling();
 
         $user = factory('App\Models\User')->create();
-
-        $this->post("api/v2/discords/$user->discord_id/attendances")->assertSee("success");
-
+        $this->post("api/v2/discords/$user->discord_id/attendances");
         $this->post("api/v2/discords/$user->discord_id/attendances")->assertSee("exist_attendance");
+
+    }
+
+    public function testCannotCheckAttendanceIfAttendanceHitMax()
+    {
+        $user = factory('App\Models\User')->create();
+        $this->post("api/v2/discords/$user->discord_id/attendances");
+
+        $attendance = AttendanceV2::query()
+            ->whereDiscordId($user->discord_id)
+            ->firstOrFail();
+
+        $attendance->key_count = 15;
+        $attendance->key_acquired_at = Carbon::yesterday();
+        $attendance->save();
+        $this->post("api/v2/discords/$user->discord_id/attendances")->assertSee("max_key_count");
     }
 
 
     public function testCanOpenBox()
     {
-        
+
+        $this->withoutExceptionHandling();
+
+
+        $user = factory('App\Models\User')->create();
+        $this->post("api/v2/discords/$user->discord_id/attendances");
+
+        $attendance = AttendanceV2::query()
+            ->whereDiscordId($user->discord_id)
+            ->firstOrFail();
+
+        $attendance->key_count = 15;
+        $attendance->save();
+
+        $this->post("api/v2/discords/$user->discord_id/attendances/unpack", [
+            "box" => "bronze"
+        ])->assertStatus(200);
     }
 }
