@@ -137,7 +137,7 @@ class AttendanceController extends Controller
             return $this->createAttendance();
         }
         if ($this->isKeyOccupiedTodayExists()) {
-            return $this->keyOccupiedTodayExists();
+            return $this->checkKeyOccupiedTodayExists();
         }
         if ($this->isExceedingKeyLimit()) {
             return $this->exceedKeyLimit();
@@ -224,7 +224,7 @@ class AttendanceController extends Controller
     /**
      * @return JsonResponse
      */
-    private function keyOccupiedTodayExists(): JsonResponse
+    private function checkKeyOccupiedTodayExists(): JsonResponse
     {
         $timeDiff = Carbon::now()
             ->diff(Carbon::tomorrow())
