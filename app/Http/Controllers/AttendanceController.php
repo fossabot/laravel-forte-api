@@ -145,24 +145,37 @@ class AttendanceController extends Controller
         }
     }
 
-    private function isAttendanceNotExists()
+    /**
+     * @return bool
+     */
+    private function isAttendanceNotExists(): bool
     {
         return ! $this->attendance;
     }
 
-    private function isKeyOccupiedTodayExists()
+    /**
+     * @return bool
+     * @throws \Carbon\Exceptions\InvalidFormatException
+     */
+    private function isKeyOccupiedTodayExists(): bool
     {
         $keyAcquiredAt = collect($this->attendance->key_acquired_at);
 
         return $keyAcquiredAt->last() && Carbon::parse($keyAcquiredAt->last())->isToday();
     }
 
-    private function isExceedingKeyLimit()
+    /**
+     * @return bool
+     */
+    private function isExceedingKeyLimit(): bool
     {
         return $this->attendance->key_count >= self::KEY_MAX_COUNT;
     }
 
-    private function createAttendance()
+    /**
+     * @return JsonResponse
+     */
+    private function createAttendance(): JsonResponse
     {
         $date = Carbon::now()->toDateTimeString();
 
@@ -177,7 +190,10 @@ class AttendanceController extends Controller
         ], Response::HTTP_CREATED);
     }
 
-    private function checkAttendance()
+    /**
+     * @return JsonResponse
+     */
+    private function checkAttendance(): JsonResponse
     {
         $keyAcquiredAt = collect($this->attendance->key_acquired_at);
         $now = Carbon::now()->toDateTimeString();
@@ -193,7 +209,10 @@ class AttendanceController extends Controller
         ], Response::HTTP_OK);
     }
 
-    private function exceedKeyLimit()
+    /**
+     * @return JsonResponse
+     */
+    private function exceedKeyLimit(): JsonResponse
     {
         return new JsonResponse([
             'status' => 'max_key_count',
@@ -201,7 +220,10 @@ class AttendanceController extends Controller
         ], Response::HTTP_CONFLICT);
     }
 
-    private function keyOccupiedTodayExists()
+    /**
+     * @return JsonResponse
+     */
+    private function keyOccupiedTodayExists(): JsonResponse
     {
         $timeDiff = Carbon::now()
             ->diff(Carbon::tomorrow())
