@@ -19,7 +19,6 @@ class CheckTrustIP
      */
     public function handle($request, Closure $next)
     {
-
         if (config('app.env') === 'testing') {
             return $next($request);
         }

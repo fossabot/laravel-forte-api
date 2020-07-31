@@ -14,7 +14,6 @@ use App\Services\XsollaAPIService;
 use Carbon\Carbon;
 use DB;
 use Exception;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
@@ -126,14 +125,17 @@ class AttendanceController extends Controller
             ->first();
         $this->id = $id;
 
-        if ($this->isAttendanceNotExists())
+        if ($this->isAttendanceNotExists()) {
             return $this->createAttendance();
-        if ($this->isKeyOccupiedTodayExists())
+        }
+        if ($this->isKeyOccupiedTodayExists()) {
             return $this->keyOccupiedTodayExists();
-        if ($this->isExceedingKeyLimit())
+        }
+        if ($this->isExceedingKeyLimit()) {
             return $this->exceedKeyLimit();
-        else
+        } else {
             return $this->checkAttendance();
+        }
     }
 
     private function isAttendanceNotExists()
@@ -144,6 +146,7 @@ class AttendanceController extends Controller
     private function isKeyOccupiedTodayExists()
     {
         $keyAcquiredAt = collect($this->attendance->key_acquired_at);
+
         return $keyAcquiredAt->last() && Carbon::parse($keyAcquiredAt->last())->isToday();
     }
 

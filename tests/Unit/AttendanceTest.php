@@ -18,16 +18,13 @@ class AttendanceTest extends TestCase
 
     public function testCanBuildPointByProbability()
     {
-
     }
 
     public function testCanCheckValidateBoxFromKeyCount()
     {
-
     }
 
     public function testCanBuildProbabilityBoxPackage()
     {
-        
     }
 }
