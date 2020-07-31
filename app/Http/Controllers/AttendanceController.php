@@ -99,6 +99,7 @@ class AttendanceController extends Controller
      *
      * @param string $id
      * @return JsonResponse
+     * @throws \Carbon\Exceptions\InvalidFormatException
      *
      * @SWG\POST(
      *     path="/discords/{discordId}/attendances",
