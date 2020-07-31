@@ -5,13 +5,10 @@ namespace Tests\Feature;
 use App\Models\AttendanceV2;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class AttendanceTest extends TestCase
 {
-
     use DatabaseMigrations;
 
     public function testCanQueryUserKeyAmount()
@@ -21,7 +18,6 @@ class AttendanceTest extends TestCase
         $user = factory('App\Models\User')->create();
 
         $this->get("api/v2/discords/$user->discord_id/attendances")->assertStatus(200);
-
     }
 
     public function testCanCheckAttendance()
@@ -30,9 +26,8 @@ class AttendanceTest extends TestCase
 
         $user = factory('App\Models\User')->create();
 
-        $this->post("api/v2/discords/$user->discord_id/attendances")->assertSee("success");
+        $this->post("api/v2/discords/$user->discord_id/attendances")->assertSee('success');
     }
-
 
     public function testCannotCheckAttendanceIfAttendanceExists()
     {
@@ -40,8 +35,7 @@ class AttendanceTest extends TestCase
 
         $user = factory('App\Models\User')->create();
         $this->post("api/v2/discords/$user->discord_id/attendances");
-        $this->post("api/v2/discords/$user->discord_id/attendances")->assertSee("exist_attendance");
-
+        $this->post("api/v2/discords/$user->discord_id/attendances")->assertSee('exist_attendance');
     }
 
     public function testCannotCheckAttendanceIfAttendanceHitMax()
@@ -56,15 +50,12 @@ class AttendanceTest extends TestCase
         $attendance->key_count = 15;
         $attendance->key_acquired_at = Carbon::yesterday();
         $attendance->save();
-        $this->post("api/v2/discords/$user->discord_id/attendances")->assertSee("max_key_count");
+        $this->post("api/v2/discords/$user->discord_id/attendances")->assertSee('max_key_count');
     }
-
 
     public function testCanOpenBox()
     {
-
         $this->withoutExceptionHandling();
-
 
         $user = factory('App\Models\User')->create();
         $this->post("api/v2/discords/$user->discord_id/attendances");
@@ -77,7 +68,7 @@ class AttendanceTest extends TestCase
         $attendance->save();
 
         $this->post("api/v2/discords/$user->discord_id/attendances/unpack", [
-            "box" => "bronze"
+            'box' => 'bronze',
         ])->assertStatus(200);
     }
 }
