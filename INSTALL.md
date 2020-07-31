@@ -92,6 +92,8 @@ $ composer install
 $ chmod -R 775 storage bootstrap/cache storage/framework storage/logs
 $ sudo chown -R $USER:www-data storage
 $ sudo chown -R $USER:www-data bootstrap/cache
+$ sudo chgrp -R www-data storage bootstrap/cache
+$ sudo chmod -R ug+rwx storage bootstrap/cache
 $ cp .env.example .env
 $ php artisan key:generate
 ```
