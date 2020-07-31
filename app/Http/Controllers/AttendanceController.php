@@ -128,17 +128,20 @@ class AttendanceController extends Controller
      */
     public function store(string $id): JsonResponse
     {
-        $this->attendance = AttendanceV2::query()
-            ->whereDiscordId($id)
-            ->first();
+        /** @var string id */
         $this->id = $id;
+        $this->attendance = AttendanceV2::query()
+            ->whereDiscordId($this->id)
+            ->first();
 
         if ($this->isAttendanceNotExists()) {
             return $this->createAttendance();
         }
+
         if ($this->isKeyOccupiedTodayExists()) {
             return $this->checkKeyOccupiedTodayExists();
         }
+
         if ($this->isExceedingKeyLimit()) {
             return $this->exceedKeyLimit();
         } else {
