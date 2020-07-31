@@ -34,17 +34,24 @@ class AttendanceController extends Controller
      * @var XsollaAPIService
      */
     private XsollaAPIService $xsollaAPIService;
-
-    private $attendance;
-    private $id;
+    /**
+     * @var string
+     */
+    private string $id;
+    /**
+     * @var AttendanceV2
+     */
+    private AttendanceV2 $attendance;
 
     /**
      * AttendanceController constructor.
      * @param AttendanceService $attendanceSerivce
      * @param XsollaAPIService $xsollaAPIService
      */
-    public function __construct(AttendanceService $attendanceSerivce, XsollaAPIService $xsollaAPIService)
-    {
+    public function __construct(
+        AttendanceService $attendanceSerivce,
+        XsollaAPIService $xsollaAPIService
+    ) {
         $this->attendanceSerivce = $attendanceSerivce;
         $this->xsollaAPIService = $xsollaAPIService;
     }
