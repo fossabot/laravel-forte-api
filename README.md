@@ -15,6 +15,7 @@
   <a href="https://github.com/team-crescendo/laravel-forte-api/graphs/commit-activity" target="_blank">
     <img alt="Maintenance" src="https://img.shields.io/badge/Maintained%3F-yes-green.svg" />
   </a>
+<a href="https://app.fossa.com/projects/git%2Bgithub.com%2Fteam-crescendo%2Flaravel-forte-api?ref=badge_shield" alt="FOSSA Status"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2Fteam-crescendo%2Flaravel-forte-api.svg?type=shield"/></a>
 
 </p>
 
@@ -72,3 +73,7 @@ When you are to contribute to **Forte API**, please follow these rules.
 
 ### 🔴 Commit Message Rules
 - [Conventional Commits](https://www.conventionalcommits.org/) 
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fteam-crescendo%2Flaravel-forte-api.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fteam-crescendo%2Flaravel-forte-api?ref=badge_large)
